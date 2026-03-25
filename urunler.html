@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ürün Kataloğu - Mühendislik Firması</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/urunler.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container header-container">
+            <a href="index.html" class="logo">
+                <i class="fa-solid fa-layer-group"></i>
+                <span class="logo-text">Mühendislik Firması</span>
+            </a>
+            <nav class="nav">
+                <ul class="nav-list">
+                    <li><a href="index.html" class="nav-link">Ana Sayfa</a></li>
+                    <li><a href="hizmetler.html" class="nav-link">Hizmetlerimiz</a></li>
+                    <li><a href="urunler.html" class="nav-link active">Ürünlerimiz</a></li>
+                    <li><a href="#" class="nav-link">Referanslar</a></li>
+                    <li><a href="#" class="nav-link">İletişim</a></li>
+                </ul>
+            </nav>
+            <a href="#" class="btn btn-primary btn-sm">Teklif Al</a>
+            <button class="mobile-menu-btn" aria-label="Menüyü Aç">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="section catalog-section">
+        <div class="container">
+            <div class="catalog-breadcrumbs">
+                <a href="index.html">Ana Sayfa</a>
+                <i class="fa-solid fa-chevron-right" style="font-size: 0.6rem;"></i>
+                <span class="current">Ürün Katalog</span>
+            </div>
+
+            <div class="catalog-layout">
+                <aside class="catalog-sidebar">
+                    <div class="sidebar-section">
+                        <h3>KATEGORİLER</h3>
+                        <div class="category-list">
+                            <button class="category-btn active">
+                                <span class="icon-text"><i class="fa-solid fa-sliders"></i> Vana Grubu</span>
+                                <span class="cat-count">24</span>
+                            </button>
+                            <button class="category-btn">
+                                <span class="icon-text"><i class="fa-solid fa-droplet"></i> Pompa Sistemleri</span>
+                                <span class="cat-count">18</span>
+                            </button>
+                            <button class="category-btn">
+                                <span class="icon-text"><i class="fa-solid fa-temperature-half"></i> Isı Değiştiriciler</span>
+                                <span class="cat-count">12</span>
+                            </button>
+                            <button class="category-btn">
+                                <span class="icon-text"><i class="fa-solid fa-microchip"></i> Otomasyon</span>
+                                <span class="cat-count">9</span>
+                            </button>
+                            <button class="category-btn">
+                                <span class="icon-text"><i class="fa-solid fa-wrench"></i> Yedek Parça</span>
+                                <span class="cat-count">45</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-section">
+                        <h3>ÖZELLİKLER</h3>
+                        <div class="filter-list">
+                            <label class="filter-label">
+                                <input type="checkbox">
+                                <span>Stokta Olanlar</span>
+                            </label>
+                            <label class="filter-label">
+                                <input type="checkbox">
+                                <span>Yeni Ürünler</span>
+                            </label>
+                            <label class="filter-label">
+                                <input type="checkbox" checked>
+                                <span>Endüstriyel Tip</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-cta">
+                        <h4>Teklif Alın</h4>
+                        <p>Projeleriniz için özel mühendislik çözümleri ve toplu siparişlerde özel fiyatlandırma için bizimle iletişime geçin.</p>
+                        <a href="#" class="btn btn-primary btn-full">İletişime Geç</a>
+                    </div>
+                </aside>
+
+                <div class="catalog-content">
+                    <div class="catalog-header">
+                        <div class="catalog-title">
+                            <h2>Vana Grubu</h2>
+                            <p>Toplam 24 ürün listeleniyor</p>
+                        </div>
+                        <div class="catalog-controls">
+                            <select class="sort-select">
+                                <option>Sıralama: Önerilen</option>
+                                <option>Fiyat: Artan</option>
+                                <option>Fiyat: Azalan</option>
+                                <option>Yeni Eklenenler</option>
+                            </select>
+                            <div class="view-toggles">
+                                <button class="view-btn active" id="gridViewBtn" title="Grid View"><i class="fa-solid fa-table-cells-large"></i></button>
+                                <button class="view-btn" id="listViewBtn" title="List View"><i class="fa-solid fa-list"></i></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="product-grid" id="productGrid">
+                        <div class="product-card">
+                            <div class="product-img-wrapper">
+                                <span class="product-badge stock">Stokta</span>
+                                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0i-1_9XkxAjSdRMyj7bPE9eN-aQDzgUxLDHaLVdCmykKDxmM14nbYGdRz4g8me_GseLWHgfIk3WLAUYtk8AM1RidTlsLO4nx6U7DNS6sR8_i215aMbZFce8QpsVNxb0w5VuO2wBlqCxv1hctRjntYW3RR1IoGzdCq6TTl8T5dTCVqtQpcamrbDeJSgVzdrZDHWAroladexbSHqHd78lTy8rLI83FjKb6nFKDxQAUhycmrRsz3d3kynLYRNSD8kzg1fgxnQf-_QHwP" alt="Küresel Vana">
+                            </div>
+                            <div class="product-info">
+                                <span class="product-cat">Endüstriyel Serisi</span>
+                                <h3 class="product-name">Küresel Vana V-101</h3>
+                                <p class="product-desc">Yüksek basınçlı buhar ve akışkan hatları için tasarlanmış DIN normlu paslanmaz çelik vana.</p>
+                                <div class="product-footer">
+                                    <span class="product-price">€245.00</span>
+                                    <a href="#" class="btn-detail">Detay Gör <i class="fa-solid fa-arrow-right"></i></a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="product-card">
+                            <div class="product-img-wrapper">
+                                <span class="product-badge new">Yeni</span>
+                                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCl6IYe6HLkjWhQsmqu66V2_r5hD1peyMIC4A3Ge3MyklGAnZoTa-8MP7Sn7pYRYi8W0HLNwRPxuvUGROwn_sEou1Mp2y8dZGAkVynLcem-82YLRnNzMbhioEm7sSeWGVz_QLLOpBDeEzuid87aZwaEIsDo4WdyyxWwno7AnRq7XbFdR3aUVCFKFhIFbGf9959ck81oYp7OQ45vI9csXz9l-21u5Vc4pXhsDY-xtq_CxFyOCeeo5OGCbmJDEaXP3tF7Jnt8ptlf4afU" alt="Yüksek Verimli Pompa">
+                            </div>
+                            <div class="product-info">
+                                <span class="product-cat">Sirkülasyon Grubu</span>
+                                <h3 class="product-name">Yüksek Verimli Pompa</h3>
+                                <p class="product-desc">IE5 enerji sınıfı, frekans konvertörlü akıllı sirkülasyon sistemi.</p>
+                                <div class="product-footer">
+                                    <span class="product-price">€1,120.00</span>
+                                    <a href="#" class="btn-detail">Detay Gör <i class="fa-solid fa-arrow-right"></i></a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="product-card">
+                            <div class="product-img-wrapper">
+                                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwRCEVTciqeNkBFI6JSprTC7LOlqY7tA0dsV3X4S9_M4cvLPe8B193LyrQnSPyRzbBxMrUMcGDljZHdDovFuSGNaJctBcDMQ-WxIu_jo0melh_KgdJK-sVW2lgIRb2CE8mE_MyaqoAVPmCWyTSdouBfp8SYHY65VRNWQZVm-bmdAaxVXueJFdUjIavsyw-OmmgsVG98pm4Z3q72IlromjzUGVAMYnPewlHD2WmfWPDxBzI2_P3HQKQVYOf31NZHlEcZceDaKV-0l0u" alt="Sürgülü Vana">
+                            </div>
+                            <div class="product-info">
+                                <span class="product-cat">Ağır Sanayi</span>
+                                <h3 class="product-name">Sürgülü Vana V-203</h3>
+                                <p class="product-desc">GGG40 dökme demir gövdeli, EPDM kaplı sürgülü endüstriyel vana.</p>
+                                <div class="product-footer">
+                                    <span class="product-price">€580.00</span>
+                                    <a href="#" class="btn-detail">Detay Gör <i class="fa-solid fa-arrow-right"></i></a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="product-card">
+                            <div class="product-img-wrapper">
+                                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBV0KJWN6xKRW7xrFcere6MJRJzuH10kpoTlYoej4T5f0V2PzGe32kNd65-TusqpqNjWgEMvymxcaX6OdabUDlbRR8LvGipkEK4-0NQE5ebNzvQjfD-RHQ2vW_melKqx9a38VYoDY_ZHSvos79rRF2PaNdd-3r2zthRZs6FIbxjC0KfatFL1Y6I0YmtbuITi3KmDJYqV_nA-BG92cS4nMKeTCFm-HhzddR76u3FYcZe6LsqJuduBTx4iStphX0R1z4Qd4iaJjAmRi6i" alt="Hidrofor">
+                            </div>
+                            <div class="product-info">
+                                <span class="product-cat">Hidrofor</span>
+                                <h3 class="product-name">Çok Kademeli Hidrofor</h3>
+                                <p class="product-desc">Toplu konut ve endüstriyel tesisler için yüksek basınçlı paket hidrofor.</p>
+                                <div class="product-footer">
+                                    <span class="product-price">€2,450.00</span>
+                                    <a href="#" class="btn-detail">Detay Gör <i class="fa-solid fa-arrow-right"></i></a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="product-card">
+                            <div class="product-img-wrapper">
+                                <span class="product-badge stock">Stokta</span>
+                                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQaiKDxEMywRO2VYcJ3jzsTKkSHVceA5HgevVgq_NsHjrykEWW3WAX1jONvx8CqHrf8kezsI_hkaKFptxVYiXo_Yfo8c7YWfg3Fmo6kR-i8D2ChTRPrkt_C7YW24asch2ayKb-kNak8qsBRlj9tN1bVLL4yc5P7U02IrelPTuBW1nCueEDopYRbCrhWi011HJzAyMHAATo9hCEYkxWx01iFMk-w8sW7MoTpcnlPLImIwChGFGEUha0To5_w6XUsnkPq4WyktX83wmq" alt="Kelebek Vana">
+                            </div>
+                            <div class="product-info">
+                                <span class="product-cat">Özel Vana</span>
+                                <h3 class="product-name">Kelebek Vana V-105</h3>
+                                <p class="product-desc">Gofret tipi paslanmaz diskli, manuel kumandalı sızdırmaz kelebek vana.</p>
+                                <div class="product-footer">
+                                    <span class="product-price">€195.00</span>
+                                    <a href="#" class="btn-detail">Detay Gör <i class="fa-solid fa-arrow-right"></i></a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="product-card">
+                            <div class="product-img-wrapper">
+                                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDiZcgCGTiwSJrrwEIVZEwEIdnaDsYCpeEpA9W6ofJg-qfraQ9q81bBM-8VmyHav7qzroPvdjn0CS2r0Id4WHqyIE2FH0ON5RPe5PQZTdqguepLIwA-EsMjwy7itOcnLHw9Nvf-bINOt5GptMniuCcKvgg0jn8RNsJJ4kCPjQiTtJJ-E-UR9bWsFf6NSaByjfmf57oq37TyLzatsLSrLEOUQa1UdwsOLzl273daGY5BR2YUuslUNporQQ1hneAq_n2_PVbEISj4YaX2" alt="Dalgıç Pompa">
+                            </div>
+                            <div class="product-info">
+                                <span class="product-cat">Drenaj Grubu</span>
+                                <h3 class="product-name">Dalgıç Pompa P-306</h3>
+                                <p class="product-desc">Kirli su ve foseptik tahliyesi için yüksek kapasiteli parçalayıcı bıçaklı pompa.</p>
+                                <div class="product-footer">
+                                    <span class="product-price">€890.00</span>
+                                    <a href="#" class="btn-detail">Detay Gör <i class="fa-solid fa-arrow-right"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pagination">
+                        <button class="page-btn"><i class="fa-solid fa-chevron-left"></i></button>
+                        <button class="page-btn active">1</button>
+                        <button class="page-btn">2</button>
+                        <button class="page-btn">3</button>
+                        <span class="page-dots">...</span>
+                        <button class="page-btn">8</button>
+                        <button class="page-btn"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <section class="newsletter-section">
+        <div class="container">
+            <div class="newsletter-wrapper">
+                <div class="newsletter-text">
+                    <h2>Güncel Kataloğumuzu İndirin</h2>
+                    <p>2024 yılı tüm ürün listesi ve teknik dökümanlar tek bir PDF'de.</p>
+                </div>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="E-posta adresiniz" required>
+                    <button type="submit">Abone Ol</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <a href="index.html" class="logo">
+                        <i class="fa-solid fa-layer-group"></i>
+                        <span class="logo-text">Mühendislik Firması</span>
+                    </a>
+                    <p>Konforunuz ve sağlığınız için en son teknoloji mühendislik çözümleriyle birleştiriyoruz. Kalite ve güvenin adresi.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+                        <a href="#"><i class="fa-brands fa-briefcase"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-links">
+                    <h3>Hızlı Bağlantılar</h3>
+                    <ul>
+                        <li><a href="index.html">Anasayfa</a></li>
+                        <li><a href="#">Hakkımızda</a></li>
+                        <li><a href="#">Projeler</a></li>
+                        <li><a href="#">İletişim</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-links">
+                    <h3>Hizmetler</h3>
+                    <ul>
+                        <li><a href="#">Klima Montaj</a></li>
+                        <li><a href="#">Kombi Bakım</a></li>
+                        <li><a href="#">Mühendislik Projelendirme</a></li>
+                        <li><a href="#">VRF Sistemleri</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-contact">
+                    <h3>Bize Ulaşın</h3>
+                    <ul>
+                        <li>
+                            <i class="fa-solid fa-location-dot"></i>
+                            <span>Mahallesi Mh. Sokak No:10, İstanbul</span>
+                        </li>
+                        <li>
+                            <i class="fa-solid fa-phone"></i>
+                            <span>+90 212 123 45 67</span>
+                        </li>
+                        <li>
+                            <i class="fa-solid fa-envelope"></i>
+                            <span>info@muhendislik.com</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <div class="copyright">
+                    © 2024 Mühendislik Firması. Tüm hakları saklıdır.
+                </div>
+                <div class="legal">
+                    <a href="#">Gizlilik Politikası</a>
+                    <a href="#">Kullanım Şartları</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script src="js/urunler.js"></script>
+</body>
+</html>

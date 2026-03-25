@@ -2,9 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const mobileBtn = document.querySelector('.mobile-menu-btn');
     const nav = document.querySelector('.nav');
 
-    // Simplistic mobile menu toggle for now (styles would need to support a class-based toggle if we had a full mobile menu overlay)
-    // Since the CSS provided hides nav on mobile, let's create a basic overlay if needed or just log for now,
-    // but to make it functional based on typically expected behavior:
+
 
     if (mobileBtn) {
         mobileBtn.addEventListener('click', () => {
