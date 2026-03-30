@@ -1,38 +1,38 @@
 <!DOCTYPE html>
 <html lang="tr">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mühendislik Firması - İdeal İklimlendirme Çözümleri</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
-    <!-- Tailwind CSS (No Preflight) for Legacy Pages -->
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>İletişim - Ilgaz Mühendislik</title>
+    <!-- Tailwind CSS ve İkonlar -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+    
     <script>
         tailwind.config = {
-            corePlugins: { preflight: false },
             theme: {
                 extend: {
-                    colors: { primary: '#d63031', 'primary-hover': '#b02626', 'dark-navy': '#151b2b', 'text-dark': '#1f2937' },
-                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                    colors: {
+                        primary: '#d63031',
+                        'primary-hover': '#b02626',
+                        'bg-soft': '#f8f9fa',
+                        'text-dark': '#1e293b',
+                        'text-muted': '#64748b',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
                 }
             }
         }
     </script>
     <style>
-        /* Polyfill for Tailwind borders without preflight */
-        header *, footer * { box-sizing: border-box; border-width: 0; border-style: solid; border-color: #e5e7eb; }
-        .border-b { border-bottom-width: 1px; border-color: #f3f4f6; }
-        .border-t-4 { border-top-width: 4px; border-color: #d63031; }
-        .border-t { border-top-width: 1px; border-color: rgba(255,255,255,0.05); }
+        body { background-color: #f8f9fa; }
     </style>
 </head>
-
-<body>
+<body class="text-text-dark font-sans flex flex-col min-h-screen">
+    
     <!-- Header -->
     <!-- Top Bar (Red thin bar) -->
     <div class="bg-primary text-white text-[0.7rem] py-1.5 hidden sm:block">
@@ -68,7 +68,10 @@
                 <a href="hakkimizda.html" class="text-xs font-bold text-gray-800 hover:text-primary transition tracking-wider uppercase">Hakkımızda</a>
                 <a href="hizmetler.html" class="text-xs font-bold text-gray-800 hover:text-primary transition tracking-wider uppercase">Hizmetlerimiz</a>
                 <a href="urunler.html" class="text-xs font-bold text-gray-800 hover:text-primary transition tracking-wider uppercase">Ürünlerimiz</a>
-                <a href="iletisim.html" class="text-xs font-bold text-gray-800 hover:text-primary transition tracking-wider uppercase">İletişim</a>
+                <div class="relative flex flex-col items-center group">
+                    <a href="iletisim.html" class="text-xs font-bold text-primary transition tracking-wider uppercase pb-1">İletişim</a>
+                    <div class="absolute bottom-0 w-full h-0.5 bg-primary"></div>
+                </div>
             </nav>
             
             <!-- Actions -->
@@ -86,157 +89,107 @@
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <h1 class="hero-title">İdeal İklimlendirme<br>Çözümleriyle Tanışın</h1>
-                <p class="hero-desc">Mühendislik uzmanlığımızla konforlu, verimli ve sağlıklı yaşam alanları
-                    yaratıyoruz.</p>
-                <div class="hero-buttons">
-                    <a href="#" class="btn btn-primary">Ürünleri Keşfet</a>
-                    <a href="#" class="btn btn-outline">Bize Ulaşın</a>
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl mx-auto w-full px-6 py-12 md:py-20">
+        <!-- İletişim Header -->
+        <div class="max-w-3xl mb-12">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-[#111827] mb-6 tracking-tight">İletişim</h1>
+            <p class="text-lg text-text-muted leading-relaxed">Projeleriniz için profesyonel mühendislik çözümleri sunuyoruz. Bize aşağıdaki kanallardan ulaşabilir veya formu doldurabilirsiniz.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+            <!-- Left Column: Form -->
+            <div class="bg-white p-8 md:p-10 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] h-full">
+                <h2 class="text-2xl font-bold mb-8">Bize Yazın</h2>
+                
+                <form class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Adınız Soyadınız</label>
+                            <input type="text" placeholder="John Doe" class="w-full bg-gray-50 border border-gray-100 rounded-lg px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">E-posta Adresiniz</label>
+                            <input type="email" placeholder="ornek@mail.com" class="w-full bg-gray-50 border border-gray-100 rounded-lg px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Konu</label>
+                        <input type="text" placeholder="Hizmetlerimiz hakkında bilgi" class="w-full bg-gray-50 border border-gray-100 rounded-lg px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Mesajınız</label>
+                        <textarea rows="5" placeholder="Mesajınızı buraya yazınız..." class="w-full bg-gray-50 border border-gray-100 rounded-lg px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors resize-none"></textarea>
+                    </div>
+                    
+                    <button type="button" class="w-full bg-[#d63031] hover:bg-[#b02626] text-white font-bold py-4 rounded-lg flex items-center justify-center gap-2 transition-colors">
+                        Gönder <i class="fa-solid fa-paper-plane text-sm ml-1"></i>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Right Column: Info Cards & Map -->
+            <div class="flex flex-col gap-6">
+                <!-- Info Cards Row 1 -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <!-- Telefon -->
+                    <div class="bg-red-50/70 p-8 rounded-2xl border border-red-100/50">
+                        <div class="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center text-xl mb-5 shadow-sm">
+                            <i class="fa-solid fa-phone"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Telefon</h3>
+                        <p class="text-text-muted">+90 (212) 555 00 00</p>
+                    </div>
+                    <!-- E-posta -->
+                    <div class="bg-red-50/70 p-8 rounded-2xl border border-red-100/50">
+                        <div class="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center text-xl mb-5 shadow-sm">
+                            <i class="fa-solid fa-envelope"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">E-posta</h3>
+                        <p class="text-text-muted">info@ilgazmuhendislik.com</p>
+                    </div>
+                </div>
+
+                <!-- Adres -->
+                <div class="bg-red-50/70 p-8 rounded-2xl border border-red-100/50">
+                    <div class="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center text-xl mb-5 shadow-sm">
+                        <i class="fa-solid fa-location-dot"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">Adres</h3>
+                    <p class="text-text-muted">Atatürk Bulvarı, No: 123, Kat: 5, Ofis: 42, Çankaya, Ankara</p>
+                </div>
+
+                <!-- Google Maps Mockup -->
+                <div class="relative w-full h-[280px] bg-gray-200 rounded-2xl overflow-hidden shadow-inner group">
+                    <!-- Abstract Map Background Graphic -->
+                    <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(#64748b 1px, transparent 1px); background-size: 20px 20px;"></div>
+                    <!-- Diagonal Map Paths -->
+                    <svg class="absolute inset-0 w-full h-full text-gray-300 opacity-60" viewBox="0 0 100 100" preserveAspectRatio="none">
+                        <path d="M0,30 L40,40 L100,20 M20,100 L40,40 L60,100 M0,80 L100,60" fill="none" stroke="currentColor" stroke-width="2"></path>
+                    </svg>
+                    
+                    <!-- Center Pin -->
+                    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center drop-shadow-md">
+                        <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-lg mb-2 relative z-10">
+                            <i class="fa-solid fa-location-dot text-3xl text-primary"></i>
+                        </div>
+                        <div class="bg-white px-4 py-1.5 rounded-full shadow-md text-xs font-bold tracking-wide uppercase">
+                            Ofis Konumumuz
+                        </div>
+                        <!-- Pin shadow -->
+                        <div class="w-4 h-1 bg-black/20 rounded-[50%] blur-sm mt-3"></div>
+                    </div>
+
+                    <!-- Open in maps button -->
+                    <a href="#" class="absolute bottom-4 right-4 bg-[#d63031] hover:bg-[#b02626] text-white text-xs font-bold px-4 py-2.5 rounded-lg flex items-center gap-2 shadow-lg transition-colors z-20">
+                        Google Haritalarda Aç <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </a>
                 </div>
             </div>
         </div>
-    </section>
-
-    <!-- Services Section -->
-    <section class="section services">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Hizmetlerimiz</h2>
-                <a href="#" class="link-arrow">Tümünü Gör <i class="fa-solid fa-arrow-right"></i></a>
-            </div>
-
-            <div class="services-grid">
-                <!-- Service 1 -->
-                <div class="service-card">
-                    <div class="icon-box">
-                        <i class="fa-solid fa-wrench"></i>
-                    </div>
-                    <h3>Kurulum</h3>
-                    <p>Uzman ekibimizle profesyonel, temiz ve garantili montaj hizmetleri sunuyoruz.</p>
-                </div>
-
-                <!-- Service 2 -->
-                <div class="service-card">
-                    <div class="icon-box">
-                        <i class="fa-solid fa-shield-halved"></i>
-                    </div>
-                    <h3>Bakım</h3>
-                    <p>Sistemlerinizin verimliliği ve uzun ömrü için periyodik bakım paketleri.</p>
-                </div>
-
-                <!-- Service 3 -->
-                <div class="service-card">
-                    <div class="icon-box">
-                        <i class="fa-solid fa-clipboard-check"></i>
-                    </div>
-                    <h3>Danışmanlık</h3>
-                    <p>Projenize en uygun iklimlendirme çözümleri için ücretsiz keşif ve rehberlik.</p>
-                </div>
-
-                <!-- Service 4 -->
-                <div class="service-card">
-                    <div class="icon-box">
-                        <i class="fa-solid fa-screwdriver-wrench"></i>
-                    </div>
-                    <h3>Onarım</h3>
-                    <p>7/24 teknik servis desteği ile hızlı ve güvenilir arıza tespit ve onarım.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Product Categories -->
-    <section class="section categories">
-        <div class="container">
-            <div class="section-top">
-                <h2 class="section-title">Ürün Kategorileri</h2>
-                <p class="section-subtitle">Ev ve iş yeriniz için en kaliteli çözümler.</p>
-            </div>
-
-            <div class="categories-grid">
-                <div class="category-card"
-                    style="background-image: linear-gradient(to top, rgba(0,0,0,0.7), transparent), url('https://images.unsplash.com/photo-1615873968403-89e06cfa5b08?q=80&w=800&auto=format&fit=crop');">
-                    <div class="category-content">
-                        <span class="badge">YENİ TEKNOLOJİ</span>
-                        <h3>Klimalar</h3>
-                        <p>Yüksek enerji tasarruflu, sessiz çalışan ve ortam havasını temizleyen modern split ve salon
-                            tipi klimalar.</p>
-                        <a href="#" class="btn btn-glass">Ürünleri İncele <i class="fa-solid fa-arrow-right"></i></a>
-                    </div>
-                </div>
-
-                <div class="category-card"
-                    style="background-image: linear-gradient(to top, rgba(0,0,0,0.7), transparent), url('https://images.unsplash.com/photo-1507646227500-4d389b0012be?q=80&w=800&auto=format&fit=crop');">
-                    <div class="category-content">
-                        <span class="badge">KIŞA HAZIRLIK</span>
-                        <h3>Kombiler</h3>
-                        <p>Tam yoğuşmalı, kompakt tasarıma sahip yüksek verimlilik sunan kombi modelleri ile tasarruf
-                            edin.</p>
-                        <a href="#" class="btn btn-glass">Ürünleri İncele <i class="fa-solid fa-arrow-right"></i></a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Why Us Section -->
-    <section class="section why-us">
-        <div class="container">
-            <div class="why-us-header">
-                <h2 class="section-title center">Neden Bizi Seçmelisiniz?</h2>
-                <p class="section-subtitle center">Yılların verdiği tecrübe ve mühendislik bilgisiyle, iklimlendirme
-                    ihtiyaçlarınızda en doğru partneriniz olmaya adayız.</p>
-            </div>
-
-            <div class="why-us-grid">
-                <div class="feature-item">
-                    <div class="feature-icon-circle">
-                        <i class="fa-solid fa-user-group"></i>
-                    </div>
-                    <h3>Uzman Mühendis Kadrosu</h3>
-                    <p>Sadece satış değil, mühendislik hesaplamalarıyla alanınıza en uygun cihazı öneriyoruz.</p>
-                </div>
-
-                <div class="feature-item">
-                    <div class="feature-icon-circle">
-                        <i class="fa-solid fa-certificate"></i>
-                    </div>
-                    <h3>Premium Markalar</h3>
-                    <p>Dünya standartlarında kalite ve güvenilirliği kanıtlanmış iklimlendirme markalarının yetkili
-                        satıcısıyız.</p>
-                </div>
-
-                <div class="feature-item">
-                    <div class="feature-icon-circle">
-                        <i class="fa-solid fa-face-smile"></i>
-                    </div>
-                    <h3>%100 Müşteri Memnuniyeti</h3>
-                    <p>Satış sonrası 7/24 destek ve hızlı servis ağımızla müşterilerimizin her zaman yanındayız.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- CTA Section -->
-    <section class="section cta-section">
-        <div class="container">
-            <div class="cta-box">
-                <div class="cta-content">
-                    <h2>Hemen Ücretsiz Keşif Randevusu Alın</h2>
-                    <p>Mühendislerimiz yerinde inceleme yaparak ihtiyacınıza en uygun çözümü size sunsun. Konforlu bir
-                        adım daha yaklaşın.</p>
-                    <div class="cta-buttons">
-                        <a href="#" class="btn btn-light">Randevu Oluştur</a>
-                        <a href="#" class="btn btn-outline-light">Bizi Arayın</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    </main>
 
     <!-- Footer -->
     <!-- Footer - Dark Version -->
@@ -319,7 +272,5 @@
         </div>
     </footer>
 
-    <script src="js/script.js"></script>
 </body>
-
 </html>

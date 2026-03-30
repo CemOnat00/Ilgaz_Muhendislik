@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Hakkımızda - Ilgaz Mühendislik</title>
+    <!-- Tailwind CSS ve İkonlar -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#d63031',
+                        'primary-hover': '#b02626',
+                        'dark-navy': '#151b2b',
+                        'text-dark': '#1f2937',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 text-text-dark font-sans antialiased text-[15px] selection:bg-primary selection:text-white flex flex-col min-h-screen">
+
+    <!-- Top Bar (Red thin bar) -->
+    <div class="bg-primary text-white text-[0.7rem] py-1.5 hidden sm:block">
+        <div class="max-w-[1440px] mx-auto px-6 flex justify-between items-center">
+            <div class="flex items-center gap-6 font-medium tracking-wider">
+                <span class="flex items-center gap-2"><i class="fa-solid fa-phone"></i> +90 (312) 555 45 67</span>
+                <span class="flex items-center gap-2"><i class="fa-solid fa-envelope"></i> info@ilgazmuhendislik.com</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="#" class="hover:text-gray-200 transition"><i class="fa-solid fa-share-nodes"></i></a>
+                <a href="#" class="hover:text-gray-200 transition font-bold">TR</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-[1440px] mx-auto px-6 h-20 flex items-center justify-between">
+            <!-- Logo -->
+            <a href="index.html" class="flex items-center gap-3">
+                <!-- Red abstract logo icon -->
+                <div class="w-7 h-10 bg-primary transform skew-x-[-20deg] flex items-center justify-center rounded-sm">
+                    <div class="w-1 h-6 bg-white transform skew-x-[20deg]"></div>
+                </div>
+                <div class="flex flex-col uppercase leading-none tracking-tighter justify-center pt-1">
+                    <span class="font-black text-xl text-gray-900 tracking-tight">ILGAZ</span>
+                    <span class="font-bold text-[0.55rem] tracking-widest text-primary mt-0.5">MÜHENDİSLİK</span>
+                </div>
+            </a>
+            
+            <!-- Navbar -->
+            <nav class="hidden lg:flex items-center gap-8">
+                <div class="relative flex flex-col items-center group">
+                    <a href="hakkimizda.html" class="text-xs font-bold text-primary transition tracking-wider uppercase pb-1">Hakkımızda</a>
+                    <div class="absolute bottom-0 w-full h-0.5 bg-primary"></div>
+                </div>
+                <a href="hizmetler.html" class="text-xs font-bold text-gray-800 hover:text-primary transition tracking-wider uppercase">Hizmetlerimiz</a>
+                <a href="urunler.html" class="text-xs font-bold text-gray-800 hover:text-primary transition tracking-wider uppercase">Ürünlerimiz</a>
+                <a href="iletisim.html" class="text-xs font-bold text-gray-800 hover:text-primary transition tracking-wider uppercase">İletişim</a>
+            </nav>
+            
+            <!-- Actions -->
+            <div class="flex items-center gap-5">
+                <button class="text-gray-600 hover:text-primary transition text-lg hidden sm:block">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+                <a href="#" class="hidden sm:inline-flex bg-primary hover:bg-primary-hover text-white text-xs font-bold px-6 py-2.5 rounded-md transition-colors uppercase tracking-wide shadow-md shadow-red-500/20">
+                    Teklif Al
+                </a>
+                <button class="lg:hidden text-gray-800 text-xl">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow">
+        
+        <!-- Hero Section (Dark Image BG) -->
+        <section class="relative bg-gray-900 pt-24 pb-48 px-6 overflow-hidden">
+            <!-- Background Image -->
+            <div class="absolute inset-0 opacity-40">
+                <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2000&auto=format&fit=crop" class="w-full h-full object-cover filter blur-[2px]" alt="Office Interior"/>
+            </div>
+            <!-- Overlay Gradient -->
+            <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/60 to-transparent"></div>
+            
+            <div class="relative z-10 max-w-4xl mx-auto text-center mt-8">
+                <h1 class="text-5xl md:text-7xl font-black text-white mb-6 tracking-tight drop-shadow-lg">Hakkımızda</h1>
+                <p class="text-lg md:text-xl text-gray-200 leading-relaxed font-medium px-4 max-w-3xl mx-auto">
+                    25 yılı aşkın tecrübemizle mühendislik dünyasında güven inşa ediyor, geleceğin şaheserlerini bugünden tasarlıyoruz.
+                </p>
+            </div>
+        </section>
+
+        <!-- Stats Cards (Overlapping) -->
+        <section class="relative z-20 max-w-[1200px] mx-auto px-6 -mt-24 mb-20">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                
+                <div class="bg-white rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] p-6 md:p-8 text-center border-b-4 border-primary transform hover:-translate-y-2 transition-transform duration-300">
+                    <h3 class="text-3xl md:text-5xl font-black text-gray-900 mb-2">25+</h3>
+                    <p class="text-[0.65rem] md:text-xs font-bold text-gray-500 uppercase tracking-widest">Yıllık Deneyim</p>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] p-6 md:p-8 text-center border-b-4 border-primary transform hover:-translate-y-2 transition-transform duration-300">
+                    <h3 class="text-3xl md:text-5xl font-black text-gray-900 mb-2">1000+</h3>
+                    <p class="text-[0.65rem] md:text-xs font-bold text-gray-500 uppercase tracking-widest">Tamamlanan Proje</p>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] p-6 md:p-8 text-center border-b-4 border-primary transform hover:-translate-y-2 transition-transform duration-300">
+                    <h3 class="text-3xl md:text-5xl font-black text-gray-900 mb-2">50+</h3>
+                    <p class="text-[0.65rem] md:text-xs font-bold text-gray-500 uppercase tracking-widest">Uzman Personel</p>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] p-6 md:p-8 text-center border-b-4 border-primary transform hover:-translate-y-2 transition-transform duration-300">
+                    <h3 class="text-3xl md:text-5xl font-black text-gray-900 mb-2">900+</h3>
+                    <p class="text-[0.65rem] md:text-xs font-bold text-gray-500 uppercase tracking-widest">Mutlu Müşteri</p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- About Text & Masonry Grid -->
+        <section class="max-w-[1240px] mx-auto px-6 mb-24">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                
+                <!-- Left Text -->
+                <div class="pr-0 md:pr-8">
+                    <h4 class="text-primary font-bold text-xs uppercase tracking-widest mb-3">Biz Kimiz?</h4>
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-6 leading-tight tracking-tight">Çeyrek Asırlık Mühendislik Serüveni</h2>
+                    
+                    <div class="space-y-5 text-gray-600 leading-relaxed text-[15px]">
+                        <p>
+                            Ilgaz Mühendislik, 1999 yılında etik değerler ve yenilikçi çözümler üretme vizyonuyla temellerini attı. Kuruluşumuzdan bu yana, karmaşık mühendislik problemlerine sürdürülebilir ve ekonomik yanıtlar üreterek sektörde güvenin simgesi haline geldik.
+                        </p>
+                        <p>
+                            Bugün, Türkiye'nin dört bir yanında imza attığımız dev projelerle, sadece yapılar değil, aynı zamanda gelecek nesiller için sağlam temeller inşa ediyoruz. Teknoloji odaklı yaklaşımımızla, geleneksel mühendislik disiplinlerini modern sistemlerle harmanlıyoruz.
+                        </p>
+                        <p>
+                            Dinamik ekibimiz, her projede sürdürülebilirlik, iş güvenliği ve mükemmeliyetçilik prensiplerinden ödün vermeden yoluna devam etmektedir.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Right Masonry Images -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-4">
+                        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=600&auto=format&fit=crop" class="w-full h-48 object-cover rounded-xl shadow-lg" alt="Team member 1"/>
+                        <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=600&auto=format&fit=crop" class="w-full h-64 object-cover rounded-xl shadow-lg" alt="Team member 2"/>
+                    </div>
+                    <div class="space-y-4 pt-12">
+                        <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=600&auto=format&fit=crop" class="w-full h-64 object-cover rounded-xl shadow-lg" alt="Team member 3"/>
+                        <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=600&auto=format&fit=crop" class="w-full h-48 object-cover rounded-xl shadow-lg" alt="Team member 4"/>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Misyon / Vizyon -->
+        <section class="max-w-[1240px] mx-auto px-6 mb-24">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <!-- Misyon -->
+                <div class="bg-red-50 p-10 md:p-14 rounded-3xl border border-red-100 hover:shadow-lg transition-shadow">
+                    <div class="w-12 h-12 bg-white text-primary rounded-full flex items-center justify-center text-2xl shadow-sm mb-6">
+                        <i class="fa-solid fa-rocket"></i>
+                    </div>
+                    <h3 class="text-2xl font-extrabold text-gray-900 mb-4">Misyonumuz</h3>
+                    <p class="text-gray-600 leading-relaxed text-[15px]">
+                        Mühendislik standartlarını en üst seviyeye taşıyarak, topluma ve çevreye duyarlı, yüksek kaliteli ve güvenli yaşam alanları tasarlamak. Her projemizde verimliliği ve inovasyonu ön planda tutarak paydaşlarımıza değer katmak.
+                    </p>
+                </div>
+
+                <!-- Vizyon -->
+                <div class="bg-dark-navy p-10 md:p-14 rounded-3xl text-white shadow-xl">
+                    <div class="w-12 h-12 bg-white/10 text-primary rounded-full flex items-center justify-center text-2xl mb-6">
+                        <i class="fa-solid fa-eye"></i>
+                    </div>
+                    <h3 class="text-2xl font-extrabold mb-4">Vizyonumuz</h3>
+                    <p class="text-gray-300 leading-relaxed text-[15px]">
+                        Küresel ölçekte tanınan, mühendislik teknolojilerine yön veren ve sektördeki değişimlerin öncüsü olan lider bir kuruluş olmak. Geleceğin akıllı şehirlerini ve endüstriyel tesislerini inşa eden ana güç haline gelmek.
+                    </p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Team Section -->
+        <section class="max-w-[1240px] mx-auto px-6 mb-24">
+            
+            <div class="text-center mb-16">
+                <h4 class="text-primary font-bold text-xs uppercase tracking-widest mb-3">Gücümüz Ekibimizden Geliyor</h4>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">Uzman Ekibimizle Tanışın</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                
+                <!-- Person 1 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-gray-100 group">
+                    <div class="aspect-[4/5] overflow-hidden bg-gray-100">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=600&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Ahmet Ilgaz"/>
+                    </div>
+                    <div class="p-6 text-center">
+                        <h4 class="text-lg font-bold text-gray-900 mb-1">Ahmet Ilgaz</h4>
+                        <p class="text-primary text-[0.65rem] font-bold uppercase tracking-widest">Kurucu & Genel Müdür</p>
+                    </div>
+                </div>
+
+                <!-- Person 2 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-gray-100 group">
+                    <div class="aspect-[4/5] overflow-hidden bg-gray-100">
+                        <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=600&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Ayşe Yılmaz"/>
+                    </div>
+                    <div class="p-6 text-center">
+                        <h4 class="text-lg font-bold text-gray-900 mb-1">Ayşe Yılmaz</h4>
+                        <p class="text-primary text-[0.65rem] font-bold uppercase tracking-widest">Baş Proje Mühendisi</p>
+                    </div>
+                </div>
+
+                <!-- Person 3 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-gray-100 group">
+                    <div class="aspect-[4/5] overflow-hidden bg-gray-100">
+                        <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=600&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Mehmet Kaya"/>
+                    </div>
+                    <div class="p-6 text-center">
+                        <h4 class="text-lg font-bold text-gray-900 mb-1">Mehmet Kaya</h4>
+                        <p class="text-primary text-[0.65rem] font-bold uppercase tracking-widest">Şantiye Koordinatörü</p>
+                    </div>
+                </div>
+
+                <!-- Person 4 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-gray-100 group">
+                    <div class="aspect-[4/5] overflow-hidden bg-gray-100">
+                        <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=600&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Zeynep Demir"/>
+                    </div>
+                    <div class="p-6 text-center">
+                        <h4 class="text-lg font-bold text-gray-900 mb-1">Zeynep Demir</h4>
+                        <p class="text-primary text-[0.65rem] font-bold uppercase tracking-widest">Mekanik Tasarım Lideri</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Bottom CTA -->
+        <section class="max-w-[1240px] mx-auto px-6 mb-12">
+            <div class="bg-gradient-to-r from-primary to-[#ff4757] rounded-3xl p-10 md:p-14 text-white shadow-xl shadow-red-500/20 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
+                <!-- Abstract circle -->
+                <div class="absolute -right-20 -top-20 w-64 h-64 bg-white opacity-10 rounded-full blur-2xl"></div>
+                
+                <div class="relative z-10 max-w-xl text-center md:text-left">
+                    <h2 class="text-3xl md:text-4xl font-extrabold mb-4 tracking-tight">Bir sonraki projenizi birlikte inşa edelim.</h2>
+                    <p class="text-red-100 text-base leading-relaxed">
+                        Uzman kadromuzla projelerinizde en doğru mühendislik çözümleri için hemen bizimle iletişime geçin.
+                    </p>
+                </div>
+                
+                <div class="relative z-10 shrink-0">
+                    <a href="iletisim.html" class="inline-flex bg-white text-primary font-extrabold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-transform uppercase tracking-wider text-sm">
+                        Hemen Teklif Al
+                    </a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer - Dark Version -->
+    <footer class="bg-dark-navy pt-20 pb-10 text-sm border-t-4 border-primary">
+        <div class="max-w-[1440px] mx-auto px-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-16">
+                
+                <!-- Brand -->
+                <div class="col-span-1">
+                    <a href="index.html" class="flex items-center gap-3 mb-6">
+                        <div class="w-7 h-9 bg-primary transform skew-x-[-15deg] flex items-center justify-center rounded-sm">
+                            <div class="w-1 h-5 bg-white transform skew-x-[15deg]"></div>
+                        </div>
+                        <div class="flex flex-col uppercase leading-none tracking-tighter justify-center pt-1">
+                            <span class="font-black text-xl text-white tracking-tight">ILGAZ</span>
+                            <span class="font-bold text-[0.55rem] tracking-widest text-primary mt-0.5">MÜHENDİSLİK</span>
+                        </div>
+                    </a>
+                    <p class="text-gray-400 leading-relaxed font-medium text-[13px] mb-6">
+                        Sektördeki 25 yıllık tecrübemizle, güvenilirlik ve kalite prensiplerimizden ödün vermeden mühendislik hizmetleri sunuyoruz.
+                    </p>
+                    <div class="flex gap-3">
+                        <a href="#" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-primary hover:text-white transition"><i class="fa-brands fa-linkedin-in text-xs"></i></a>
+                        <a href="#" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-primary hover:text-white transition"><i class="fa-brands fa-twitter text-xs"></i></a>
+                        <a href="#" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-primary hover:text-white transition"><i class="fa-brands fa-instagram text-xs"></i></a>
+                    </div>
+                </div>
+                
+                <!-- Hızlı Menü -->
+                <div>
+                    <h3 class="font-bold text-white mb-6 text-sm tracking-wide">Hızlı Menü</h3>
+                    <ul class="flex flex-col gap-3 text-gray-400 font-medium text-[13px]">
+                        <li><a href="#" class="hover:text-primary transition flex items-center gap-2"><div class="w-1 h-1 bg-primary rounded-full"></div> Ana Sayfa</a></li>
+                        <li><a href="#" class="hover:text-primary transition flex items-center gap-2"><div class="w-1 h-1 bg-primary rounded-full"></div> Hakkımızda</a></li>
+                        <li><a href="#" class="hover:text-primary transition flex items-center gap-2"><div class="w-1 h-1 bg-primary rounded-full"></div> Projelerimiz</a></li>
+                        <li><a href="#" class="hover:text-primary transition flex items-center gap-2"><div class="w-1 h-1 bg-primary rounded-full"></div> Hizmet Alanları</a></li>
+                        <li><a href="#" class="hover:text-primary transition flex items-center gap-2"><div class="w-1 h-1 bg-primary rounded-full"></div> İnsan Kaynakları</a></li>
+                        <li><a href="#" class="hover:text-primary transition flex items-center gap-2"><div class="w-1 h-1 bg-primary rounded-full"></div> İletişim</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Hizmetlerimiz -->
+                <div>
+                    <h3 class="font-bold text-white mb-6 text-sm tracking-wide">Hizmetlerimiz</h3>
+                    <ul class="flex flex-col gap-3 text-gray-400 font-medium text-[13px]">
+                        <li><a href="#" class="hover:text-primary transition">Statik Proje Tasarımı</a></li>
+                        <li><a href="#" class="hover:text-primary transition">Endüstriyel Yapılar</a></li>
+                        <li><a href="#" class="hover:text-primary transition">Zemin Etüdü & Analizi</a></li>
+                        <li><a href="#" class="hover:text-primary transition">Müşavirlik & Denetim</a></li>
+                        <li><a href="#" class="hover:text-primary transition">Güçlendirme Projeleri</a></li>
+                    </ul>
+                </div>
+                
+                <!-- İletişim -->
+                <div>
+                    <h3 class="font-bold text-white mb-6 text-sm tracking-wide">İletişim</h3>
+                    <ul class="flex flex-col gap-4 text-gray-400 font-medium text-[13px]">
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-location-dot text-primary mt-1"></i>
+                            <span class="leading-relaxed">Merkez Mah. Mühendis Sk.<br>No: 24, Şişli / İstanbul</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fa-solid fa-phone text-primary"></i>
+                            <span>+90 212 123 45 67</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fa-solid fa-envelope text-primary"></i>
+                            <span class="break-all">info@ilgazmuhendislik.com</span>
+                        </li>
+                    </ul>
+                </div>
+                
+            </div>
+            
+            <!-- Bottom -->
+            <div class="pt-8 border-t border-white/5 text-gray-500 font-medium text-xs text-center">
+                <p>&copy; 2024 Ilgaz Mühendislik A.Ş. Tüm hakları saklıdır.</p>
+            </div>
+            
+        </div>
+    </footer>
+
+</body>
+</html>

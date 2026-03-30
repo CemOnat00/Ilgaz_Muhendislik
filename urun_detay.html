@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Ürün Detayı - Yüksek Basınçlı Buhar Vanası</title>
+    <!-- Tailwind CSS ve İkonlar -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#d63031',
+                        'primary-hover': '#b02626',
+                        'bg-soft': '#fdfdfd',
+                        'text-dark': '#111827',
+                        'text-muted': '#6b7280',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-white text-text-dark font-sans antialiased text-sm md:text-base selection:bg-primary selection:text-white">
+
+    <!-- Header -->
+    <!-- Top Bar (Red thin bar) -->
+    <div class="bg-primary text-white text-[0.7rem] py-1.5 hidden sm:block">
+        <div class="max-w-[1440px] mx-auto px-6 flex justify-between items-center">
+            <div class="flex items-center gap-6 font-medium tracking-wider">
+                <span class="flex items-center gap-2"><i class="fa-solid fa-phone"></i> +90 (312) 555 45 67</span>
+                <span class="flex items-center gap-2"><i class="fa-solid fa-envelope"></i> info@ilgazmuhendislik.com</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="#" class="hover:text-gray-200 transition"><i class="fa-solid fa-share-nodes"></i></a>
+                <a href="#" class="hover:text-gray-200 transition font-bold">TR</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-[1440px] mx-auto px-6 h-20 flex items-center justify-between">
+            <!-- Logo -->
+            <a href="index.html" class="flex items-center gap-3">
+                <!-- Red abstract logo icon -->
+                <div class="w-7 h-10 bg-primary transform skew-x-[-20deg] flex items-center justify-center rounded-sm">
+                    <div class="w-1 h-6 bg-white transform skew-x-[20deg]"></div>
+                </div>
+                <div class="flex flex-col uppercase leading-none tracking-tighter justify-center pt-1">
+                    <span class="font-black text-xl text-gray-900 tracking-tight">ILGAZ</span>
+                    <span class="font-bold text-[0.55rem] tracking-widest text-primary mt-0.5">MÜHENDİSLİK</span>
+                </div>
+            </a>
+            
+            <!-- Navbar -->
+            <nav class="hidden lg:flex items-center gap-8">
+                <a href="hakkimizda.html" class="text-xs font-bold text-gray-800 hover:text-primary transition tracking-wider uppercase">Hakkımızda</a>
+                <a href="hizmetler.html" class="text-xs font-bold text-gray-800 hover:text-primary transition tracking-wider uppercase">Hizmetlerimiz</a>
+                <a href="urunler.html" class="text-xs font-bold text-gray-800 hover:text-primary transition tracking-wider uppercase">Ürünlerimiz</a>
+                <a href="iletisim.html" class="text-xs font-bold text-gray-800 hover:text-primary transition tracking-wider uppercase">İletişim</a>
+            </nav>
+            
+            <!-- Actions -->
+            <div class="flex items-center gap-5">
+                <button class="text-gray-600 hover:text-primary transition text-lg hidden sm:block">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+                <a href="#" class="hidden sm:inline-flex bg-primary hover:bg-primary-hover text-white text-xs font-bold px-6 py-2.5 rounded-md transition-colors uppercase tracking-wide shadow-md shadow-red-500/20">
+                    Teklif Al
+                </a>
+                <button class="lg:hidden text-gray-800 text-xl">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-[1440px] mx-auto px-6 py-8 md:py-12">
+        
+        <!-- Top Controls: Back Button & Breadcrumbs -->
+        <div class="flex flex-col md:flex-row md:items-center gap-4 md:gap-6 mb-8">
+            <a href="urunler.html" class="inline-flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-primary transition-colors bg-gray-50 hover:bg-red-50 px-4 py-2 rounded-lg border border-gray-100 w-max shadow-sm">
+                <i class="fa-solid fa-arrow-left text-xs"></i> Geri
+            </a>
+            <div class="hidden md:block w-px h-5 bg-gray-200"></div>
+            <!-- Breadcrumbs -->
+            <div class="flex flex-wrap items-center gap-2 text-[0.65rem] font-bold text-gray-400 uppercase tracking-widest">
+                <a href="urunler.html" class="hover:text-primary transition">Ürünler</a>
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                <span class="text-primary">Yüksek Basınçlı Buhar Vanası</span>
+            </div>
+        </div>
+
+        <!-- YUKSEL SECTION 1: Product Top -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 xl:gap-20 mb-20">
+            
+            <!-- Sol: Ürün Görselleri -->
+            <div class="flex flex-col gap-4 w-full">
+                <!-- Ana Görsel -->
+                <div class="w-full aspect-[4/3] bg-gray-50 rounded-2xl flex items-center justify-center p-8 border border-gray-100 overflow-hidden">
+                    <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0i-1_9XkxAjSdRMyj7bPE9eN-aQDzgUxLDHaLVdCmykKDxmM14nbYGdRz4g8me_GseLWHgfIk3WLAUYtk8AM1RidTlsLO4nx6U7DNS6sR8_i215aMbZFce8QpsVNxb0w5VuO2wBlqCxv1hctRjntYW3RR1IoGzdCq6TTl8T5dTCVqtQpcamrbDeJSgVzdrZDHWAroladexbSHqHd78lTy8rLI83FjKb6nFKDxQAUhycmrRsz3d3kynLYRNSD8kzg1fgxnQf-_QHwP" alt="Buhar Vanası Büyük" class="w-full h-full object-contain filter drop-shadow-xl hover:scale-105 transition-transform duration-500"/>
+                </div>
+                
+                <!-- Thumbnails (4-col grid) -->
+                <div class="grid grid-cols-4 gap-4">
+                    <button class="aspect-square bg-gray-50 rounded-xl border-2 border-[#1E90FF] flex items-center justify-center p-2 overflow-hidden shadow-sm">
+                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0i-1_9XkxAjSdRMyj7bPE9eN-aQDzgUxLDHaLVdCmykKDxmM14nbYGdRz4g8me_GseLWHgfIk3WLAUYtk8AM1RidTlsLO4nx6U7DNS6sR8_i215aMbZFce8QpsVNxb0w5VuO2wBlqCxv1hctRjntYW3RR1IoGzdCq6TTl8T5dTCVqtQpcamrbDeJSgVzdrZDHWAroladexbSHqHd78lTy8rLI83FjKb6nFKDxQAUhycmrRsz3d3kynLYRNSD8kzg1fgxnQf-_QHwP" alt="Thumb 1" class="w-full h-full object-contain"/>
+                    </button>
+                    <!-- other random thumbs fitting style -->
+                    <button class="aspect-square bg-gray-800 rounded-xl border border-gray-200 flex items-center justify-center overflow-hidden hover:border-gray-400 transition relative">
+                        <!-- Simulated grey image with gauge -->
+                        <div class="w-full h-full bg-[#5d564f] flex flex-col items-center justify-center p-2">
+                             <div class="w-10 h-10 bg-white rounded-full border border-gray-300"></div>
+                             <div class="w-6 h-8 bg-gray-200 mt-1"></div>
+                        </div>
+                    </button>
+                    <button class="aspect-square bg-gray-100 rounded-xl border border-gray-200 flex items-center justify-center overflow-hidden hover:border-gray-400 transition p-2">
+                         <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwRCEVTciqeNkBFI6JSprTC7LOlqY7tA0dsV3X4S9_M4cvLPe8B193LyrQnSPyRzbBxMrUMcGDljZHdDovFuSGNaJctBcDMQ-WxIu_jo0melh_KgdJK-sVW2lgIRb2CE8mE_MyaqoAVPmCWyTSdouBfp8SYHY65VRNWQZVm-bmdAaxVXueJFdUjIavsyw-OmmgsVG98pm4Z3q72IlromjzUGVAMYnPewlHD2WmfWPDxBzI2_P3HQKQVYOf31NZHlEcZceDaKV-0l0u" alt="Thumb 3" class="w-full h-full object-contain opacity-70 grayscale"/>
+                    </button>
+                    <button class="aspect-square bg-gray-50 rounded-xl border border-gray-200 flex items-center justify-center hover:bg-gray-100 transition relative group cursor-pointer">
+                        <div class="w-full h-full absolute inset-0 bg-white"></div>
+                        <i class="fa-solid fa-play text-gray-300 text-3xl z-10 group-hover:text-primary transition"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sağ: Ürün Bilgileri -->
+            <div class="flex flex-col text-text-dark">
+                
+                <!-- Badge -->
+                <div class="mb-4">
+                    <span class="bg-red-50 text-primary text-[0.65rem] font-bold px-3 py-1 rounded uppercase tracking-widest border border-red-100">
+                        Model: ILG-V2400-S
+                    </span>
+                </div>
+                
+                <h1 class="text-3xl md:text-5xl font-extrabold mb-6 leading-[1.1] tracking-tight text-gray-900">
+                    Yüksek Basınçlı Flanşlı<br/>Buhar Vanası
+                </h1>
+                
+                <p class="text-gray-500 text-[15px] leading-relaxed mb-8">
+                    Endüstriyel tesisler için yüksek performanslı sızdırmazlık ve uzun ömürlü kullanım sunan ağır hizmet tipi buhar kontrol vanası.
+                </p>
+                
+                <!-- Teknik Özellikler Tablosu -->
+                <div class="bg-gray-50/50 rounded-2xl border border-gray-100 overflow-hidden mb-8">
+                    <div class="px-6 py-4 flex items-center gap-2 border-b border-gray-100 bg-white">
+                        <div class="w-3 h-3 bg-primary rounded-sm transform rotate-45"></div>
+                        <h3 class="font-bold text-xs uppercase tracking-widest text-gray-800">Teknik Özellikler</h3>
+                    </div>
+                    
+                    <div class="flex flex-col text-sm text-gray-600">
+                        <div class="flex items-center justify-between px-6 py-3.5 border-b border-gray-100 hover:bg-white transition-colors">
+                            <span>Çalışma Basıncı (PN)</span>
+                            <span class="font-bold text-gray-900">PN 40 / PN 63</span>
+                        </div>
+                        <div class="flex items-center justify-between px-6 py-3.5 border-b border-gray-100 hover:bg-white transition-colors">
+                            <span>Gövde Malzemesi</span>
+                            <span class="font-bold text-gray-900">Dökme Çelik GS-C25</span>
+                        </div>
+                        <div class="flex items-center justify-between px-6 py-3.5 border-b border-gray-100 hover:bg-white transition-colors">
+                            <span>Max. Çalışma Sıcaklığı</span>
+                            <span class="font-bold text-gray-900">450°C</span>
+                        </div>
+                        <div class="flex items-center justify-between px-6 py-3.5 border-b border-gray-100 hover:bg-white transition-colors">
+                            <span>Bağlantı Şekli</span>
+                            <span class="font-bold text-gray-900">Flanşlı (DIN EN 1092-1)</span>
+                        </div>
+                        <div class="flex items-center justify-between px-6 py-3.5 border-b border-gray-100 hover:bg-white transition-colors">
+                            <span>Sızdırmazlık Sınıfı</span>
+                            <span class="font-bold text-gray-900">Class VI (Bubbles Tight)</span>
+                        </div>
+                        <div class="flex items-center justify-between px-6 py-3.5 hover:bg-white transition-colors">
+                            <span>Nominal Çap (DN)</span>
+                            <span class="font-bold text-gray-900">DN 15 - DN 300</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Butonlar -->
+                <div class="flex flex-col sm:flex-row gap-4 mt-auto">
+                    <button class="flex-1 bg-[#d63031] hover:bg-[#b02626] text-white font-bold py-4 rounded-lg flex items-center justify-center gap-2 transition-colors shadow-lg shadow-red-500/20 tracking-wide text-sm">
+                        <i class="fa-solid fa-file-invoice text-lg"></i> TEKLİF İSTE
+                    </button>
+                    <button class="flex-1 bg-white hover:bg-gray-50 text-gray-800 border-2 border-gray-100 hover:border-gray-200 font-bold py-4 rounded-lg flex items-center justify-center gap-2 transition-all tracking-wide text-sm">
+                        <i class="fa-solid fa-download"></i> KATALOG
+                    </button>
+                </div>
+                
+            </div>
+        </div>
+
+        <hr class="border-gray-100 mb-16" />
+
+        <!-- YUKSEL SECTION 2: Açıklama Alt -->
+        <div class="max-w-4xl mb-24">
+            
+            <div class="flex items-center gap-4 mb-8">
+                <div class="w-1.5 h-6 bg-primary rounded-full"></div>
+                <h2 class="text-2xl font-extrabold uppercase tracking-tight">Ürün Detayı ve Uygulama Alanları</h2>
+            </div>
+            
+            <p class="text-gray-600 leading-relaxed mb-8 text-[15px]">
+                Ilgaz Mühendislik ILG-V2400-S serisi flanşlı buhar vanaları, en zorlu endüstriyel koşullarda bile maksimum güvenilirlik sağlamak üzere tasarlanmıştır. Yüksek sıcaklık ve basınç altında çalışan kızgın buhar hatları için optimize edilmiş olan bu vanalar, özel alaşımlı dökme çelik gövdesi sayesinde korozyona ve ısıl genleşmelere karşı üstün direnç gösterir.
+            </p>
+            
+            <!-- Bilgi Kutuları -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="bg-red-50/60 p-6 rounded-xl border border-red-100/50">
+                    <h4 class="font-bold text-gray-900 mb-3 text-[15px]">Üstün Sızdırmazlık</h4>
+                    <p class="text-gray-600 text-sm leading-relaxed">Stellite kaplı valf oturma yüzeyleri sayesinde binlerce açma-kapama döngüsünden sonra dahi mükemmel sızdırmazlık performansı korunur.</p>
+                </div>
+                <div class="bg-red-50/60 p-6 rounded-xl border border-red-100/50">
+                    <h4 class="font-bold text-gray-900 mb-3 text-[15px]">Kolay Bakım</h4>
+                    <p class="text-gray-600 text-sm leading-relaxed">Hattan sökülmeden salmastra değişimi yapılabilen özel "back-seat" tasarımı ile işletme duruş sürelerini minimize eder.</p>
+                </div>
+            </div>
+            
+            <p class="text-gray-600 leading-relaxed text-[15px]">
+                <strong class="font-semibold text-gray-800">Uygulama Alanları:</strong> Enerji santralleri, tekstil fabrikaları kurutma hatları, kimya endüstrisi reaktör besleme hatları ve merkezi ısıtma sistemleri. Tüm ürünlerimiz EN 10204 3.1 sertifikasyonuna uygun olarak test edilmekte ve raporlanmaktadır.
+            </p>
+            
+        </div>
+
+        <!-- CTA Banner -->
+        <div class="bg-[#1a202c] rounded-[2rem] p-8 md:p-12 mb-10 overflow-hidden relative shadow-2xl flex flex-col md:flex-row items-center justify-between gap-8 w-full border border-gray-800">
+            <!-- Background Decoration (subtle graphic) -->
+            <div class="absolute right-0 top-0 h-full w-1/2 opacity-10 flex">
+                <div class="w-full h-full bg-gradient-to-l from-white to-transparent transform skew-x-12 translate-x-1/4"></div>
+            </div>
+            
+            <div class="relative z-10 max-w-2xl">
+                <h2 class="text-3xl font-extrabold text-white mb-3">Projeniz için teknik destek mi gerekiyor?</h2>
+                <p class="text-gray-400 text-base">Mühendislerimiz size en uygun vana seçimi ve sistem tasarımı için hazır.</p>
+            </div>
+            
+            <div class="relative z-10 flex flex-col sm:flex-row items-center gap-4 shrink-0">
+                <a href="#" class="w-full sm:w-auto bg-white text-gray-900 font-bold py-3.5 px-6 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-100 transition shadow-lg">
+                    <i class="fa-solid fa-phone transform -scale-x-100"></i> Bize Ulaşın
+                </a>
+                <a href="#" class="w-full sm:w-auto bg-[#d63031] hover:bg-[#b02626] text-white font-bold py-3.5 px-6 rounded-lg flex items-center justify-center gap-2 transition shadow-lg">
+                    <i class="fa-solid fa-envelope"></i> Teklif İsteyin
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <!-- Footer - Dark Version -->
+    <footer class="bg-dark-navy pt-20 pb-10 text-sm border-t-4 border-primary">
+        <div class="max-w-[1440px] mx-auto px-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-16">
+                
+                <!-- Brand -->
+                <div class="col-span-1">
+                    <a href="index.html" class="flex items-center gap-3 mb-6">
+                        <div class="w-7 h-9 bg-primary transform skew-x-[-15deg] flex items-center justify-center rounded-sm">
+                            <div class="w-1 h-5 bg-white transform skew-x-[15deg]"></div>
+                        </div>
+                        <div class="flex flex-col uppercase leading-none tracking-tighter justify-center pt-1">
+                            <span class="font-black text-xl text-white tracking-tight">ILGAZ</span>
+                            <span class="font-bold text-[0.55rem] tracking-widest text-primary mt-0.5">MÜHENDİSLİK</span>
+                        </div>
+                    </a>
+                    <p class="text-gray-400 leading-relaxed font-medium text-[13px] mb-6">
+                        Sektördeki 25 yıllık tecrübemizle, güvenilirlik ve kalite prensiplerimizden ödün vermeden mühendislik hizmetleri sunuyoruz.
+                    </p>
+                    <div class="flex gap-3">
+                        <a href="#" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-primary hover:text-white transition"><i class="fa-brands fa-linkedin-in text-xs"></i></a>
+                        <a href="#" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-primary hover:text-white transition"><i class="fa-brands fa-twitter text-xs"></i></a>
+                        <a href="#" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-primary hover:text-white transition"><i class="fa-brands fa-instagram text-xs"></i></a>
+                    </div>
+                </div>
+                
+                <!-- Hızlı Menü -->
+                <div>
+                    <h3 class="font-bold text-white mb-6 text-sm tracking-wide">Hızlı Menü</h3>
+                    <ul class="flex flex-col gap-3 text-gray-400 font-medium text-[13px]">
+                        <li><a href="#" class="hover:text-primary transition flex items-center gap-2"><div class="w-1 h-1 bg-primary rounded-full"></div> Ana Sayfa</a></li>
+                        <li><a href="#" class="hover:text-primary transition flex items-center gap-2"><div class="w-1 h-1 bg-primary rounded-full"></div> Hakkımızda</a></li>
+                        <li><a href="#" class="hover:text-primary transition flex items-center gap-2"><div class="w-1 h-1 bg-primary rounded-full"></div> Projelerimiz</a></li>
+                        <li><a href="#" class="hover:text-primary transition flex items-center gap-2"><div class="w-1 h-1 bg-primary rounded-full"></div> Hizmet Alanları</a></li>
+                        <li><a href="#" class="hover:text-primary transition flex items-center gap-2"><div class="w-1 h-1 bg-primary rounded-full"></div> İnsan Kaynakları</a></li>
+                        <li><a href="#" class="hover:text-primary transition flex items-center gap-2"><div class="w-1 h-1 bg-primary rounded-full"></div> İletişim</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Hizmetlerimiz -->
+                <div>
+                    <h3 class="font-bold text-white mb-6 text-sm tracking-wide">Hizmetlerimiz</h3>
+                    <ul class="flex flex-col gap-3 text-gray-400 font-medium text-[13px]">
+                        <li><a href="#" class="hover:text-primary transition">Statik Proje Tasarımı</a></li>
+                        <li><a href="#" class="hover:text-primary transition">Endüstriyel Yapılar</a></li>
+                        <li><a href="#" class="hover:text-primary transition">Zemin Etüdü & Analizi</a></li>
+                        <li><a href="#" class="hover:text-primary transition">Müşavirlik & Denetim</a></li>
+                        <li><a href="#" class="hover:text-primary transition">Güçlendirme Projeleri</a></li>
+                    </ul>
+                </div>
+                
+                <!-- İletişim -->
+                <div>
+                    <h3 class="font-bold text-white mb-6 text-sm tracking-wide">İletişim</h3>
+                    <ul class="flex flex-col gap-4 text-gray-400 font-medium text-[13px]">
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-location-dot text-primary mt-1"></i>
+                            <span class="leading-relaxed">Merkez Mah. Mühendis Sk.<br>No: 24, Şişli / İstanbul</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fa-solid fa-phone text-primary"></i>
+                            <span>+90 212 123 45 67</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fa-solid fa-envelope text-primary"></i>
+                            <span class="break-all">info@ilgazmuhendislik.com</span>
+                        </li>
+                    </ul>
+                </div>
+                
+            </div>
+            
+            <!-- Bottom -->
+            <div class="pt-8 border-t border-white/5 text-gray-500 font-medium text-xs text-center">
+                <p>&copy; 2024 Ilgaz Mühendislik A.Ş. Tüm hakları saklıdır.</p>
+            </div>
+            
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const thumbnailsContainer = document.querySelector('.grid.grid-cols-4.gap-4');
+            if (!thumbnailsContainer) return;
+            
+            const thumbnails = thumbnailsContainer.querySelectorAll('button');
+            const mainContainer = thumbnailsContainer.previousElementSibling;
+            
+            thumbnails.forEach(thumb => {
+                thumb.addEventListener('click', () => {
+                    // Start a simple fade effect
+                    mainContainer.style.opacity = '0.5';
+                    
+                    setTimeout(() => {
+                        thumbnails.forEach(t => {
+                            t.classList.remove('border-[#1E90FF]', 'border-2');
+                            t.classList.add('border-gray-200', 'border');
+                        });
+                        thumb.classList.remove('border-gray-200', 'border');
+                        thumb.classList.add('border-[#1E90FF]', 'border-2');
+                        
+                        const img = thumb.querySelector('img');
+                        if (img) {
+                            mainContainer.innerHTML = `<img src="${img.src}" alt="Ürün Görseli" class="w-full h-full object-contain filter drop-shadow-xl hover:scale-105 transition-transform duration-500"/>`;
+                        } else {
+                            mainContainer.innerHTML = `<div class="w-full h-full flex items-center justify-center scale-150">${thumb.innerHTML}</div>`;
+                        }
+                        
+                        // End fade effect
+                        mainContainer.style.opacity = '1';
+                    }, 150);
+                    
+                    mainContainer.style.transition = 'opacity 0.15s ease-in-out';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
