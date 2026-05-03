@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Settings - Ilgaz Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            corePlugins: { preflight: false },
+            theme: {
+                extend: {
+                    colors: { 
+                        primary: '#d63031', 
+                        'primary-hover': '#b02626',
+                        'primary-light': '#fee2e2',
+                        'dark-navy': '#151b2b', 
+                        'text-dark': '#1f2937' 
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        *, ::before, ::after { box-sizing: border-box; border-width: 0; border-style: solid; border-color: #e5e7eb; }
+        body { margin: 0; font-family: 'Inter', sans-serif; background-color: #f8f9fa; color: #1f2937; }
+        .border { border-width: 1px; }
+        .border-b { border-bottom-width: 1px; }
+        .border-t { border-bottom-width: 1px; }
+        .border-r { border-right-width: 1px; }
+    </style>
+</head>
+
+<body class="flex h-screen overflow-hidden selection:bg-primary selection:text-white">
+
+    <!-- Sidebar -->
+    <aside class="w-[260px] bg-white border-r border-gray-200 flex flex-col justify-between flex-shrink-0 relative z-20">
+        <div>
+            <!-- Logo -->
+            <div class="h-20 px-6 flex items-center border-b border-gray-100">
+                <a href="admin-dashboard.html" class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white shadow-sm">
+                        <i class="fa-solid fa-industry text-sm"></i>
+                    </div>
+                    <div class="flex flex-col leading-none justify-center">
+                        <span class="font-bold text-[15px] text-gray-900">Ilgaz Mühendislik</span>
+                        <span class="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mt-0.5">Admin Panel</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Menu -->
+            <nav class="p-4 flex flex-col gap-1.5 mt-2">
+                <a href="admin-dashboard.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors">
+                    <i class="fa-solid fa-border-all w-5 text-center text-lg"></i>
+                    <span class="text-sm">Dashboard</span>
+                </a>
+                
+                <a href="admin-products.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors">
+                    <i class="fa-solid fa-box w-5 text-center text-lg"></i>
+                    <span class="text-sm">Products & Services</span>
+                </a>
+                
+                <a href="admin-messages.html" class="flex items-center justify-between px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors group">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-envelope w-5 text-center text-lg"></i>
+                        <span class="text-sm">Messages</span>
+                    </div>
+                    <span class="bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-full group-hover:scale-110 transition-transform">12</span>
+                </a>
+                
+                <a href="admin-projects.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors">
+                    <i class="fa-solid fa-compass-drafting w-5 text-center text-lg"></i>
+                    <span class="text-sm">Engineering Projects</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Bottom Actions -->
+        <div class="p-4 border-t border-gray-100 flex flex-col gap-2">
+            <!-- Active Item -->
+            <a href="admin-settings.html" class="flex items-center gap-3 px-4 py-2.5 bg-primary text-white font-semibold rounded-lg shadow-md shadow-red-500/20 transition-colors">
+                <i class="fa-solid fa-gear w-5 text-center"></i>
+                <span class="text-sm">Settings</span>
+            </a>
+            <a href="admin-login.html" class="flex items-center gap-3 px-4 py-2.5 text-gray-500 hover:bg-red-50 hover:text-primary font-medium rounded-lg transition-colors mt-2">
+                <i class="fa-solid fa-arrow-right-from-bracket w-5 text-center"></i>
+                <span class="text-sm">Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Wrapper -->
+    <div class="flex-grow flex flex-col overflow-hidden relative">
+        
+        <!-- Header -->
+        <header class="h-20 bg-white border-b border-gray-200 px-8 flex items-center justify-between flex-shrink-0">
+            <h1 class="text-lg font-bold text-gray-900">System Settings</h1>
+            
+            <div class="flex items-center gap-6">
+                <!-- Notifications -->
+                <button class="relative w-10 h-10 rounded-full bg-red-50 text-primary hover:bg-red-100 transition-colors flex items-center justify-center">
+                    <i class="fa-solid fa-bell"></i>
+                    <span class="absolute top-0 right-0 w-2.5 h-2.5 bg-primary border-2 border-white rounded-full"></span>
+                </button>
+                
+                <!-- Avatar -->
+                <div class="flex items-center gap-3 pl-4 border-l border-gray-200">
+                    <div class="flex flex-col items-end">
+                        <span class="text-sm font-bold text-gray-900">Admin User</span>
+                        <span class="text-[10px] font-semibold text-gray-500 tracking-wide uppercase">Super Admin</span>
+                    </div>
+                    <div class="w-9 h-9 rounded-full bg-primary-light overflow-hidden shadow-sm">
+                        <img src="https://ui-avatars.com/api/?name=Admin+User&background=fee2e2&color=d63031" alt="Admin" class="w-full h-full object-cover">
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Scrollable Content -->
+        <main class="flex-grow overflow-y-auto p-8">
+            <div class="max-w-[800px] mx-auto">
+                
+                <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden mb-6">
+                    <div class="px-8 py-6 border-b border-gray-100">
+                        <h3 class="text-xl font-bold text-gray-900">Company Information</h3>
+                        <p class="text-sm text-gray-500 mt-1">Update your company details and contact information.</p>
+                    </div>
+                    
+                    <form class="p-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Company Name</label>
+                                <input type="text" class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-3 outline-none" value="Ilgaz Mühendislik A.Ş.">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Contact Email</label>
+                                <input type="email" class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-3 outline-none" value="info@ilgazmuhendislik.com">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Phone Number</label>
+                                <input type="text" class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-3 outline-none" value="+90 212 123 45 67">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Support Email</label>
+                                <input type="email" class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-3 outline-none" value="support@ilgazmuhendislik.com">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-8">
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Office Address</label>
+                            <textarea class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-3 outline-none" rows="3">Merkez Mah. Mühendis Sk. No: 24, Şişli / İstanbul</textarea>
+                        </div>
+
+                        <div class="flex justify-end">
+                            <button type="button" class="bg-primary hover:bg-primary-hover text-white font-bold py-2.5 px-6 rounded-lg shadow-md shadow-red-500/20 transition-all">
+                                Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Messages - Ilgaz Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            corePlugins: { preflight: false },
+            theme: {
+                extend: {
+                    colors: { 
+                        primary: '#d63031', 
+                        'primary-hover': '#b02626',
+                        'primary-light': '#fee2e2',
+                        'dark-navy': '#151b2b', 
+                        'text-dark': '#1f2937' 
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        *, ::before, ::after { box-sizing: border-box; border-width: 0; border-style: solid; border-color: #e5e7eb; }
+        body { margin: 0; font-family: 'Inter', sans-serif; background-color: #f8f9fa; color: #1f2937; }
+        .border { border-width: 1px; }
+        .border-b { border-bottom-width: 1px; }
+        .border-t { border-bottom-width: 1px; }
+        .border-r { border-right-width: 1px; }
+        .border-l { border-left-width: 1px; }
+        
+        /* Custom scrollbar for message list */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #e5e7eb; border-radius: 10px; }
+    </style>
+</head>
+
+<body class="flex h-screen overflow-hidden selection:bg-primary selection:text-white">
+
+    <!-- Sidebar -->
+    <aside class="w-[260px] bg-white border-r border-gray-200 flex flex-col justify-between flex-shrink-0 relative z-20">
+        <div>
+            <!-- Logo -->
+            <div class="h-20 px-6 flex items-center border-b border-gray-100">
+                <a href="admin-dashboard.html" class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white shadow-sm">
+                        <i class="fa-solid fa-industry text-sm"></i>
+                    </div>
+                    <div class="flex flex-col leading-none justify-center">
+                        <span class="font-bold text-[15px] text-gray-900">Ilgaz Mühendislik</span>
+                        <span class="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mt-0.5">Admin Panel</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Menu -->
+            <nav class="p-4 flex flex-col gap-1.5 mt-2">
+                <a href="admin-dashboard.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors">
+                    <i class="fa-solid fa-border-all w-5 text-center text-lg"></i>
+                    <span class="text-sm">Dashboard</span>
+                </a>
+                
+                <a href="admin-products.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors">
+                    <i class="fa-solid fa-box w-5 text-center text-lg"></i>
+                    <span class="text-sm">Products & Services</span>
+                </a>
+                
+                <!-- Active Item -->
+                <a href="admin-messages.html" class="flex items-center justify-between px-4 py-3 bg-primary-light text-primary font-semibold rounded-lg transition-colors group">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-envelope w-5 text-center text-lg"></i>
+                        <span class="text-sm">Messages</span>
+                    </div>
+                    <span class="bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-full">12</span>
+                </a>
+                
+                <a href="admin-projects.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors">
+                    <i class="fa-solid fa-compass-drafting w-5 text-center text-lg"></i>
+                    <span class="text-sm">Engineering Projects</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Bottom Actions -->
+        <div class="p-4 border-t border-gray-100 flex flex-col gap-2">
+            <a href="admin-settings.html" class="flex items-center gap-3 px-4 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors">
+                <i class="fa-solid fa-gear w-5 text-center"></i>
+                <span class="text-sm">Settings</span>
+            </a>
+            <a href="admin-login.html" class="flex items-center gap-3 px-4 py-2.5 text-gray-500 hover:bg-red-50 hover:text-primary font-medium rounded-lg transition-colors mt-2">
+                <i class="fa-solid fa-arrow-right-from-bracket w-5 text-center"></i>
+                <span class="text-sm">Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Wrapper -->
+    <div class="flex-grow flex flex-col overflow-hidden relative">
+        
+        <!-- Header -->
+        <header class="h-20 bg-white border-b border-gray-200 px-8 flex items-center justify-between flex-shrink-0">
+            <!-- Search Bar -->
+            <div class="relative w-[400px]">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="fa-solid fa-magnifying-glass text-gray-400 text-sm"></i>
+                </div>
+                <input type="text" class="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full pl-10 p-2.5 outline-none transition-colors" placeholder="Search messages, names, or emails...">
+            </div>
+            
+            <div class="flex items-center gap-6">
+                <!-- Notifications -->
+                <button class="relative text-gray-500 hover:text-gray-800 transition-colors">
+                    <i class="fa-solid fa-bell text-xl"></i>
+                    <span class="absolute -top-0.5 right-0 w-2.5 h-2.5 bg-primary border-2 border-white rounded-full"></span>
+                </button>
+                
+                <button class="text-gray-500 hover:text-gray-800 transition-colors">
+                    <i class="fa-solid fa-circle-question text-xl"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Scrollable Content -->
+        <main class="flex-grow overflow-hidden flex flex-col p-8 pb-0">
+            <div class="max-w-[1400px] w-full mx-auto flex flex-col h-full">
+                
+                <!-- Page Header -->
+                <div class="flex justify-between items-start mb-6 flex-shrink-0">
+                    <div>
+                        <h2 class="text-3xl font-black text-gray-900 tracking-tight mb-2">Contact Messages</h2>
+                        <p class="text-gray-500 text-lg">Review and respond to inquiries from your website visitors.</p>
+                    </div>
+                    <div class="flex gap-3">
+                        <button class="bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-bold py-2.5 px-5 rounded-lg shadow-sm transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-filter"></i> Filter
+                        </button>
+                        <button class="bg-primary hover:bg-primary-hover text-white font-bold py-2.5 px-5 rounded-lg shadow-md shadow-red-500/20 transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-download"></i> Export CSV
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <div class="flex gap-8 border-b border-gray-200 mb-6 px-2 flex-shrink-0">
+                    <button class="pb-4 font-bold text-primary border-b-2 border-primary flex items-center gap-2">
+                        All Messages <span class="bg-red-50 text-primary text-[10px] px-2 py-0.5 rounded-full">24</span>
+                    </button>
+                    <button class="pb-4 font-semibold text-gray-500 hover:text-gray-700 transition-colors border-b-2 border-transparent">
+                        Unread
+                    </button>
+                    <button class="pb-4 font-semibold text-gray-500 hover:text-gray-700 transition-colors border-b-2 border-transparent">
+                        Archived
+                    </button>
+                    <button class="pb-4 font-semibold text-gray-500 hover:text-gray-700 transition-colors border-b-2 border-transparent">
+                        Spam
+                    </button>
+                </div>
+
+                <!-- Messages Layout -->
+                <div class="flex gap-6 h-full min-h-0 pb-8">
+                    
+                    <!-- Left Column: Message List -->
+                    <div class="w-[350px] lg:w-[400px] xl:w-[450px] flex-shrink-0 bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
+                        <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center text-xs font-bold text-gray-400 uppercase tracking-widest bg-gray-50/50">
+                            <span>Recent Inquiries</span>
+                            <button class="hover:text-gray-600"><i class="fa-solid fa-arrow-down-short-wide"></i></button>
+                        </div>
+                        
+                        <div class="flex-grow overflow-y-auto custom-scrollbar">
+                            <!-- Message 1 (Active) -->
+                            <div class="flex items-start gap-4 px-6 py-5 border-l-4 border-primary bg-red-50/20 cursor-pointer border-b border-gray-50">
+                                <div class="w-10 h-10 rounded-full bg-red-100 text-primary flex items-center justify-center font-bold text-sm flex-shrink-0 mt-0.5">
+                                    AY
+                                </div>
+                                <div class="flex-grow min-w-0">
+                                    <div class="flex justify-between items-baseline mb-0.5">
+                                        <p class="text-gray-900 font-bold truncate">Ahmet Yılmaz</p>
+                                        <p class="text-gray-500 text-[11px] font-medium whitespace-nowrap ml-2">Oct 24, 14:30</p>
+                                    </div>
+                                    <p class="text-gray-800 text-sm font-bold truncate mb-1">Project Inquiry - Site 2A</p>
+                                    <p class="text-xs text-gray-500 truncate mb-3">I would like to request a quote for our new commercial complex in Bahçelievler...</p>
+                                    <div>
+                                        <span class="text-red-600 text-[10px] font-bold bg-white border border-red-100 px-2.5 py-1 rounded-sm uppercase tracking-wide shadow-sm">New</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Message 2 -->
+                            <div class="flex items-start gap-4 px-6 py-5 border-l-4 border-transparent hover:bg-gray-50 cursor-pointer border-b border-gray-50 transition-colors">
+                                <div class="w-10 h-10 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center font-bold text-sm flex-shrink-0 mt-0.5">
+                                    ZK
+                                </div>
+                                <div class="flex-grow min-w-0">
+                                    <div class="flex justify-between items-baseline mb-0.5">
+                                        <p class="text-gray-700 font-bold truncate">Zeynep Kaya</p>
+                                        <p class="text-gray-400 text-[11px] font-medium whitespace-nowrap ml-2">Oct 23, 09:15</p>
+                                    </div>
+                                    <p class="text-gray-600 text-sm font-semibold truncate mb-1">Maintenance Request</p>
+                                    <p class="text-xs text-gray-400 truncate mb-3">The HVAC system in our central office needs an urgent inspection...</p>
+                                    <div>
+                                        <span class="text-gray-500 text-[10px] font-bold bg-white border border-gray-200 px-2.5 py-1 rounded-sm uppercase tracking-wide">Replied</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Message 3 -->
+                            <div class="flex items-start gap-4 px-6 py-5 border-l-4 border-transparent hover:bg-gray-50 cursor-pointer border-b border-gray-50 transition-colors">
+                                <div class="w-10 h-10 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center font-bold text-sm flex-shrink-0 mt-0.5">
+                                    MD
+                                </div>
+                                <div class="flex-grow min-w-0">
+                                    <div class="flex justify-between items-baseline mb-0.5">
+                                        <p class="text-gray-700 font-bold truncate">Mehmet Demir</p>
+                                        <p class="text-gray-400 text-[11px] font-medium whitespace-nowrap ml-2">Oct 22, 17:45</p>
+                                    </div>
+                                    <p class="text-gray-600 text-sm font-semibold truncate mb-1">Pricing Quote for Villa Project</p>
+                                    <p class="text-xs text-gray-400 truncate mb-3">Looking for a long-term partner for our upcoming residential project...</p>
+                                    <div>
+                                        <span class="text-green-600 text-[10px] font-bold bg-white border border-green-100 px-2.5 py-1 rounded-sm uppercase tracking-wide">Replied</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Message 4 -->
+                            <div class="flex items-start gap-4 px-6 py-5 border-l-4 border-transparent hover:bg-gray-50 cursor-pointer border-b border-gray-50 transition-colors">
+                                <div class="w-10 h-10 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center font-bold text-sm flex-shrink-0 mt-0.5">
+                                    SA
+                                </div>
+                                <div class="flex-grow min-w-0">
+                                    <div class="flex justify-between items-baseline mb-0.5">
+                                        <p class="text-gray-700 font-bold truncate">Selin Aras</p>
+                                        <p class="text-gray-400 text-[11px] font-medium whitespace-nowrap ml-2">Oct 21, 11:20</p>
+                                    </div>
+                                    <p class="text-gray-600 text-sm font-semibold truncate mb-1">General Information</p>
+                                    <p class="text-xs text-gray-400 truncate mb-3">Are you providing services in the Aegean region for commercial projects?</p>
+                                    <div>
+                                        <span class="text-gray-500 text-[10px] font-bold bg-white border border-gray-200 px-2.5 py-1 rounded-sm uppercase tracking-wide">Replied</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div class="px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex justify-between items-center">
+                            <span class="text-[11px] text-gray-500 font-bold uppercase tracking-wide">1-4 of 24</span>
+                            <div class="flex gap-1.5">
+                                <button class="w-8 h-8 flex items-center justify-center border border-gray-200 bg-white rounded-md text-gray-400 hover:bg-gray-50 transition-colors shadow-sm"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                                <button class="w-8 h-8 flex items-center justify-center border border-gray-200 bg-white rounded-md text-gray-600 hover:bg-gray-50 transition-colors shadow-sm"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Message Detail -->
+                    <div class="flex-grow flex flex-col">
+                        <div class="bg-white rounded-xl border border-gray-100 shadow-sm flex flex-col h-full overflow-hidden">
+                            <!-- Detail Header Actions -->
+                            <div class="px-8 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/30">
+                                <div class="flex items-center gap-4 text-gray-400 text-lg">
+                                    <button class="hover:text-gray-700 transition-colors" title="Download"><i class="fa-solid fa-circle-down"></i></button>
+                                    <button class="hover:text-primary transition-colors" title="Delete"><i class="fa-solid fa-trash-can"></i></button>
+                                    <button class="hover:text-gray-700 transition-colors" title="Mark Unread"><i class="fa-solid fa-envelope-open"></i></button>
+                                </div>
+                                <span class="text-xs font-bold text-gray-400 uppercase tracking-widest"><i class="fa-regular fa-clock mr-1"></i> Received 2h ago</span>
+                            </div>
+
+                            <!-- Detail Content -->
+                            <div class="p-8 flex-grow overflow-y-auto custom-scrollbar">
+                                <h3 class="text-2xl font-black text-gray-900 mb-4">Project Inquiry - Site 2A</h3>
+                                
+                                <div class="flex items-center gap-2 mb-8">
+                                    <span class="text-sm text-gray-500">From:</span>
+                                    <span class="text-sm font-bold text-primary">Ahmet Yılmaz</span>
+                                    <span class="text-sm text-gray-500">(ahmet@yilmaz-const.com)</span>
+                                </div>
+
+                                <div class="bg-gray-50 rounded-xl p-8 border border-gray-100">
+                                    <p class="text-gray-700 leading-relaxed mb-6 italic text-[15px]">
+                                        "Hello Ilgaz Engineering Team,
+                                    </p>
+                                    <p class="text-gray-700 leading-relaxed mb-6 italic text-[15px]">
+                                        We are currently planning a new commercial complex in the Bahçelievler district (Project Site 2A). We were very impressed with your recent industrial projects and would like to invite you for a preliminary consultation regarding the full electrical design and mechanical installation of this project.
+                                    </p>
+                                    <p class="text-gray-700 leading-relaxed mb-8 italic text-[15px]">
+                                        Could you please provide a standard rate card or let us know your availability for a site visit next Thursday?
+                                    </p>
+                                    <p class="text-gray-700 leading-relaxed italic text-[15px]">
+                                        Best regards,<br>
+                                        Ahmet Yılmaz<br>
+                                        CEO, Yılmaz Construction"
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <!-- Reply Box (Simulated) -->
+                            <div class="p-6 border-t border-gray-100 bg-gray-50">
+                                <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                                    <textarea class="w-full text-sm text-gray-700 resize-none outline-none bg-transparent" rows="3" placeholder="Click here to reply to Ahmet Yılmaz..."></textarea>
+                                    <div class="flex justify-between items-center mt-3 pt-3 border-t border-gray-100">
+                                        <div class="flex gap-3 text-gray-400">
+                                            <button class="hover:text-gray-700"><i class="fa-solid fa-paperclip"></i></button>
+                                            <button class="hover:text-gray-700"><i class="fa-regular fa-image"></i></button>
+                                        </div>
+                                        <button class="bg-primary hover:bg-primary-hover text-white text-sm font-bold py-2 px-6 rounded-md transition-colors shadow-sm">Send Reply</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>
