@@ -85,7 +85,7 @@
                 <h1 class="text-2xl font-bold text-gray-900 mb-2">Admin Login</h1>
                 <p class="text-sm text-gray-500 mb-8 leading-relaxed">Please enter your credentials to access the management dashboard.</p>
 
-                <form action="admin-dashboard.html" method="GET">
+                <form id="loginForm">
                     <!-- Username Input -->
                     <div class="mb-5">
                         <label for="username" class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Username</label>
@@ -105,8 +105,8 @@
                                 <i class="fa-solid fa-lock"></i>
                             </div>
                             <input type="password" id="password" class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block pl-11 pr-11 p-3 outline-none transition-colors" placeholder="••••••••" required>
-                            <button type="button" class="absolute right-4 text-gray-400 hover:text-gray-600 transition-colors">
-                                <i class="fa-solid fa-eye"></i>
+                            <button type="button" id="togglePassword" class="absolute right-4 text-gray-400 hover:text-gray-600 transition-colors">
+                                <i class="fa-solid fa-eye" id="toggleIcon"></i>
                             </button>
                         </div>
                     </div>
@@ -119,14 +119,72 @@
                             </div>
                             <span class="text-sm text-gray-600 font-medium">Remember me</span>
                         </label>
-                        <a href="#" class="text-sm text-primary font-semibold hover:text-primary-hover transition-colors">Forgot password?</a>
+                        <a href="javascript:void(0)" class="text-sm text-primary font-semibold hover:text-primary-hover transition-colors">Forgot password?</a>
                     </div>
 
+                    <!-- Alert Error -->
+                    <div id="loginAlert" class="hidden mb-4 p-3 rounded-lg bg-red-100 text-red-700 text-sm font-semibold text-center"></div>
+
                     <!-- Submit Button -->
-                    <button type="submit" class="w-full text-white bg-primary hover:bg-primary-hover focus:ring-4 focus:outline-none focus:ring-red-300 font-bold rounded-lg text-sm px-5 py-3.5 text-center transition-all shadow-md shadow-red-500/30 flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-arrow-right-to-bracket"></i> Secure Login
+                    <button type="submit" id="submitBtn" class="w-full text-white bg-primary hover:bg-primary-hover focus:ring-4 focus:outline-none focus:ring-red-300 font-bold rounded-lg text-sm px-5 py-3.5 text-center transition-all shadow-md shadow-red-500/30 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-arrow-right-to-bracket"></i> <span id="submitText">Secure Login</span>
                     </button>
                 </form>
+
+                <script>
+                    // Password Toggle Logic
+                    const togglePassword = document.getElementById('togglePassword');
+                    const password = document.getElementById('password');
+                    const toggleIcon = document.getElementById('toggleIcon');
+
+                    togglePassword.addEventListener('click', function () {
+                        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+                        password.setAttribute('type', type);
+                        toggleIcon.classList.toggle('fa-eye');
+                        toggleIcon.classList.toggle('fa-eye-slash');
+                    });
+
+                    // Login Fetch Logic
+                    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+                        e.preventDefault();
+                        
+                        const submitBtn = document.getElementById('submitBtn');
+                        const submitText = document.getElementById('submitText');
+                        const alertBox = document.getElementById('loginAlert');
+                        
+                        submitBtn.disabled = true;
+                        submitText.innerText = 'Authenticating...';
+                        alertBox.classList.add('hidden');
+
+                        const data = {
+                            kullanici_adi: document.getElementById('username').value,
+                            sifre: document.getElementById('password').value
+                        };
+
+                        try {
+                            const response = await fetch('/api/admin/login', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(data)
+                            });
+
+                            const result = await response.json();
+
+                            if (response.ok) {
+                                localStorage.setItem('adminToken', result.token);
+                                window.location.href = 'admin-dashboard.html';
+                            } else {
+                                throw new Error(result.error || 'Authentication failed');
+                            }
+                        } catch (error) {
+                            alertBox.innerText = error.message;
+                            alertBox.classList.remove('hidden');
+                        } finally {
+                            submitBtn.disabled = false;
+                            submitText.innerText = 'Secure Login';
+                        }
+                    });
+                </script>
             </div>
 
             <!-- Card Footer -->
@@ -142,9 +200,9 @@
         <div class="mt-10 text-center">
             <h3 class="text-gray-700 font-bold text-sm mb-3">Engineering excellence since 1998</h3>
             <div class="flex items-center justify-center gap-4 text-xs font-medium text-gray-400">
-                <a href="#" class="hover:text-gray-600 transition-colors">Privacy Policy</a>
-                <a href="#" class="hover:text-gray-600 transition-colors">Support Center</a>
-                <a href="#" class="hover:text-gray-600 transition-colors">Contact Admin</a>
+                <a href="javascript:void(0)" class="hover:text-gray-600 transition-colors">Privacy Policy</a>
+                <a href="javascript:void(0)" class="hover:text-gray-600 transition-colors">Support Center</a>
+                <a href="javascript:void(0)" class="hover:text-gray-600 transition-colors">Contact Admin</a>
             </div>
         </div>
     </main>
