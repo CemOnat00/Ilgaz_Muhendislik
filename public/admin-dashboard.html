@@ -137,10 +137,10 @@
                             <div class="w-12 h-12 bg-red-50 text-primary rounded-lg flex items-center justify-center text-xl">
                                 <i class="fa-solid fa-box-open"></i>
                             </div>
-                            <span class="text-green-500 text-sm font-bold bg-green-50 px-2 py-1 rounded-md">+5%</span>
+                            <span class="text-green-500 text-sm font-bold bg-green-50 px-2 py-1 rounded-md">Live</span>
                         </div>
                         <h3 class="text-gray-500 text-sm font-medium mb-1">Total Products</h3>
-                        <p class="text-3xl font-black text-gray-900">45</p>
+                        <p id="stat-products" class="text-3xl font-black text-gray-900">0</p>
                     </div>
 
                     <!-- Stat 2 -->
@@ -149,10 +149,10 @@
                             <div class="w-12 h-12 bg-blue-50 text-blue-500 rounded-lg flex items-center justify-center text-xl">
                                 <i class="fa-solid fa-envelope-open-text"></i>
                             </div>
-                            <span class="text-green-500 text-sm font-bold bg-green-50 px-2 py-1 rounded-md">+2%</span>
+                            <span class="text-green-500 text-sm font-bold bg-green-50 px-2 py-1 rounded-md">New</span>
                         </div>
-                        <h3 class="text-gray-500 text-sm font-medium mb-1">New Messages</h3>
-                        <p class="text-3xl font-black text-gray-900">12</p>
+                        <h3 class="text-gray-500 text-sm font-medium mb-1">Total Messages</h3>
+                        <p id="stat-messages" class="text-3xl font-black text-gray-900">0</p>
                     </div>
 
                     <!-- Stat 3 -->
@@ -161,10 +161,10 @@
                             <div class="w-12 h-12 bg-orange-50 text-orange-500 rounded-lg flex items-center justify-center text-xl">
                                 <i class="fa-solid fa-users-gear"></i>
                             </div>
-                            <span class="text-gray-500 text-sm font-bold bg-gray-100 px-2 py-1 rounded-md">Stable</span>
+                            <span class="text-gray-500 text-sm font-bold bg-gray-100 px-2 py-1 rounded-md">Active</span>
                         </div>
                         <h3 class="text-gray-500 text-sm font-medium mb-1">Active Projects</h3>
-                        <p class="text-3xl font-black text-gray-900">8</p>
+                        <p id="stat-projects" class="text-3xl font-black text-gray-900">0</p>
                     </div>
 
                     <!-- Stat 4 -->
@@ -318,4 +318,66 @@
     </div>
 
 </body>
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const token = localStorage.getItem('adminToken');
+        if (!token) {
+            window.location.href = 'admin-login.html';
+            return;
+        }
+
+        try {
+            // Fetch Products
+            const resUrunler = await fetch('/api/urunler');
+            const products = await resUrunler.json();
+            document.getElementById('stat-products').innerText = products.length;
+
+            // Fetch Projects
+            const resProjeler = await fetch('/api/projeler');
+            const projects = await resProjeler.json();
+            document.getElementById('stat-projects').innerText = projects.length;
+
+            // Fetch Messages (Protected)
+            const resMessages = await fetch('/api/admin/mesajlar', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            
+            if (resMessages.ok) {
+                const messages = await resMessages.json();
+                document.getElementById('stat-messages').innerText = messages.length;
+                
+                // Populate Recent Inquiries Table
+                const tableBody = document.querySelector('tbody'); // Recent Inquiries table body
+                if (tableBody) {
+                    tableBody.innerHTML = messages.slice(0, 5).map(m => `
+                        <tr class="hover:bg-gray-50/50 transition-colors">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-red-50 text-primary flex items-center justify-center text-xs font-bold">
+                                        ${m.ad_soyad[0]}
+                                    </div>
+                                    <span class="text-gray-900 font-bold">${m.ad_soyad}</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-600 font-medium">${m.konu}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wide ${m.okundu_mu ? 'bg-green-50 text-green-600' : 'bg-orange-50 text-orange-600'}">
+                                    ${m.okundu_mu ? 'Read' : 'New'}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-gray-400 font-medium text-xs">
+                                ${new Date(m.tarih).toLocaleDateString('tr-TR')}
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } else if (resMessages.status === 401) {
+                window.location.href = 'admin-login.html';
+            }
+            
+        } catch (error) {
+            console.error('Stats loading failed:', error);
+        }
+    });
+</script>
 </html>

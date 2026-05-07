@@ -6,29 +6,71 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"ilgaz-backend/internal/models"
+	"github.com/cemonat00/ilgaz-backend/internal/models"
 )
 
 // --- IN-MEMORY MOCK DATA ---
 
 var mockUrunler = []models.Urun{
 	{
-		ID:         "1",
-		Kategori:   "Hvac",
-		Baslik:     "Yüksek Verimli Pompa Sistemi",
-		Aciklama:   "Endüstriyel tesisler için enerji tasarruflu akıllı sirkülasyon pompası.",
-		Resim:      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80",
-		Ozellikler: []string{"A Sınıfı Enerji", "Sessiz Çalışma"},
-		Durum:      "Aktif",
+		ID:          "1",
+		Kategori:    "Vana Grubu",
+		Baslik:      "Küresel Vana - Tip 101",
+		Isim:        "Endüstriyel Küresel Vana",
+		Aciklama:    "Yüksek basınçlı buhar hatları için özel sızdırmazlık teknolojisi.",
+		Resim:       "https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80",
+		Fiyat:       1250.00,
+		StoktaVarMi: true,
+		Ozellikler:  []string{"Endüstriyel Tip", "Paslanmaz Çelik"},
+		Durum:       "Aktif",
 	},
 	{
-		ID:         "2",
-		Kategori:   "Elektrik",
-		Baslik:     "Akıllı Ana Dağıtım Panosu",
-		Aciklama:   "Tesisin tüm elektrik yükünü güvenle yöneten, uzaktan izlenebilir akıllı pano sistemi.",
-		Resim:      "https://images.unsplash.com/photo-1581092335397-9583eb92d232?auto=format&fit=crop&q=80",
-		Ozellikler: []string{"Uzaktan İzleme", "Aşırı Yük Koruması"},
-		Durum:      "Aktif",
+		ID:          "2",
+		Kategori:    "Pompa Sistemleri",
+		Baslik:      "Sirkülasyon Pompası XP",
+		Isim:        "XP Serisi Sirkülasyon Pompası",
+		Aciklama:    "Isıtma ve soğutma sistemlerinde yüksek verimli enerji tasarrufu.",
+		Resim:       "https://images.unsplash.com/photo-1581092335397-9583eb92d232?auto=format&fit=crop&q=80",
+		Fiyat:       3400.00,
+		StoktaVarMi: true,
+		Ozellikler:  []string{"Yeni Ürün", "A Sınıfı Enerji"},
+		Durum:       "Aktif",
+	},
+	{
+		ID:          "3",
+		Kategori:    "Isı Değiştiriciler",
+		Baslik:      "Plakalı Eşanjör - HE-50",
+		Isim:        "Yüksek Verimli Plakalı Eşanjör",
+		Aciklama:    "Kompakt tasarım ile maksimum ısı transfer verimliliği.",
+		Resim:       "https://images.unsplash.com/photo-1581092430616-94e671651e14?auto=format&fit=crop&q=80",
+		Fiyat:       5600.00,
+		StoktaVarMi: false,
+		Ozellikler:  []string{"Endüstriyel Tip"},
+		Durum:       "Aktif",
+	},
+	{
+		ID:          "4",
+		Kategori:    "Otomasyon",
+		Baslik:      "PLC Kontrol Paneli",
+		Isim:        "Akıllı Proses Kontrol Ünitesi",
+		Aciklama:    "Fabrika otomasyonu için programlanabilir mantıksal denetleyici.",
+		Resim:       "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&q=80",
+		Fiyat:       8900.00,
+		StoktaVarMi: true,
+		Ozellikler:  []string{"Yeni Ürün", "Endüstriyel Tip"},
+		Durum:       "Aktif",
+	},
+	{
+		ID:          "5",
+		Kategori:    "Yedek Parça",
+		Baslik:      "Conta Takımı - Viton",
+		Isim:        "Yüksek Isı Dayanımlı Conta Takımı",
+		Aciklama:    "Kimyasal dayanımı yüksek, sızdırmazlık garantili conta seti.",
+		Resim:       "https://images.unsplash.com/photo-1581092334651-ddf26d9a1930?auto=format&fit=crop&q=80",
+		Fiyat:       450.00,
+		StoktaVarMi: true,
+		Ozellikler:  []string{"Endüstriyel Tip"},
+		Durum:       "Aktif",
 	},
 }
 
@@ -44,7 +86,69 @@ var mockMesajlar = []models.Mesaj{
 	},
 }
 
+var mockProjeler = []models.Proje{
+	{
+		ID:       "1",
+		Baslik:   "Modern Konut Kompleksi",
+		Musteri:  "Yılmaz İnşaat",
+		Kategori: "Elektrik & Mekanik",
+		Durum:    "Devam Ediyor",
+		Tarih:    time.Now(),
+		Aciklama: "500 dairelik konut projesinin tüm elektrik altyapı işleri.",
+	},
+}
+
 // --- HANDLERS ---
+
+// GetProjeler returns all projects
+func GetProjeler(c *gin.Context) {
+	c.JSON(http.StatusOK, mockProjeler)
+}
+
+// AddProje adds a new project
+func AddProje(c *gin.Context) {
+	var yeniProje models.Proje
+	if err := c.ShouldBindJSON(&yeniProje); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	yeniProje.ID = fmt.Sprintf("%d", time.Now().UnixNano())
+	yeniProje.Tarih = time.Now()
+	mockProjeler = append([]models.Proje{yeniProje}, mockProjeler...)
+	c.JSON(http.StatusCreated, yeniProje)
+}
+
+// UpdateProje updates an existing project
+func UpdateProje(c *gin.Context) {
+	id := c.Param("id")
+	var guncelProje models.Proje
+	if err := c.ShouldBindJSON(&guncelProje); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	for i, p := range mockProjeler {
+		if p.ID == id {
+			guncelProje.ID = id
+			mockProjeler[i] = guncelProje
+			c.JSON(http.StatusOK, guncelProje)
+			return
+		}
+	}
+	c.JSON(http.StatusNotFound, gin.H{"error": "Project not found"})
+}
+
+// DeleteProje deletes a project
+func DeleteProje(c *gin.Context) {
+	id := c.Param("id")
+	for i, p := range mockProjeler {
+		if p.ID == id {
+			mockProjeler = append(mockProjeler[:i], mockProjeler[i+1:]...)
+			c.JSON(http.StatusOK, gin.H{"message": "Project deleted"})
+			return
+		}
+	}
+	c.JSON(http.StatusNotFound, gin.H{"error": "Project not found"})
+}
 
 // GetUrunler returns all products
 func GetUrunler(c *gin.Context) {

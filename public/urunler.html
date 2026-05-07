@@ -100,26 +100,30 @@
                 <aside class="catalog-sidebar">
                     <div class="sidebar-section">
                         <h3>KATEGORİLER</h3>
-                        <div class="category-list">
-                            <button class="category-btn active">
+                        <div class="category-list" id="categoryList">
+                            <button class="category-btn active" data-category="all">
+                                <span class="icon-text"><i class="fa-solid fa-border-all"></i> Tüm Ürünler</span>
+                                <span class="cat-count" id="count-all">0</span>
+                            </button>
+                            <button class="category-btn" data-category="Vana Grubu">
                                 <span class="icon-text"><i class="fa-solid fa-sliders"></i> Vana Grubu</span>
-                                <span class="cat-count">24</span>
+                                <span class="cat-count" id="count-Vana Grubu">0</span>
                             </button>
-                            <button class="category-btn">
+                            <button class="category-btn" data-category="Pompa Sistemleri">
                                 <span class="icon-text"><i class="fa-solid fa-droplet"></i> Pompa Sistemleri</span>
-                                <span class="cat-count">18</span>
+                                <span class="cat-count" id="count-Pompa Sistemleri">0</span>
                             </button>
-                            <button class="category-btn">
+                            <button class="category-btn" data-category="Isı Değiştiriciler">
                                 <span class="icon-text"><i class="fa-solid fa-temperature-half"></i> Isı Değiştiriciler</span>
-                                <span class="cat-count">12</span>
+                                <span class="cat-count" id="count-Isı Değiştiriciler">0</span>
                             </button>
-                            <button class="category-btn">
+                            <button class="category-btn" data-category="Otomasyon">
                                 <span class="icon-text"><i class="fa-solid fa-microchip"></i> Otomasyon</span>
-                                <span class="cat-count">9</span>
+                                <span class="cat-count" id="count-Otomasyon">0</span>
                             </button>
-                            <button class="category-btn">
+                            <button class="category-btn" data-category="Yedek Parça">
                                 <span class="icon-text"><i class="fa-solid fa-wrench"></i> Yedek Parça</span>
-                                <span class="cat-count">45</span>
+                                <span class="cat-count" id="count-Yedek Parça">0</span>
                             </button>
                         </div>
                     </div>
@@ -128,15 +132,15 @@
                         <h3>ÖZELLİKLER</h3>
                         <div class="filter-list">
                             <label class="filter-label">
-                                <input type="checkbox">
+                                <input type="checkbox" id="filter-stock">
                                 <span>Stokta Olanlar</span>
                             </label>
                             <label class="filter-label">
-                                <input type="checkbox">
+                                <input type="checkbox" id="filter-new">
                                 <span>Yeni Ürünler</span>
                             </label>
                             <label class="filter-label">
-                                <input type="checkbox" checked>
+                                <input type="checkbox" id="filter-industrial">
                                 <span>Endüstriyel Tip</span>
                             </label>
                         </div>
@@ -152,8 +156,8 @@
                 <div class="catalog-content">
                     <div class="catalog-header">
                         <div class="catalog-title">
-                            <h2>Vana Grubu</h2>
-                            <p>Toplam 24 ürün listeleniyor</p>
+                            <h2 id="current-category-title">Tüm Ürünler</h2>
+                            <p id="product-count-text">Toplam 0 ürün listeleniyor</p>
                         </div>
                         <div class="catalog-controls">
                             <select class="sort-select">
@@ -285,46 +289,112 @@
     <script src="js/script.js"></script>
     <script src="js/urunler.js"></script>
     <script>
+        let allProducts = [];
+        let currentFilters = {
+            category: 'all',
+            stockOnly: false,
+            newOnly: false,
+            industrialOnly: false
+        };
+
         document.addEventListener('DOMContentLoaded', async () => {
+            await fetchProducts();
+            setupEventListeners();
+        });
+
+        async function fetchProducts() {
             try {
                 const response = await fetch('/api/urunler');
-                const products = await response.json();
-                
-                const productGrid = document.getElementById('productGrid');
-                productGrid.innerHTML = '';
-                
-                if (products.length === 0) {
-                    productGrid.innerHTML = '<p style="text-align: center; grid-column: 1/-1;">Şu an için ürün bulunmamaktadır.</p>';
-                    return;
-                }
-
-                products.forEach(p => {
-                    const priceFormatted = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'EUR' }).format(p.fiyat);
-                    
-                    const cardHTML = `
-                        <div class="product-card">
-                            <div class="product-img-wrapper">
-                                ${p.stokta_var_mi ? '<span class="product-badge stock">Stokta</span>' : '<span class="product-badge bg-gray-500 text-white">Tükendi</span>'}
-                                <img src="${p.resim}" alt="${p.isim}" onerror="this.src='https://via.placeholder.com/300x200?text=Ilgaz+Ürün'">
-                            </div>
-                            <div class="product-info">
-                                <span class="product-cat">${p.kategori}</span>
-                                <h3 class="product-name">${p.isim}</h3>
-                                <p class="product-desc">${p.aciklama}</p>
-                                <div class="product-footer">
-                                    <span class="product-price">${priceFormatted}</span>
-                                    <a href="urun_detay.html?id=${p.id}" class="btn-detail">Detay Gör <i class="fa-solid fa-arrow-right"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    productGrid.innerHTML += cardHTML;
-                });
+                allProducts = await response.json();
+                updateCategoryCounts();
+                renderProducts();
             } catch (error) {
                 console.error('Ürünler yüklenirken hata oluştu:', error);
-                document.getElementById('productGrid').innerHTML = '<p style="text-align: center; color: red; grid-column: 1/-1;">Ürünler yüklenirken bir sorun oluştu.</p>';
             }
-        });
+        }
+
+        function updateCategoryCounts() {
+            const counts = { all: allProducts.length };
+            allProducts.forEach(p => {
+                counts[p.kategori] = (counts[p.kategori] || 0) + 1;
+            });
+
+            const categoryButtons = document.querySelectorAll('.category-btn');
+            categoryButtons.forEach(btn => {
+                const cat = btn.dataset.category;
+                const countSpan = btn.querySelector('.cat-count');
+                if (countSpan) countSpan.innerText = counts[cat] || 0;
+            });
+        }
+
+        function setupEventListeners() {
+            // Category clicks
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentFilters.category = btn.dataset.category;
+                    
+                    const catTitle = btn.querySelector('.icon-text').innerText;
+                    document.getElementById('current-category-title').innerText = catTitle;
+                    renderProducts();
+                });
+            });
+
+            // Feature checkboxes
+            document.getElementById('filter-stock').addEventListener('change', (e) => {
+                currentFilters.stockOnly = e.target.checked;
+                renderProducts();
+            });
+            document.getElementById('filter-new').addEventListener('change', (e) => {
+                currentFilters.newOnly = e.target.checked;
+                renderProducts();
+            });
+            document.getElementById('filter-industrial').addEventListener('change', (e) => {
+                currentFilters.industrialOnly = e.target.checked;
+                renderProducts();
+            });
+        }
+
+        function renderProducts() {
+            const productGrid = document.getElementById('productGrid');
+            
+            const filtered = allProducts.filter(p => {
+                const matchCat = currentFilters.category === 'all' || p.kategori === currentFilters.category;
+                const matchStock = !currentFilters.stockOnly || p.stokta_var_mi;
+                const matchNew = !currentFilters.newOnly || (p.ozellikler && p.ozellikler.includes('Yeni Ürün'));
+                const matchIndustrial = !currentFilters.industrialOnly || (p.ozellikler && p.ozellikler.includes('Endüstriyel Tip'));
+                return matchCat && matchStock && matchNew && matchIndustrial;
+            });
+
+            document.getElementById('product-count-text').innerText = `Toplam ${filtered.length} ürün listeleniyor`;
+            
+            if (filtered.length === 0) {
+                productGrid.innerHTML = '<div class="col-span-full py-20 text-center"><i class="fa-solid fa-magnifying-glass text-4xl text-gray-200 mb-4 block"></i><p class="text-gray-500 font-medium">Aradığınız kriterlere uygun ürün bulunamadı.</p></div>';
+                return;
+            }
+
+            productGrid.innerHTML = filtered.map(p => {
+                const priceFormatted = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'EUR' }).format(p.fiyat);
+                return `
+                    <div class="product-card">
+                        <div class="product-img-wrapper">
+                            ${p.stokta_var_mi ? '<span class="product-badge stock">Stokta</span>' : '<span class="product-badge bg-gray-500 text-white">Tükendi</span>'}
+                            <img src="${p.resim}" alt="${p.isim}" onerror="this.src='https://via.placeholder.com/300x200?text=Ilgaz+Ürün'">
+                        </div>
+                        <div class="product-info">
+                            <span class="product-cat">${p.kategori}</span>
+                            <h3 class="product-name">${p.isim}</h3>
+                            <p class="product-desc">${p.aciklama}</p>
+                            <div class="product-footer">
+                                <span class="product-price">${priceFormatted}</span>
+                                <a href="urun_detay.html?id=${p.id}" class="btn-detail">Detay Gör <i class="fa-solid fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
     </script>
 </body>
 </html>

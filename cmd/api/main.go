@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
-	"ilgaz-backend/internal/routes"
+	"github.com/cemonat00/ilgaz-backend/internal/routes"
 )
 
 func main() {
