@@ -198,10 +198,18 @@
                     <h2>Güncel Kataloğumuzu İndirin</h2>
                     <p>2024 yılı tüm ürün listesi ve teknik dökümanlar tek bir PDF'de.</p>
                 </div>
-                <form class="newsletter-form">
-                    <input type="email" placeholder="E-posta adresiniz" required>
+                <form class="newsletter-form" id="newsletterForm">
+                    <input type="email" id="newsletterEmail" placeholder="E-posta adresiniz" required>
                     <button type="submit">Abone Ol</button>
                 </form>
+                <script>
+                    document.getElementById('newsletterForm')?.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        const email = document.getElementById('newsletterEmail').value;
+                        alert('Teşekkürler! ' + email + ' adresi bülten listemize eklendi.');
+                        e.target.reset();
+                    });
+                </script>
             </div>
         </div>
     </section>
@@ -290,12 +298,16 @@
     <script src="js/urunler.js"></script>
     <script>
         let allProducts = [];
+        let filteredProducts = [];
         let currentFilters = {
             category: 'all',
             stockOnly: false,
             newOnly: false,
-            industrialOnly: false
+            industrialOnly: false,
+            search: new URLSearchParams(window.location.search).get('search') || ''
         };
+        let currentPage = 1;
+        const itemsPerPage = 8;
 
         document.addEventListener('DOMContentLoaded', async () => {
             await fetchProducts();
@@ -307,7 +319,7 @@
                 const response = await fetch('/api/urunler');
                 allProducts = await response.json();
                 updateCategoryCounts();
-                renderProducts();
+                applyFilters();
             } catch (error) {
                 console.error('Ürünler yüklenirken hata oluştu:', error);
             }
@@ -319,8 +331,7 @@
                 counts[p.kategori] = (counts[p.kategori] || 0) + 1;
             });
 
-            const categoryButtons = document.querySelectorAll('.category-btn');
-            categoryButtons.forEach(btn => {
+            document.querySelectorAll('.category-btn').forEach(btn => {
                 const cat = btn.dataset.category;
                 const countSpan = btn.querySelector('.cat-count');
                 if (countSpan) countSpan.innerText = counts[cat] || 0;
@@ -337,63 +348,119 @@
                     
                     const catTitle = btn.querySelector('.icon-text').innerText;
                     document.getElementById('current-category-title').innerText = catTitle;
-                    renderProducts();
+                    currentPage = 1;
+                    applyFilters();
                 });
             });
 
             // Feature checkboxes
             document.getElementById('filter-stock').addEventListener('change', (e) => {
                 currentFilters.stockOnly = e.target.checked;
-                renderProducts();
+                currentPage = 1;
+                applyFilters();
             });
             document.getElementById('filter-new').addEventListener('change', (e) => {
                 currentFilters.newOnly = e.target.checked;
-                renderProducts();
+                currentPage = 1;
+                applyFilters();
             });
             document.getElementById('filter-industrial').addEventListener('change', (e) => {
                 currentFilters.industrialOnly = e.target.checked;
-                renderProducts();
+                currentPage = 1;
+                applyFilters();
             });
+
+            // Sorting
+            document.querySelector('.sort-select').addEventListener('change', (e) => {
+                const val = e.target.value;
+                if (val.includes('Artan')) {
+                    allProducts.sort((a, b) => a.fiyat - b.fiyat);
+                } else if (val.includes('Azalan')) {
+                    allProducts.sort((a, b) => b.fiyat - a.fiyat);
+                } else if (val.includes('Yeni')) {
+                    allProducts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                }
+                applyFilters();
+            });
+        }
+
+        function applyFilters() {
+            filteredProducts = allProducts.filter(p => {
+                const matchCat = currentFilters.category === 'all' || p.kategori === currentFilters.category;
+                const matchStock = !currentFilters.stockOnly || p.stokta_var_mi;
+                const matchSearch = !currentFilters.search || 
+                                   p.isim.toLowerCase().includes(currentFilters.search.toLowerCase()) || 
+                                   p.aciklama.toLowerCase().includes(currentFilters.search.toLowerCase());
+                return matchCat && matchStock && matchSearch;
+            });
+
+            renderProducts();
+            renderPagination();
         }
 
         function renderProducts() {
             const productGrid = document.getElementById('productGrid');
-            
-            const filtered = allProducts.filter(p => {
-                const matchCat = currentFilters.category === 'all' || p.kategori === currentFilters.category;
-                const matchStock = !currentFilters.stockOnly || p.stokta_var_mi;
-                const matchNew = !currentFilters.newOnly || (p.ozellikler && p.ozellikler.includes('Yeni Ürün'));
-                const matchIndustrial = !currentFilters.industrialOnly || (p.ozellikler && p.ozellikler.includes('Endüstriyel Tip'));
-                return matchCat && matchStock && matchNew && matchIndustrial;
-            });
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageItems = filteredProducts.slice(start, end);
 
-            document.getElementById('product-count-text').innerText = `Toplam ${filtered.length} ürün listeleniyor`;
+            document.getElementById('product-count-text').innerText = `Toplam ${filteredProducts.length} ürün listeleniyor`;
             
-            if (filtered.length === 0) {
+            if (pageItems.length === 0) {
                 productGrid.innerHTML = '<div class="col-span-full py-20 text-center"><i class="fa-solid fa-magnifying-glass text-4xl text-gray-200 mb-4 block"></i><p class="text-gray-500 font-medium">Aradığınız kriterlere uygun ürün bulunamadı.</p></div>';
                 return;
             }
 
-            productGrid.innerHTML = filtered.map(p => {
+            productGrid.innerHTML = pageItems.map(p => {
                 const priceFormatted = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'EUR' }).format(p.fiyat);
                 return `
-                    <div class="product-card">
-                        <div class="product-img-wrapper">
+                    <div class="product-card group">
+                        <div class="product-img-wrapper overflow-hidden relative">
                             ${p.stokta_var_mi ? '<span class="product-badge stock">Stokta</span>' : '<span class="product-badge bg-gray-500 text-white">Tükendi</span>'}
-                            <img src="${p.resim}" alt="${p.isim}" onerror="this.src='https://via.placeholder.com/300x200?text=Ilgaz+Ürün'">
+                            <img src="${p.resim}" alt="${p.isim}" class="group-hover:scale-110 transition-transform duration-500" onerror="this.src='https://via.placeholder.com/300x200?text=Ilgaz+Ürün'">
                         </div>
                         <div class="product-info">
                             <span class="product-cat">${p.kategori}</span>
                             <h3 class="product-name">${p.isim}</h3>
-                            <p class="product-desc">${p.aciklama}</p>
+                            <p class="product-desc line-clamp-2">${p.aciklama}</p>
                             <div class="product-footer">
-                                <span class="product-price">${priceFormatted}</span>
-                                <a href="urun_detay.html?id=${p.id}" class="btn-detail">Detay Gör <i class="fa-solid fa-arrow-right"></i></a>
+                                <span class="product-price text-primary">${priceFormatted}</span>
+                                <a href="urun_detay.html?id=${p.id}" class="btn-detail">İncele <i class="fa-solid fa-arrow-right"></i></a>
                             </div>
                         </div>
                     </div>
                 `;
             }).join('');
+        }
+
+        function renderPagination() {
+            const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+            const container = document.querySelector('.pagination');
+            
+            if (totalPages <= 1) {
+                container.classList.add('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+            let html = `<button class="page-btn ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}" onclick="changePage(${currentPage - 1})"><i class="fa-solid fa-chevron-left"></i></button>`;
+            
+            for (let i = 1; i <= totalPages; i++) {
+                html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+            }
+            
+            html += `<button class="page-btn ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}" onclick="changePage(${currentPage + 1})"><i class="fa-solid fa-chevron-right"></i></button>`;
+            
+            container.innerHTML = html;
+        }
+
+        function changePage(page) {
+            const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            renderProducts();
+            renderPagination();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
 </body>

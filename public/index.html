@@ -235,9 +235,28 @@
                         <a href="iletisim.html" class="btn btn-outline-light">Bizi Arayın</a>
                     </div>
                 </div>
+                <!-- Add Newsletter here if missing or just keep as is -->
             </div>
         </div>
     </section>
+
+    <section class="section bg-white border-t border-gray-100 py-16">
+        <div class="container max-w-4xl mx-auto text-center px-6">
+            <h2 class="text-3xl font-black text-gray-900 mb-4">Güncel Kataloğumuzu İndirin</h2>
+            <p class="text-gray-500 mb-8">2024 yılı tüm ürün listesi ve teknik dökümanlar tek bir PDF'de.</p>
+            <form id="newsletterForm" class="flex flex-col sm:flex-row gap-4 justify-center">
+                <input type="email" id="newsletterEmail" placeholder="E-posta adresiniz" required class="flex-grow max-w-md px-6 py-4 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
+                <button type="submit" class="bg-primary hover:bg-primary-hover text-white font-bold px-10 py-4 rounded-lg transition-colors shadow-lg shadow-red-500/20 uppercase tracking-widest text-xs">Abone Ol</button>
+            </form>
+        </div>
+    </section>
+    <script>
+        document.getElementById('newsletterForm')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Teşekkürler! Bülten listemize başarıyla eklendiniz.');
+            e.target.reset();
+        });
+    </script>
 
     <!-- Footer -->
     <!-- Footer - Dark Version -->

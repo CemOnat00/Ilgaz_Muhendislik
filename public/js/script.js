@@ -1,47 +1,118 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- MOBILE MENU ---
-    const mobileBtn = document.querySelector('.mobile-menu-btn');
-    const nav = document.querySelector('.nav'); // Using class for consistency if adjusted
-    const header = document.querySelector('.header');
-
-    // For Tailwind pages (iletisim, etc.) the selector might be different
-    const tailwindMobileBtn = document.querySelector('header button.lg\\:hidden');
+    // --- MOBILE MENU LOGIC ---
+    const mobileBtn = document.querySelector('.lg\\:hidden i.fa-bars')?.parentElement;
     
-    function toggleMobileMenu() {
-        // Implement a simple mobile menu or just show a message for now
-        // In a real app, this would toggle a sidebar or dropdown
-        console.log('Mobile menu toggled');
+    // Create Mobile Menu Overlay if it doesn't exist
+    if (!document.getElementById('mobile-menu')) {
+        const menuOverlay = document.createElement('div');
+        menuOverlay.id = 'mobile-menu';
+        menuOverlay.className = 'fixed inset-0 bg-dark-navy/95 z-[100] flex flex-col items-center justify-center gap-8 transition-all duration-300 opacity-0 pointer-events-none';
+        menuOverlay.innerHTML = `
+            <button class="absolute top-6 right-6 text-white text-3xl" id="close-mobile-menu">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <a href="index.html" class="text-white text-xl font-bold uppercase tracking-widest hover:text-primary transition">Ana Sayfa</a>
+            <a href="hakkimizda.html" class="text-white text-xl font-bold uppercase tracking-widest hover:text-primary transition">Hakkımızda</a>
+            <a href="hizmetler.html" class="text-white text-xl font-bold uppercase tracking-widest hover:text-primary transition">Hizmetlerimiz</a>
+            <a href="urunler.html" class="text-white text-xl font-bold uppercase tracking-widest hover:text-primary transition">Ürünlerimiz</a>
+            <a href="iletisim.html" class="text-white text-xl font-bold uppercase tracking-widest hover:text-primary transition">İletişim</a>
+            <div class="mt-8 flex gap-6 text-white text-2xl">
+                <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+                <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#"><i class="fa-brands fa-twitter"></i></a>
+            </div>
+        `;
+        document.body.appendChild(menuOverlay);
     }
+
+    const mobileMenu = document.getElementById('mobile-menu');
+    const closeMenuBtn = document.getElementById('close-mobile-menu');
 
     if (mobileBtn) {
-        mobileBtn.addEventListener('click', toggleMobileMenu);
+        mobileBtn.addEventListener('click', () => {
+            mobileMenu.classList.remove('opacity-0', 'pointer-events-none');
+            document.body.style.overflow = 'hidden';
+        });
     }
+
+    if (closeMenuBtn) {
+        closeMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.add('opacity-0', 'pointer-events-none');
+            document.body.style.overflow = 'auto';
+        });
+    }
+
+    // --- SEARCH OVERLAY LOGIC ---
+    const searchBtn = document.querySelector('button i.fa-magnifying-glass')?.parentElement;
     
-    if (tailwindMobileBtn) {
-        tailwindMobileBtn.addEventListener('click', () => {
-            alert('Mobil menü yakında eklenecektir.');
+    if (!document.getElementById('search-overlay')) {
+        const searchOverlay = document.createElement('div');
+        searchOverlay.id = 'search-overlay';
+        searchOverlay.className = 'fixed inset-0 bg-white/98 z-[100] flex flex-col items-center justify-center p-6 transition-all duration-300 opacity-0 pointer-events-none';
+        searchOverlay.innerHTML = `
+            <button class="absolute top-6 right-6 text-dark-navy text-3xl" id="close-search">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="w-full max-w-2xl">
+                <h2 class="text-3xl font-black text-dark-navy mb-8 text-center uppercase tracking-tighter">Ne aramıştınız?</h2>
+                <div class="relative">
+                    <input type="text" id="search-input" placeholder="Ürün veya hizmet adı yazın..." class="w-full border-b-4 border-dark-navy py-4 text-2xl font-bold focus:outline-none focus:border-primary transition-colors bg-transparent">
+                    <button id="execute-search" class="absolute right-0 bottom-4 text-2xl text-dark-navy hover:text-primary transition-colors">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+                <p class="mt-4 text-gray-400 text-sm font-medium">Örn: Pompa sistemleri, Klima bakımı, Endüstriyel çözümler...</p>
+            </div>
+        `;
+        document.body.appendChild(searchOverlay);
+    }
+
+    const searchOverlay = document.getElementById('search-overlay');
+    const closeSearchBtn = document.getElementById('close-search');
+    const searchInput = document.getElementById('search-input');
+    const executeSearchBtn = document.getElementById('execute-search');
+
+    if (searchBtn) {
+        searchBtn.addEventListener('click', () => {
+            searchOverlay.classList.remove('opacity-0', 'pointer-events-none');
+            searchInput.focus();
+            document.body.style.overflow = 'hidden';
+        });
+    }
+
+    if (closeSearchBtn) {
+        closeSearchBtn.addEventListener('click', () => {
+            searchOverlay.classList.add('opacity-0', 'pointer-events-none');
+            document.body.style.overflow = 'auto';
+        });
+    }
+
+    const performSearch = () => {
+        const query = searchInput.value.trim();
+        if (query) {
+            window.location.href = `/urunler.html?search=\${encodeURIComponent(query)}`;
+        }
+    };
+
+    if (executeSearchBtn) executeSearchBtn.addEventListener('click', performSearch);
+    if (searchInput) {
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') performSearch();
         });
     }
 
     // --- HEADER SCROLL EFFECT ---
+    const header = document.querySelector('header');
     window.addEventListener('scroll', () => {
         if (window.scrollY > 50) {
-            header?.classList.add('scrolled');
-            if (header) header.style.boxShadow = "0 4px 6px -1px rgb(0 0 0 / 0.1)";
+            header?.classList.add('shadow-lg');
+            header?.classList.add('h-16');
+            header?.classList.remove('h-20');
         } else {
-            header?.classList.remove('scrolled');
-            if (header) header.style.boxShadow = "none";
+            header?.classList.remove('shadow-lg');
+            header?.classList.add('h-20');
+            header?.classList.remove('h-16');
         }
     });
-
-    // --- SEARCH BAR MOCK ---
-    const searchBtn = document.querySelector('button i.fa-magnifying-glass')?.parentElement;
-    if (searchBtn) {
-        searchBtn.addEventListener('click', () => {
-            const query = prompt('Aramak istediğiniz ürün veya hizmeti yazın:');
-            if (query) {
-                window.location.href = `/urunler.html?search=${encodeURIComponent(query)}`;
-            }
-        });
-    }
 });
+

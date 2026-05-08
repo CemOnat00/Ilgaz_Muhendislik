@@ -186,15 +186,14 @@
                     </div>
                 </div>
                 
-                <!-- Butonlar -->
-                <div class="flex flex-col sm:flex-row gap-4 mt-auto">
-                    <button class="flex-1 bg-[#d63031] hover:bg-[#b02626] text-white font-bold py-4 rounded-lg flex items-center justify-center gap-2 transition-colors shadow-lg shadow-red-500/20 tracking-wide text-sm">
-                        <i class="fa-solid fa-file-invoice text-lg"></i> TEKLİF İSTE
-                    </button>
-                    <button class="flex-1 bg-white hover:bg-gray-50 text-gray-800 border-2 border-gray-100 hover:border-gray-200 font-bold py-4 rounded-lg flex items-center justify-center gap-2 transition-all tracking-wide text-sm">
-                        <i class="fa-solid fa-download"></i> KATALOG
-                    </button>
-                </div>
+                    <div class="flex flex-col sm:flex-row gap-4 mt-auto">
+                        <button id="teklifBtn" class="flex-1 bg-[#d63031] hover:bg-[#b02626] text-white font-bold py-4 rounded-lg flex items-center justify-center gap-2 transition-colors shadow-lg shadow-red-500/20 tracking-wide text-sm">
+                            <i class="fa-solid fa-file-invoice text-lg"></i> TEKLİF İSTE
+                        </button>
+                        <button onclick="window.print()" class="flex-1 bg-white hover:bg-gray-50 text-gray-800 border-2 border-gray-100 hover:border-gray-200 font-bold py-4 rounded-lg flex items-center justify-center gap-2 transition-all tracking-wide text-sm">
+                            <i class="fa-solid fa-download"></i> KATALOG / YAZDIR
+                        </button>
+                    </div>
                 
             </div>
         </div>
@@ -336,13 +335,19 @@
         </div>
     </footer>
 
+    <script src="js/script.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
-            const productId = urlParams.get('id') || 1; // Default to 1 if no id
+            const productId = urlParams.get('id');
+            
+            if (!productId) {
+                window.location.href = 'urunler.html';
+                return;
+            }
             
             try {
-                const response = await fetch(`/api/urunler/${productId}`);
+                const response = await fetch(`/api/urunler/\${productId}`);
                 if (!response.ok) throw new Error('Ürün bulunamadı');
                 
                 const p = await response.json();
@@ -353,8 +358,12 @@
                 document.getElementById('productCatBadge').innerText = p.kategori;
                 document.getElementById('mainImage').src = p.resim;
                 
-                // Set the price in the Teklif İste button or add it
-                // For now, we just rely on the existing layout and the loaded data
+                // Teklif İste logic
+                document.getElementById('teklifBtn').onclick = () => {
+                    const subject = encodeURIComponent(`Teklif İsteği: \${p.isim}`);
+                    const message = encodeURIComponent(`Merhaba, \${p.isim} ürünü için fiyat teklifi almak istiyorum. ID: \${p.id}`);
+                    window.location.href = `iletisim.html?subject=\${subject}&message=\${message}`;
+                };
                 
             } catch (error) {
                 console.error(error);
@@ -383,9 +392,9 @@
                         
                         const img = thumb.querySelector('img');
                         if (img) {
-                            mainContainer.innerHTML = `<img id="mainImage" src="${img.src}" alt="Ürün Görseli" class="w-full h-full object-contain filter drop-shadow-xl hover:scale-105 transition-transform duration-500"/>`;
+                            mainContainer.innerHTML = `<img id="mainImage" src="\${img.src}" alt="Ürün Görseli" class="w-full h-full object-contain filter drop-shadow-xl hover:scale-105 transition-transform duration-500"/>`;
                         } else {
-                            mainContainer.innerHTML = `<div class="w-full h-full flex items-center justify-center scale-150">${thumb.innerHTML}</div>`;
+                            mainContainer.innerHTML = `<div class="w-full h-full flex items-center justify-center scale-150">\${thumb.innerHTML}</div>`;
                         }
                         
                         mainContainer.style.opacity = '1';
