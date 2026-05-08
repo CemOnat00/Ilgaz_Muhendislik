@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"log"
+	"os"
 	"time"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
@@ -14,11 +15,15 @@ var MongoClient *mongo.Client
 var DB *mongo.Database
 
 const (
-	uri    = "mongodb+srv://satircemonat_db_user:2PKxc2hByMp6j05e@ilgazmuhdb.inirtn0.mongodb.net/?appName=IlgazMuhDB"
 	dbName = "IlgazDB"
 )
 
 func ConnectDB() {
+	uri := os.Getenv("MONGO_URI")
+	if uri == "" {
+		log.Fatal("MONGO_URI environment variable is not set")
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 

@@ -7,9 +7,16 @@ import (
 	"github.com/cemonat00/ilgaz-backend/internal/database"
 	"github.com/cemonat00/ilgaz-backend/internal/routes"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	// 0. Load .env file
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("Uyarı: .env dosyası bulunamadı, sistem değişkenleri kullanılacak")
+	}
+
 	// 1. Initialize Database
 	database.ConnectDB()
 	database.SeedAdmin()
