@@ -134,33 +134,33 @@
                         <p class="text-sm text-gray-500 mt-1">Update your company details and contact information.</p>
                     </div>
                     
-                    <form class="p-8">
+                    <form class="p-8" id="settingsForm">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                             <div>
                                 <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Company Name</label>
-                                <input type="text" class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-3 outline-none" value="Ilgaz Mühendislik A.Ş.">
+                                <input type="text" id="cName" class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-3 outline-none" value="Ilgaz Mühendislik A.Ş.">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Contact Email</label>
-                                <input type="email" class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-3 outline-none" value="info@ilgazmuhendislik.com">
+                                <input type="email" id="cEmail" class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-3 outline-none" value="info@ilgazmuhendislik.com">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Phone Number</label>
-                                <input type="text" class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-3 outline-none" value="+90 212 123 45 67">
+                                <input type="text" id="cPhone" class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-3 outline-none" value="+90 212 123 45 67">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Support Email</label>
-                                <input type="email" class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-3 outline-none" value="support@ilgazmuhendislik.com">
+                                <input type="email" id="cSupport" class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-3 outline-none" value="support@ilgazmuhendislik.com">
                             </div>
                         </div>
                         
                         <div class="mb-8">
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Office Address</label>
-                            <textarea class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-3 outline-none" rows="3">Merkez Mah. Mühendis Sk. No: 24, Şişli / İstanbul</textarea>
+                            <textarea id="cAddress" class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-3 outline-none" rows="3">Merkez Mah. Mühendis Sk. No: 24, Şişli / İstanbul</textarea>
                         </div>
 
                         <div class="flex justify-end">
-                            <button type="button" class="bg-primary hover:bg-primary-hover text-white font-bold py-2.5 px-6 rounded-lg shadow-md shadow-red-500/20 transition-all">
+                            <button type="submit" class="bg-primary hover:bg-primary-hover text-white font-bold py-2.5 px-6 rounded-lg shadow-md shadow-red-500/20 transition-all">
                                 Save Changes
                             </button>
                         </div>
@@ -170,6 +170,21 @@
             </div>
         </main>
     </div>
+
+    <script>
+        document.getElementById('settingsForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.disabled = true;
+            btn.innerText = 'Saving...';
+            
+            setTimeout(() => {
+                alert('Ayarlar başarıyla kaydedildi!');
+                btn.disabled = false;
+                btn.innerText = 'Save Changes';
+            }, 800);
+        });
+    </script>
 
 </body>
 </html>
