@@ -1,264 +1,431 @@
 package handlers
 
 import (
-	"fmt"
+	"context"
 	"net/http"
 	"time"
 
-	"github.com/gin-gonic/gin"
+	"github.com/cemonat00/ilgaz-backend/internal/database"
 	"github.com/cemonat00/ilgaz-backend/internal/models"
+	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/v2/bson"
+	"path/filepath"
+	"fmt"
 )
 
-// --- IN-MEMORY MOCK DATA ---
+// --- UPLOAD HANDLER ---
 
-var mockUrunler = []models.Urun{
-	{
-		ID:          "1",
-		Kategori:    "Vana Grubu",
-		Baslik:      "Küresel Vana - Tip 101",
-		Isim:        "Endüstriyel Küresel Vana",
-		Aciklama:    "Yüksek basınçlı buhar hatları için özel sızdırmazlık teknolojisi.",
-		Resim:       "https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80",
-		Fiyat:       1250.00,
-		StoktaVarMi: true,
-		Ozellikler:  []string{"Endüstriyel Tip", "Paslanmaz Çelik"},
-		Durum:       "Aktif",
-	},
-	{
-		ID:          "2",
-		Kategori:    "Pompa Sistemleri",
-		Baslik:      "Sirkülasyon Pompası XP",
-		Isim:        "XP Serisi Sirkülasyon Pompası",
-		Aciklama:    "Isıtma ve soğutma sistemlerinde yüksek verimli enerji tasarrufu.",
-		Resim:       "https://images.unsplash.com/photo-1581092335397-9583eb92d232?auto=format&fit=crop&q=80",
-		Fiyat:       3400.00,
-		StoktaVarMi: true,
-		Ozellikler:  []string{"Yeni Ürün", "A Sınıfı Enerji"},
-		Durum:       "Aktif",
-	},
-	{
-		ID:          "3",
-		Kategori:    "Isı Değiştiriciler",
-		Baslik:      "Plakalı Eşanjör - HE-50",
-		Isim:        "Yüksek Verimli Plakalı Eşanjör",
-		Aciklama:    "Kompakt tasarım ile maksimum ısı transfer verimliliği.",
-		Resim:       "https://images.unsplash.com/photo-1581092430616-94e671651e14?auto=format&fit=crop&q=80",
-		Fiyat:       5600.00,
-		StoktaVarMi: false,
-		Ozellikler:  []string{"Endüstriyel Tip"},
-		Durum:       "Aktif",
-	},
-	{
-		ID:          "4",
-		Kategori:    "Otomasyon",
-		Baslik:      "PLC Kontrol Paneli",
-		Isim:        "Akıllı Proses Kontrol Ünitesi",
-		Aciklama:    "Fabrika otomasyonu için programlanabilir mantıksal denetleyici.",
-		Resim:       "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&q=80",
-		Fiyat:       8900.00,
-		StoktaVarMi: true,
-		Ozellikler:  []string{"Yeni Ürün", "Endüstriyel Tip"},
-		Durum:       "Aktif",
-	},
-	{
-		ID:          "5",
-		Kategori:    "Yedek Parça",
-		Baslik:      "Conta Takımı - Viton",
-		Isim:        "Yüksek Isı Dayanımlı Conta Takımı",
-		Aciklama:    "Kimyasal dayanımı yüksek, sızdırmazlık garantili conta seti.",
-		Resim:       "https://images.unsplash.com/photo-1581092334651-ddf26d9a1930?auto=format&fit=crop&q=80",
-		Fiyat:       450.00,
-		StoktaVarMi: true,
-		Ozellikler:  []string{"Endüstriyel Tip"},
-		Durum:       "Aktif",
-	},
-}
-
-var mockMesajlar = []models.Mesaj{
-	{
-		ID:       "1",
-		AdSoyad:  "Ahmet Yılmaz",
-		Email:    "ahmet@yilmaz-const.com",
-		Konu:     "Project Inquiry - Site 2A",
-		Mesaj:    "I would like to request a quote for our new commercial complex in Bahçelievler.",
-		Tarih:    time.Now().Add(-2 * time.Hour),
-		OkunduMu: false,
-	},
-}
-
-var mockProjeler = []models.Proje{
-	{
-		ID:       "1",
-		Baslik:   "Modern Konut Kompleksi",
-		Musteri:  "Yılmaz İnşaat",
-		Kategori: "Elektrik & Mekanik",
-		Durum:    "Devam Ediyor",
-		Tarih:    time.Now(),
-		Aciklama: "500 dairelik konut projesinin tüm elektrik altyapı işleri.",
-	},
-}
-
-// --- HANDLERS ---
-
-// GetProjeler returns all projects
-func GetProjeler(c *gin.Context) {
-	c.JSON(http.StatusOK, mockProjeler)
-}
-
-// AddProje adds a new project
-func AddProje(c *gin.Context) {
-	var yeniProje models.Proje
-	if err := c.ShouldBindJSON(&yeniProje); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+func UploadImage(c *gin.Context) {
+	file, err := c.FormFile("image")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Dosya yüklenemedi"})
 		return
 	}
-	yeniProje.ID = fmt.Sprintf("%d", time.Now().UnixNano())
-	yeniProje.Tarih = time.Now()
-	mockProjeler = append([]models.Proje{yeniProje}, mockProjeler...)
-	c.JSON(http.StatusCreated, yeniProje)
-}
 
-// UpdateProje updates an existing project
-func UpdateProje(c *gin.Context) {
-	id := c.Param("id")
-	var guncelProje models.Proje
-	if err := c.ShouldBindJSON(&guncelProje); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	// Create unique filename
+	filename := fmt.Sprintf("%d-%s", time.Now().Unix(), filepath.Base(file.Filename))
+	savePath := filepath.Join("assets", "uploads", filename)
+
+	if err := c.SaveUploadedFile(file, savePath); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Dosya kaydedilemedi"})
 		return
 	}
-	for i, p := range mockProjeler {
-		if p.ID == id {
-			guncelProje.ID = id
-			mockProjeler[i] = guncelProje
-			c.JSON(http.StatusOK, guncelProje)
-			return
-		}
-	}
-	c.JSON(http.StatusNotFound, gin.H{"error": "Project not found"})
+
+	// Return the accessible URL
+	url := fmt.Sprintf("/assets/uploads/%s", filename)
+	c.JSON(http.StatusOK, gin.H{"url": url})
 }
 
-// DeleteProje deletes a project
-func DeleteProje(c *gin.Context) {
-	id := c.Param("id")
-	for i, p := range mockProjeler {
-		if p.ID == id {
-			mockProjeler = append(mockProjeler[:i], mockProjeler[i+1:]...)
-			c.JSON(http.StatusOK, gin.H{"message": "Project deleted"})
-			return
-		}
-	}
-	c.JSON(http.StatusNotFound, gin.H{"error": "Project not found"})
-}
+// --- PRODUCT HANDLERS ---
 
-// GetUrunler returns all products
-func GetUrunler(c *gin.Context) {
-	c.JSON(http.StatusOK, mockUrunler)
-}
+func GetProducts(c *gin.Context) {
+	collection := database.GetCollection("products")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
-// GetUrun returns a specific product by ID
-func GetUrun(c *gin.Context) {
-	id := c.Param("id")
-	for _, urun := range mockUrunler {
-		if urun.ID == id {
-			c.JSON(http.StatusOK, urun)
-			return
-		}
-	}
-	c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
-}
-
-// AddUrun adds a new product
-func AddUrun(c *gin.Context) {
-	var yeniUrun models.Urun
-	if err := c.ShouldBindJSON(&yeniUrun); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	var products []models.Product
+	cursor, err := collection.Find(ctx, bson.M{})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Ürünler çekilemedi"})
 		return
 	}
-	yeniUrun.ID = fmt.Sprintf("%d", time.Now().UnixNano())
-	mockUrunler = append([]models.Urun{yeniUrun}, mockUrunler...)
-	c.JSON(http.StatusCreated, yeniUrun)
+	defer cursor.Close(ctx)
+
+	for cursor.Next(ctx) {
+		var product models.Product
+		cursor.Decode(&product)
+		products = append(products, product)
+	}
+
+	c.JSON(http.StatusOK, products)
 }
 
-// UpdateUrun updates an existing product
-func UpdateUrun(c *gin.Context) {
+func GetProductByID(c *gin.Context) {
 	id := c.Param("id")
-	var guncelUrun models.Urun
-	if err := c.ShouldBindJSON(&guncelUrun); err != nil {
+	objID, _ := bson.ObjectIDFromHex(id)
+
+	collection := database.GetCollection("products")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	var product models.Product
+	err := collection.FindOne(ctx, bson.M{"_id": objID}).Decode(&product)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Ürün bulunamadı"})
+		return
+	}
+
+	c.JSON(http.StatusOK, product)
+}
+
+func AddProduct(c *gin.Context) {
+	var product models.Product
+	if err := c.ShouldBindJSON(&product); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	for i, urun := range mockUrunler {
-		if urun.ID == id {
-			guncelUrun.ID = id
-			mockUrunler[i] = guncelUrun
-			c.JSON(http.StatusOK, guncelUrun)
-			return
-		}
+	product.ID = bson.NewObjectID()
+	product.CreatedAt = time.Now()
+
+	collection := database.GetCollection("products")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	_, err := collection.InsertOne(ctx, product)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Ürün eklenemedi"})
+		return
 	}
-	c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
+
+	c.JSON(http.StatusCreated, product)
 }
 
-// DeleteUrun deletes a product by ID
-func DeleteUrun(c *gin.Context) {
+func UpdateProduct(c *gin.Context) {
 	id := c.Param("id")
-	for i, urun := range mockUrunler {
-		if urun.ID == id {
-			// Remove from slice
-			mockUrunler = append(mockUrunler[:i], mockUrunler[i+1:]...)
-			c.JSON(http.StatusOK, gin.H{"message": "Product deleted successfully"})
-			return
-		}
+	objID, _ := bson.ObjectIDFromHex(id)
+
+	var product models.Product
+	if err := c.ShouldBindJSON(&product); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
-	c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
+
+	collection := database.GetCollection("products")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	update := bson.M{
+		"$set": bson.M{
+			"name":         product.Name,
+			"isim":         product.Isim,
+			"category":     product.Category,
+			"kategori":     product.Kategori,
+			"price":        product.Price,
+			"stock_status": product.StockStatus,
+			"image_url":    product.ImageURL,
+			"description":  product.Description,
+			"status":       product.Status,
+		},
+	}
+
+	_, err := collection.UpdateOne(ctx, bson.M{"_id": objID}, update)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Güncelleme başarısız"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Ürün güncellendi"})
 }
 
-// PostMesaj handles incoming contact form submissions
-func PostMesaj(c *gin.Context) {
-	var yeniMesaj models.Mesaj
+func DeleteProduct(c *gin.Context) {
+	id := c.Param("id")
+	objID, _ := bson.ObjectIDFromHex(id)
+
+	collection := database.GetCollection("products")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	_, err := collection.DeleteOne(ctx, bson.M{"_id": objID})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Silme işlemi başarısız"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Ürün silindi"})
+}
+
+// --- MESSAGE HANDLERS ---
+
+func CreateMessage(c *gin.Context) {
+	var msg models.Message
+	if err := c.ShouldBindJSON(&msg); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Geçersiz mesaj verisi"})
+		return
+	}
+
+	msg.ID = bson.NewObjectID()
+	msg.CreatedAt = time.Now()
+	msg.Status = "Unread"
+
+	collection := database.GetCollection("messages")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	_, err := collection.InsertOne(ctx, msg)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Mesaj gönderilemedi"})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"message": "Mesajınız başarıyla iletildi"})
+}
+
+func GetMessages(c *gin.Context) {
+	collection := database.GetCollection("messages")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	var messages []models.Message
+	cursor, err := collection.Find(ctx, bson.M{})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Mesajlar çekilemedi"})
+		return
+	}
+	defer cursor.Close(ctx)
+
+	for cursor.Next(ctx) {
+		var m models.Message
+		cursor.Decode(&m)
+		m.Tarih = m.CreatedAt // Duplicate for frontend compatibility
+		messages = append(messages, m)
+	}
+
+	c.JSON(http.StatusOK, messages)
+}
+
+func MarkMessageRead(c *gin.Context) {
+	id := c.Param("id")
+	objID, _ := bson.ObjectIDFromHex(id)
+
+	collection := database.GetCollection("messages")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	_, err := collection.UpdateOne(ctx, bson.M{"_id": objID}, bson.M{"$set": bson.M{"is_read": true, "status": "Read"}})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Güncellenemedi"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Okundu işaretlendi"})
+}
+
+func DeleteMessage(c *gin.Context) {
+	id := c.Param("id")
+	objID, _ := bson.ObjectIDFromHex(id)
+
+	collection := database.GetCollection("messages")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	_, err := collection.DeleteOne(ctx, bson.M{"_id": objID})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Silinemedi"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Mesaj silindi"})
+}
+
+// --- PROJECT HANDLERS ---
+
+func GetProjects(c *gin.Context) {
+	collection := database.GetCollection("projects")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	var projects []models.Project
+	cursor, err := collection.Find(ctx, bson.M{})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Projeler çekilemedi"})
+		return
+	}
+	defer cursor.Close(ctx)
+
+	for cursor.Next(ctx) {
+		var p models.Project
+		cursor.Decode(&p)
+		projects = append(projects, p)
+	}
+
+	c.JSON(http.StatusOK, projects)
+}
+
+func AddProject(c *gin.Context) {
+	var project models.Project
+	if err := c.ShouldBindJSON(&project); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	project.ID = bson.NewObjectID()
+	project.Date = time.Now()
+
+	collection := database.GetCollection("projects")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	_, err := collection.InsertOne(ctx, project)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Proje eklenemedi"})
+		return
+	}
+
+	c.JSON(http.StatusCreated, project)
+}
+
+func UpdateProject(c *gin.Context) {
+	id := c.Param("id")
+	objID, _ := bson.ObjectIDFromHex(id)
+
+	var project models.Project
+	if err := c.ShouldBindJSON(&project); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	collection := database.GetCollection("projects")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	update := bson.M{
+		"$set": bson.M{
+			"title":       project.Title,
+			"customer":    project.Customer,
+			"category":    project.Category,
+			"subtitle":    project.SubTitle,
+			"progress":    project.Progress,
+			"status":      project.Status,
+			"description": project.Description,
+			"image_url":   project.ImageURL,
+		},
+	}
+
+	_, err := collection.UpdateOne(ctx, bson.M{"_id": objID}, update)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Güncelleme başarısız"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Proje güncellendi"})
+}
+
+func DeleteProject(c *gin.Context) {
+	id := c.Param("id")
+	objID, _ := bson.ObjectIDFromHex(id)
+
+	collection := database.GetCollection("projects")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	_, err := collection.DeleteOne(ctx, bson.M{"_id": objID})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Silme işlemi başarısız"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Proje silindi"})
+}
+
+// --- AUTH HANDLERS ---
+
+func AdminLogin(c *gin.Context) {
+	var loginReq models.LoginRequest
+	if err := c.ShouldBindJSON(&loginReq); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Eksik bilgi"})
+		return
+	}
+
+	collection := database.GetCollection("admins")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	var admin models.Admin
+	err := collection.FindOne(ctx, bson.M{"username": loginReq.Username}).Decode(&admin)
 	
-	// Bind JSON request to struct
-	if err := c.ShouldBindJSON(&yeniMesaj); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	// Simple password check (In production, use bcrypt)
+	if err != nil || admin.Password != loginReq.Password {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Geçersiz kullanıcı adı veya şifre"})
 		return
 	}
 
-	// Assign ID and timestamp
-	yeniMesaj.ID = fmt.Sprintf("%d", time.Now().UnixNano())
-	yeniMesaj.Tarih = time.Now()
-	yeniMesaj.OkunduMu = false
-
-	// Add to in-memory store
-	mockMesajlar = append([]models.Mesaj{yeniMesaj}, mockMesajlar...) // Add to beginning
-
-	c.JSON(http.StatusCreated, gin.H{
-		"message": "Mesaj başarıyla alındı",
-		"data":    yeniMesaj,
+	c.JSON(http.StatusOK, models.LoginResponse{
+		Token:   "mock-jwt-token-" + admin.Username,
+		Message: "Giriş başarılı",
 	})
 }
 
-// GetAdminMesajlar returns all messages for the admin panel
-func GetAdminMesajlar(c *gin.Context) {
-	c.JSON(http.StatusOK, mockMesajlar)
+func ForgotPassword(c *gin.Context) {
+	var req models.ForgotPasswordRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Geçersiz email"})
+		return
+	}
+
+	collection := database.GetCollection("admins")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	var admin models.Admin
+	err := collection.FindOne(ctx, bson.M{"email": req.Email}).Decode(&admin)
+	if err != nil {
+		// Don't reveal if email exists for security, but for this project we'll return success
+		c.JSON(http.StatusOK, gin.H{"message": "Sıfırlama linki gönderildi"})
+		return
+	}
+
+	// Generate mock reset token
+	resetToken := "token-" + bson.NewObjectID().Hex()
+	_, _ = collection.UpdateOne(ctx, bson.M{"_id": admin.ID}, bson.M{"$set": bson.M{"reset_token": resetToken}})
+
+	// In a real app, send email. Here we return the URL for testing.
+	resetURL := "/admin-reset-password.html?token=" + resetToken
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":   "Sıfırlama linki gönderildi",
+		"reset_url": resetURL, // Dev mode convenience
+	})
 }
 
-// AdminLogin handles a simple mock authentication
-func AdminLogin(c *gin.Context) {
-	var loginReq models.LoginRequest
-	
-	if err := c.ShouldBindJSON(&loginReq); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Geçersiz istek formatı"})
+func ResetPassword(c *gin.Context) {
+	var req models.ResetPasswordRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Geçersiz veri"})
 		return
 	}
 
-	// Mock check
-	if loginReq.KullaniciAdi == "admin" && loginReq.Sifre == "1234" {
-		c.JSON(http.StatusOK, models.LoginResponse{
-			Token:   "mock-jwt-token-12345",
-			Message: "Giriş başarılı",
-		})
+	collection := database.GetCollection("admins")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	var admin models.Admin
+	err := collection.FindOne(ctx, bson.M{"reset_token": req.Token}).Decode(&admin)
+	if err != nil || req.Token == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Geçersiz veya süresi dolmuş token"})
 		return
 	}
 
-	c.JSON(http.StatusUnauthorized, gin.H{"error": "Hatalı kullanıcı adı veya şifre"})
+	// Update password and clear token
+	_, err = collection.UpdateOne(ctx, bson.M{"_id": admin.ID}, bson.M{
+		"$set":   bson.M{"password": req.NewPassword},
+		"$unset": bson.M{"reset_token": ""},
+	})
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Şifre güncellenemedi"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Şifre başarıyla güncellendi"})
 }

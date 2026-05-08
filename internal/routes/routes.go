@@ -1,57 +1,38 @@
 package routes
 
 import (
-	"net/http"
-	"strings"
-	"github.com/gin-gonic/gin"
 	"github.com/cemonat00/ilgaz-backend/internal/handlers"
+	"github.com/gin-gonic/gin"
 )
 
-// AuthMiddleware checks for a valid mock token in the Authorization header
-func AuthMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		token := c.GetHeader("Authorization")
-		
-		// In a real app, you would validate a JWT here
-		if token == "" || !strings.HasPrefix(token, "Bearer mock-jwt-token") {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Bu işlem için yetkiniz yok"})
-			c.Abort()
-			return
-		}
-		c.Next()
-	}
-}
-
-// SetupRoutes configures the API endpoints
-func SetupRoutes(router *gin.Engine) {
-	
+func SetupRoutes(r *gin.Engine) {
 	// API Group
-	api := router.Group("/api")
+	api := r.Group("/api")
 	{
 		// Public Endpoints
-		api.GET("/urunler", handlers.GetUrunler)
-		api.GET("/urunler/:id", handlers.GetUrun)
-		api.GET("/projeler", handlers.GetProjeler)
-		api.POST("/mesajlar", handlers.PostMesaj)
+		api.GET("/urunler", handlers.GetProducts)
+		api.GET("/urunler/:id", handlers.GetProductByID)
+		api.POST("/mesajlar", handlers.CreateMessage)
+		api.GET("/projeler", handlers.GetProjects)
 
-		// Admin Login (Public)
+		// Admin Auth
 		api.POST("/admin/login", handlers.AdminLogin)
+		api.POST("/admin/forgot-password", handlers.ForgotPassword)
+		api.POST("/admin/reset-password", handlers.ResetPassword)
 
-		// Protected Admin Endpoints
+		// Protected Admin Endpoints (Middleware can be added later)
 		admin := api.Group("/admin")
-		admin.Use(AuthMiddleware())
 		{
-			admin.GET("/mesajlar", handlers.GetAdminMesajlar)
-			
-			// Product CRUD
-			admin.POST("/urunler", handlers.AddUrun)
-			admin.PUT("/urunler/:id", handlers.UpdateUrun)
-			admin.DELETE("/urunler/:id", handlers.DeleteUrun)
-
-			// Project CRUD
-			admin.POST("/projeler", handlers.AddProje)
-			admin.PUT("/projeler/:id", handlers.UpdateProje)
-			admin.DELETE("/projeler/:id", handlers.DeleteProje)
+			admin.POST("/upload", handlers.UploadImage)
+			admin.GET("/mesajlar", handlers.GetMessages)
+			admin.PUT("/mesajlar/:id/read", handlers.MarkMessageRead)
+			admin.DELETE("/mesajlar/:id", handlers.DeleteMessage)
+			admin.POST("/urunler", handlers.AddProduct)
+			admin.PUT("/urunler/:id", handlers.UpdateProduct)
+			admin.DELETE("/urunler/:id", handlers.DeleteProduct)
+			admin.POST("/projeler", handlers.AddProject)
+			admin.PUT("/projeler/:id", handlers.UpdateProject)
+			admin.DELETE("/projeler/:id", handlers.DeleteProject)
 		}
 	}
 }

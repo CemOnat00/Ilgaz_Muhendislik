@@ -226,8 +226,27 @@
                         <label for="pInStock" class="text-sm font-bold text-gray-700">In Stock</label>
                     </div>
                     <div class="col-span-2">
-                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Image URL</label>
-                        <input type="text" id="pImage" placeholder="https://..." class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-3 outline-none">
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Product Image</label>
+                        <div class="flex gap-4">
+                            <div class="flex-grow">
+                                <label for="pImageFile" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-200 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
+                                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                        <i class="fa-solid fa-cloud-arrow-up text-gray-400 text-2xl mb-2"></i>
+                                        <p class="mb-1 text-sm text-gray-500 font-bold">Click to upload</p>
+                                        <p class="text-xs text-gray-400">PNG, JPG or WEBP (MAX. 2MB)</p>
+                                    </div>
+                                    <input type="file" id="pImageFile" class="hidden" accept="image/*" />
+                                </label>
+                                <input type="hidden" id="pImage">
+                            </div>
+                            <div class="w-32 h-32 rounded-lg border border-gray-200 bg-gray-50 overflow-hidden flex-shrink-0 relative group">
+                                <img id="pPreview" src="" alt="Preview" class="w-full h-full object-cover hidden">
+                                <div id="pNoPreview" class="w-full h-full flex items-center justify-center text-gray-300 text-xs text-center p-4">No Image Selected</div>
+                                <div id="uploadLoader" class="absolute inset-0 bg-white/80 hidden items-center justify-center">
+                                    <i class="fa-solid fa-circle-notch fa-spin text-primary text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-span-2">
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Description</label>
@@ -243,11 +262,110 @@
         </div>
     </div>
 
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[110] hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
+            <div class="p-8 text-center">
+                <div class="w-16 h-16 bg-red-50 text-primary rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
+                    <i class="fa-solid fa-trash-can"></i>
+                </div>
+                <h3 class="text-xl font-black text-gray-900 mb-2">Are you sure?</h3>
+                <p class="text-gray-500 text-sm mb-8">This product will be permanently removed. This action cannot be undone.</p>
+                <div class="flex flex-col gap-3">
+                    <button id="confirmDeleteBtn" class="w-full py-3 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl transition-all shadow-md shadow-red-500/20">Delete Product</button>
+                    <button onclick="closeDeleteModal()" class="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold rounded-xl transition-all">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script>
         const tableBody = document.getElementById('products-table-body');
         const productModal = document.getElementById('productModal');
         const productForm = document.getElementById('productForm');
+        const deleteModal = document.getElementById('deleteModal');
+        const pImageFile = document.getElementById('pImageFile');
+        const pImageHidden = document.getElementById('pImage');
+        const pPreview = document.getElementById('pPreview');
+        const pNoPreview = document.getElementById('pNoPreview');
+        const uploadLoader = document.getElementById('uploadLoader');
+        let deleteTargetId = null;
         
+        // Image Upload Logic
+        pImageFile.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Show preview locally immediately
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                pPreview.src = event.target.result;
+                pPreview.classList.remove('hidden');
+                pNoPreview.classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
+
+            // Upload to server
+            uploadLoader.classList.remove('hidden');
+            uploadLoader.classList.add('flex');
+
+            const formData = new FormData();
+            formData.append('image', file);
+
+            const token = localStorage.getItem('adminToken');
+            try {
+                const response = await fetch('/api/admin/upload', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    pImageHidden.value = result.url;
+                } else {
+                    alert('Upload failed: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error uploading:', error);
+            } finally {
+                uploadLoader.classList.add('hidden');
+                uploadLoader.classList.remove('flex');
+            }
+        });
+
+        function updatePreview(url) {
+            if (url && url.trim() !== '') {
+                pPreview.src = url;
+                pPreview.classList.remove('hidden');
+                pNoPreview.classList.add('hidden');
+                pImageHidden.value = url;
+            } else {
+                pPreview.src = '';
+                pPreview.classList.add('hidden');
+                pNoPreview.classList.remove('hidden');
+                pImageHidden.value = '';
+            }
+        }
+
+        // Drag & Drop Sorting
+        new Sortable(tableBody, {
+            animation: 150,
+            ghostClass: 'bg-red-50',
+            onEnd: async function() {
+                const rows = Array.from(tableBody.querySelectorAll('tr'));
+                const newOrder = rows.map(row => row.dataset.id);
+                const token = localStorage.getItem('adminToken');
+                try {
+                    await fetch('/api/admin/urunler/reorder', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ order: newOrder })
+                    });
+                } catch (e) {}
+            }
+        });
+
         // Fetch all products
         async function loadProducts() {
             try {
@@ -256,7 +374,7 @@
                 document.getElementById('total-count').innerText = products.length;
                 
                 tableBody.innerHTML = products.map(p => `
-                    <tr class="hover:bg-gray-50 transition-colors">
+                    <tr class="hover:bg-gray-50 transition-colors cursor-move" data-id="${p.id}">
                         <td class="px-6 py-4 whitespace-nowrap text-gray-400 font-mono text-xs">#${p.id.substring(0,8)}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center gap-4">
@@ -293,6 +411,7 @@
         // Modal Controls
         function openModal() {
             productForm.reset();
+            updatePreview('');
             document.getElementById('productId').value = '';
             document.getElementById('modalTitle').innerText = 'Add New Product';
             productModal.classList.remove('hidden');
@@ -304,9 +423,15 @@
             productModal.classList.remove('flex');
         }
 
+        function closeDeleteModal() {
+            deleteModal.classList.add('hidden');
+            deleteModal.classList.remove('flex');
+            deleteTargetId = null;
+        }
+
         async function editProduct(id) {
             try {
-                const response = await fetch(\`/api/urunler/\${id}\`);
+                const response = await fetch(`/api/urunler/${id}`);
                 const p = await response.json();
                 
                 document.getElementById('productId').value = p.id;
@@ -319,6 +444,8 @@
                 document.getElementById('pImage').value = p.resim;
                 document.getElementById('pDescription').value = p.aciklama;
                 
+                updatePreview(p.resim);
+                
                 document.getElementById('modalTitle').innerText = 'Edit Product';
                 productModal.classList.remove('hidden');
                 productModal.classList.add('flex');
@@ -327,16 +454,23 @@
             }
         }
 
-        async function deleteProduct(id) {
-            if (!confirm('Are you sure you want to delete this product?')) return;
+        function deleteProduct(id) {
+            deleteTargetId = id;
+            deleteModal.classList.remove('hidden');
+            deleteModal.classList.add('flex');
+        }
+
+        document.getElementById('confirmDeleteBtn').onclick = async () => {
+            if (!deleteTargetId) return;
             const token = localStorage.getItem('adminToken');
             
             try {
-                const response = await fetch(\`/api/admin/urunler/\${id}\`, { 
+                const response = await fetch(`/api/admin/urunler/${deleteTargetId}`, { 
                     method: 'DELETE',
-                    headers: { 'Authorization': \`Bearer \${token}\` }
+                    headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (response.ok) {
+                    closeDeleteModal();
                     loadProducts();
                 } else {
                     alert('Failed to delete product');
@@ -344,7 +478,7 @@
             } catch (error) {
                 console.error('Error deleting product:', error);
             }
-        }
+        };
 
         productForm.onsubmit = async (e) => {
             e.preventDefault();
@@ -357,12 +491,12 @@
                 fiyat: parseFloat(document.getElementById('pPrice').value),
                 durum: document.getElementById('pStatus').value,
                 stokta_var_mi: document.getElementById('pInStock').checked,
-                resim: document.getElementById('pImage').value,
+                resim: pImageHidden.value,
                 aciklama: document.getElementById('pDescription').value,
                 ozellikler: []
             };
 
-            const url = id ? \`/api/admin/urunler/\${id}\` : '/api/admin/urunler';
+            const url = id ? `/api/admin/urunler/${id}` : '/api/admin/urunler';
             const method = id ? 'PUT' : 'POST';
 
             try {
@@ -370,7 +504,7 @@
                     method: method,
                     headers: { 
                         'Content-Type': 'application/json',
-                        'Authorization': \`Bearer \${token}\`
+                        'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify(data)
                 });
@@ -390,4 +524,5 @@
         loadProducts();
     </script>
 </body>
+
 </html>

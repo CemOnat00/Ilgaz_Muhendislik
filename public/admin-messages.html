@@ -243,10 +243,29 @@
         </main>
     </div>
 
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[110] hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
+            <div class="p-8 text-center">
+                <div class="w-16 h-16 bg-red-50 text-primary rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
+                    <i class="fa-solid fa-trash-can"></i>
+                </div>
+                <h3 class="text-xl font-black text-gray-900 mb-2">Delete Message?</h3>
+                <p class="text-gray-500 text-sm mb-8">This inquiry will be permanently removed. This action cannot be undone.</p>
+                <div class="flex flex-col gap-3">
+                    <button id="confirmDeleteBtn" class="w-full py-3 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl transition-all shadow-md shadow-red-500/20">Confirm Delete</button>
+                    <button onclick="closeDeleteModal()" class="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold rounded-xl transition-all">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 <script>
     let allMessages = [];
     let currentFilter = 'all';
+    let deleteTargetId = null;
+    const deleteModal = document.getElementById('deleteModal');
 
     document.addEventListener('DOMContentLoaded', async () => {
         const token = localStorage.getItem('adminToken');
@@ -306,17 +325,17 @@
             const initials = m.ad_soyad.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
             const date = new Date(m.tarih).toLocaleString('tr-TR', { month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' });
             return `
-            <div class="flex items-start gap-4 px-6 py-5 border-l-4 ${m.okundu_mu ? 'border-transparent' : 'border-primary'} hover:bg-gray-50 cursor-pointer border-b border-gray-50 transition-colors" onclick="showDetail('${m.id}')">
+            <div class="flex items-start gap-4 px-6 py-5 border-l-4 \${m.okundu_mu ? 'border-transparent' : 'border-primary'} hover:bg-gray-50 cursor-pointer border-b border-gray-50 transition-colors" onclick="showDetail('\${m.id}')">
                 <div class="w-10 h-10 rounded-full bg-red-50 text-primary flex items-center justify-center font-bold text-sm flex-shrink-0 mt-0.5">
-                    ${initials}
+                    \${initials}
                 </div>
                 <div class="flex-grow min-w-0">
                     <div class="flex justify-between items-baseline mb-0.5">
-                        <p class="text-gray-700 font-bold truncate">${m.ad_soyad}</p>
-                        <p class="text-gray-400 text-[11px] font-medium whitespace-nowrap ml-2">${date}</p>
+                        <p class="text-gray-700 font-bold truncate">\${m.ad_soyad}</p>
+                        <p class="text-gray-400 text-[11px] font-medium whitespace-nowrap ml-2">\${date}</p>
                     </div>
-                    <p class="text-gray-600 text-sm font-semibold truncate mb-1">${m.konu}</p>
-                    <p class="text-xs text-gray-400 truncate">${m.mesaj}</p>
+                    <p class="text-gray-600 text-sm font-semibold truncate mb-1">\${m.konu}</p>
+                    <p class="text-xs text-gray-400 truncate">\${m.mesaj}</p>
                 </div>
             </div>`;
         }).join('');
@@ -332,19 +351,19 @@
                 <div class="px-8 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/30">
                     <div class="flex items-center gap-4 text-gray-400 text-lg">
                         <button onclick="window.location.reload()" class="hover:text-gray-700" title="Back"><i class="fa-solid fa-arrow-left"></i></button>
-                        <button class="hover:text-primary transition-colors" title="Delete"><i class="fa-solid fa-trash-can"></i></button>
+                        <button onclick="confirmDelete('\${m.id}')" class="hover:text-primary transition-colors" title="Delete"><i class="fa-solid fa-trash-can"></i></button>
                     </div>
-                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest"><i class="fa-regular fa-clock mr-1"></i> Received ${new Date(m.tarih).toLocaleTimeString()}</span>
+                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest"><i class="fa-regular fa-clock mr-1"></i> Received \${new Date(m.tarih).toLocaleTimeString()}</span>
                 </div>
                 <div class="p-8 flex-grow overflow-y-auto custom-scrollbar">
-                    <h3 class="text-2xl font-black text-gray-900 mb-4">${m.konu}</h3>
+                    <h3 class="text-2xl font-black text-gray-900 mb-4">\${m.konu}</h3>
                     <div class="flex items-center gap-2 mb-8">
                         <span class="text-sm text-gray-500">From:</span>
-                        <span class="text-sm font-bold text-primary">${m.ad_soyad}</span>
-                        <span class="text-sm text-gray-500">(${m.email})</span>
+                        <span class="text-sm font-bold text-primary">\${m.ad_soyad}</span>
+                        <span class="text-sm text-gray-500">(\${m.email})</span>
                     </div>
                     <div class="bg-gray-50 rounded-xl p-8 border border-gray-100 italic text-[15px] text-gray-700 leading-relaxed">
-                        "${m.mesaj}"
+                        "\${m.mesaj}"
                     </div>
                 </div>
                 <div class="p-6 border-t border-gray-100 bg-gray-50">
@@ -358,6 +377,34 @@
             </div>
         `;
     }
+
+    function confirmDelete(id) {
+        deleteTargetId = id;
+        deleteModal.classList.remove('hidden');
+        deleteModal.classList.add('flex');
+    }
+
+    function closeDeleteModal() {
+        deleteModal.classList.add('hidden');
+        deleteModal.classList.remove('flex');
+        deleteTargetId = null;
+    }
+
+    document.getElementById('confirmDeleteBtn').onclick = async () => {
+        if (!deleteTargetId) return;
+        const token = localStorage.getItem('adminToken');
+        try {
+            const res = await fetch(\`/api/admin/mesajlar/\${deleteTargetId}\`, {
+                method: 'DELETE',
+                headers: { 'Authorization': \`Bearer \${token}\` }
+            });
+            if (res.ok) {
+                closeDeleteModal();
+                loadMessages();
+                window.location.reload();
+            }
+        } catch (e) {}
+    };
 
     function setupExport() {
         document.getElementById('exportCSV').addEventListener('click', () => {
