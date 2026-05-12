@@ -2,26 +2,45 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/smtp"
 	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/cemonat00/ilgaz-backend/internal/database"
 	"github.com/cemonat00/ilgaz-backend/internal/models"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
-	"path/filepath"
-	"fmt"
 )
 
 // --- UPLOAD HANDLER ---
 
 func UploadImage(c *gin.Context) {
+	// Enforce 10MB file size limit
+	c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, 10<<20) // 10 MB
+
 	file, err := c.FormFile("image")
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Dosya yüklenemedi"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Dosya yüklenemedi veya çok büyük (Max 10MB)"})
+		return
+	}
+
+	// Validate file extension
+	ext := strings.ToLower(filepath.Ext(file.Filename))
+	allowedExts := map[string]bool{
+		".jpg":  true,
+		".jpeg": true,
+		".png":  true,
+		".webp": true,
+	}
+
+	if !allowedExts[ext] {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Geçersiz dosya formatı. Sadece JPG, PNG ve WEBP izinlidir."})
 		return
 	}
 
@@ -471,8 +490,25 @@ func AdminLogin(c *gin.Context) {
 		return
 	}
 
+	// Generate real JWT token
+	secret := os.Getenv("JWT_SECRET")
+	if secret == "" {
+		secret = "super-secret-key-for-dev"
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"username": admin.Username,
+		"exp":      time.Now().Add(time.Hour * 24).Unix(), // 24 hour expiration
+	})
+
+	tokenString, err := token.SignedString([]byte(secret))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Token oluşturulamadı"})
+		return
+	}
+
 	c.JSON(http.StatusOK, models.LoginResponse{
-		Token:   "mock-jwt-token-" + admin.Username,
+		Token:   tokenString,
 		Message: "Giriş başarılı",
 	})
 }

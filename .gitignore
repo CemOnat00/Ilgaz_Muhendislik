@@ -2,3 +2,16 @@
 .DS_Store
 /assets/uploads/*
 !/assets/uploads/.gitkeep
+
+# Go binaries
+main
+api
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test output
+*.test
+*.out

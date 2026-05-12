@@ -2,6 +2,7 @@ package routes
 
 import (
 	"github.com/cemonat00/ilgaz-backend/internal/handlers"
+	"github.com/cemonat00/ilgaz-backend/internal/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,8 +21,9 @@ func SetupRoutes(r *gin.Engine) {
 		api.POST("/admin/forgot-password", handlers.ForgotPassword)
 		api.POST("/admin/reset-password", handlers.ResetPassword)
 
-		// Protected Admin Endpoints (Middleware can be added later)
+		// Protected Admin Endpoints (Middleware applied)
 		admin := api.Group("/admin")
+		admin.Use(middleware.AuthRequired())
 		{
 			admin.POST("/upload", handlers.UploadImage)
 			admin.GET("/mesajlar", handlers.GetMessages)
