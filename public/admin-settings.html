@@ -73,7 +73,7 @@
                         <i class="fa-solid fa-envelope w-5 text-center text-lg"></i>
                         <span class="text-sm">Messages</span>
                     </div>
-                    <span class="bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-full group-hover:scale-110 transition-transform">12</span>
+                    <span id="sidebar-msg-count" class="bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-full group-hover:scale-110 transition-transform">0</span>
                 </a>
                 
                 <a href="admin-projects.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors">
@@ -172,7 +172,30 @@
     </div>
 
     <script>
-        document.getElementById('settingsForm').addEventListener('submit', (e) => {
+        async function updateSidebarCount() {
+            const token = localStorage.getItem('adminToken');
+            if (!token) return;
+            try {
+                const response = await fetch('/api/admin/mesajlar', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const messages = await response.json();
+                    const unreadCount = messages.filter(m => !m.okundu_mu).length;
+                    const sidebarBadge = document.getElementById('sidebar-msg-count');
+                    if (sidebarBadge) sidebarBadge.innerText = unreadCount;
+                }
+            } catch (e) {}
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('adminToken');
+            if (!token) { window.location.href = 'admin-login.html'; return; }
+            updateSidebarCount();
+        });
+
+        document.getElementById('settingsForm').addEventListener('submit', function(e) {
+
             e.preventDefault();
             const btn = e.target.querySelector('button');
             btn.disabled = true;

@@ -27,10 +27,13 @@ func SetupRoutes(r *gin.Engine) {
 			admin.GET("/mesajlar", handlers.GetMessages)
 			admin.PUT("/mesajlar/:id/read", handlers.MarkMessageRead)
 			admin.DELETE("/mesajlar/:id", handlers.DeleteMessage)
+			admin.POST("/mesajlar/:id/reply", handlers.ReplyMessage)
 			admin.POST("/urunler", handlers.AddProduct)
+			admin.PUT("/urunler/reorder", handlers.ReorderProducts)
 			admin.PUT("/urunler/:id", handlers.UpdateProduct)
 			admin.DELETE("/urunler/:id", handlers.DeleteProduct)
 			admin.POST("/projeler", handlers.AddProject)
+			admin.PUT("/projeler/reorder", handlers.ReorderProjects)
 			admin.PUT("/projeler/:id", handlers.UpdateProject)
 			admin.DELETE("/projeler/:id", handlers.DeleteProject)
 		}

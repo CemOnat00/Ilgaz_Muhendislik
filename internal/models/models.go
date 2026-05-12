@@ -20,6 +20,7 @@ type Product struct {
 	Description string             `json:"aciklama" bson:"description"`
 	Features    []string           `json:"ozellikler" bson:"features"`
 	Status      string             `json:"durum" bson:"status"` // Aktif/Pasif (durum for frontend)
+	Order       int                `json:"order" bson:"order"`
 	CreatedAt   time.Time          `json:"created_at" bson:"created_at"`
 }
 
@@ -47,6 +48,7 @@ type Project struct {
 	Status      string             `json:"status" bson:"status"` // In Progress, Completed
 	Description string             `json:"description" bson:"description"`
 	ImageURL    string             `json:"image_url" bson:"image_url"`
+	Order       int                `json:"order" bson:"order"`
 	Date        time.Time          `json:"date" bson:"date"`
 }
 

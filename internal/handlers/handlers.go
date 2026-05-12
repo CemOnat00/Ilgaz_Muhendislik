@@ -3,12 +3,15 @@ package handlers
 import (
 	"context"
 	"net/http"
+	"net/smtp"
+	"os"
 	"time"
 
 	"github.com/cemonat00/ilgaz-backend/internal/database"
 	"github.com/cemonat00/ilgaz-backend/internal/models"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 	"path/filepath"
 	"fmt"
 )
@@ -44,7 +47,8 @@ func GetProducts(c *gin.Context) {
 	defer cancel()
 
 	var products []models.Product
-	cursor, err := collection.Find(ctx, bson.M{})
+	options := options.Find().SetSort(bson.M{"order": 1})
+	cursor, err := collection.Find(ctx, bson.M{}, options)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Ürünler çekilemedi"})
 		return
@@ -117,9 +121,10 @@ func UpdateProduct(c *gin.Context) {
 
 	update := bson.M{
 		"$set": bson.M{
-			"name":         product.Name,
+			"name":         product.Isim,
+			"baslik":       product.Baslik,
 			"isim":         product.Isim,
-			"category":     product.Category,
+			"category":     product.Kategori,
 			"kategori":     product.Kategori,
 			"price":        product.Price,
 			"stock_status": product.StockStatus,
@@ -153,6 +158,27 @@ func DeleteProduct(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Ürün silindi"})
+}
+
+func ReorderProducts(c *gin.Context) {
+	var req struct {
+		Order []string `json:"order"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Geçersiz veri"})
+		return
+	}
+
+	collection := database.GetCollection("products")
+	for i, idStr := range req.Order {
+		objID, err := bson.ObjectIDFromHex(idStr)
+		if err != nil {
+			continue
+		}
+		_, _ = collection.UpdateOne(context.Background(), bson.M{"_id": objID}, bson.M{"$set": bson.M{"order": i}})
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Sıralama güncellendi"})
 }
 
 // --- MESSAGE HANDLERS ---
@@ -238,6 +264,69 @@ func DeleteMessage(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Mesaj silindi"})
 }
 
+func ReplyMessage(c *gin.Context) {
+	id := c.Param("id")
+	objID, err := bson.ObjectIDFromHex(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Geçersiz mesaj ID"})
+		return
+	}
+
+	var req struct {
+		Message string `json:"message"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Geçersiz veri"})
+		return
+	}
+
+	collection := database.GetCollection("messages")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	var msg models.Message
+	err = collection.FindOne(ctx, bson.M{"_id": objID}).Decode(&msg)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Mesaj bulunamadı"})
+		return
+	}
+
+	// E-posta gönderimi
+	err = sendEmail(msg.Email, "Re: "+msg.Subject, req.Message)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "E-posta gönderilemedi: " + err.Error()})
+		return
+	}
+
+	// Mesaj durumunu güncelle
+	_, _ = collection.UpdateOne(ctx, bson.M{"_id": objID}, bson.M{"$set": bson.M{"status": "Replied", "okundu_mu": true}})
+
+	c.JSON(http.StatusOK, gin.H{"message": "Yanıt başarıyla gönderildi"})
+}
+
+func sendEmail(to string, subject string, body string) error {
+	from := os.Getenv("SMTP_USER")
+	password := os.Getenv("SMTP_PASS")
+	smtpHost := os.Getenv("SMTP_HOST")
+	smtpPort := os.Getenv("SMTP_PORT") // Örn: "587"
+
+	if from == "" || password == "" || smtpHost == "" || smtpPort == "" {
+		// SMTP ayarları yoksa hata vermeden logla (Geliştirme aşaması için)
+		fmt.Printf("SMTP ayarları eksik. Gönderilecek mail:\nTo: %s\nSubject: %s\nBody: %s\n", to, subject, body)
+		return nil
+	}
+
+	// Email header ve body
+	message := []byte("To: " + to + "\r\n" +
+		"Subject: " + subject + "\r\n" +
+		"\r\n" +
+		body + "\r\n")
+
+	auth := smtp.PlainAuth("", from, password, smtpHost)
+	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, []string{to}, message)
+	return err
+}
+
 // --- PROJECT HANDLERS ---
 
 func GetProjects(c *gin.Context) {
@@ -246,7 +335,8 @@ func GetProjects(c *gin.Context) {
 	defer cancel()
 
 	var projects []models.Project
-	cursor, err := collection.Find(ctx, bson.M{})
+	options := options.Find().SetSort(bson.M{"order": 1})
+	cursor, err := collection.Find(ctx, bson.M{}, options)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Projeler çekilemedi"})
 		return
@@ -336,6 +426,27 @@ func DeleteProject(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Proje silindi"})
+}
+
+func ReorderProjects(c *gin.Context) {
+	var req struct {
+		Order []string `json:"order"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Geçersiz veri"})
+		return
+	}
+
+	collection := database.GetCollection("projects")
+	for i, idStr := range req.Order {
+		objID, err := bson.ObjectIDFromHex(idStr)
+		if err != nil {
+			continue
+		}
+		_, _ = collection.UpdateOne(context.Background(), bson.M{"_id": objID}, bson.M{"$set": bson.M{"order": i}})
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Sıralama güncellendi"})
 }
 
 // --- AUTH HANDLERS ---
