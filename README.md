@@ -13,7 +13,7 @@ Bu proje, bir mühendislik firmasının tüm dijital ihtiyaçlarını karşılam
 * **Görsel Yönetimi:** Yerel dosya yükleme sistemi (`multipart/form-data`)
 
 ### Frontend
-* **UI/UX:** HTML5, modern CSS3 ve **Tailwind CSS**.
+* **UI/UX:** HTML5, modern CSS3 (Custom Variables & Modern Layouts).
 * **Dinamizm:** Vanilla JavaScript (ES6+) ile asenkron API entegrasyonu (Fetch API).
 * **İkonlar:** FontAwesome 6.4.0
 * **Fontlar:** Inter (Google Fonts)
@@ -27,7 +27,14 @@ Bu proje, bir mühendislik firmasının tüm dijital ihtiyaçlarını karşılam
     *   **Proje Takibi:** Mühendislik projelerinin ilerleme durumunu ve detaylarını yönetme.
     *   **Mesaj Merkezi:** Gelen müşteri taleplerini okuma, silme ve yönetme.
 *   **Mobil Uyumluluk:** Tüm cihazlarda sorunsuz çalışan tam ekran mobil menü ve responsive tasarım.
-*   **Güvenlik:** Admin girişi için şifre doğrulama ve korumalı API uçları.
+*   **Güvenlik:** 
+    *   **JWT Auth:** Stateless kimlik doğrulama ile güvenli API erişimi.
+    *   **Protected Routes:** Sadece yetkili kullanıcıların erişebileceği endpoint'ler.
+    *   **Secure Uploads:** Dosya tipi ve boyutu doğrulamalı güvenli görsel yükleme sistemi.
+
+## 🧪 Test ve Güvenlik
+*   **Automated Tests:** `internal/handlers/auth_test.go` üzerinden otomatik auth testleri.
+*   **Security Scripts:** `scripts/security_test.sh` ile API güvenlik taramaları.
 
 ## 📂 Klasör Yapısı
 *   `cmd/api/`: Uygulamanın giriş noktası ve sunucu yapılandırması.
