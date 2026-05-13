@@ -113,6 +113,72 @@ document.addEventListener('DOMContentLoaded', () => {
             header?.classList.add('h-20');
             header?.classList.remove('h-16');
         }
-    });
+    // --- CONTACT FORM LOGIC ---
+    const contactForm = document.getElementById('contactForm') || document.querySelector('form[action="#"]');
+    if (contactForm) {
+        if (!contactForm.id) contactForm.id = 'contactForm';
+        contactForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                ad_soyad: contactForm.querySelector('input[type="text"], [name="name"]')?.value || '',
+                email: contactForm.querySelector('input[type="email"], [name="email"]')?.value || '',
+                konu: contactForm.querySelector('input[placeholder*="Konu"], [name="subject"]')?.value || 'Genel İletişim',
+                mesaj: contactForm.querySelector('textarea, [name="message"]')?.value || ''
+            };
+
+            try {
+                const response = await fetch('/api/mesajlar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    alert('Mesajınız başarıyla gönderildi!');
+                    contactForm.reset();
+                } else {
+                    const errorData = await response.json();
+                    alert('Hata: ' + (errorData.error || 'Mesaj gönderilemedi.'));
+                }
+            } catch (error) {
+                console.error('Contact Form Error:', error);
+                alert('Sistem hatası. Lütfen daha sonra tekrar deneyiniz.');
+            }
+        });
+    }
+
+    // --- ADMIN LOGIN LOGIC ---
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const loginData = {
+                kullanici_adi: loginForm.querySelector('#username')?.value || '',
+                sifre: loginForm.querySelector('#password')?.value || ''
+            };
+
+            try {
+                const response = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(loginData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('adminToken', result.token);
+                    window.location.href = 'admin-dashboard.html';
+                } else {
+                    alert('Kullanıcı adı veya şifre hatalı!');
+                }
+            } catch (error) {
+                console.error('Login Error:', error);
+                alert('Giriş yapılırken bir hata oluştu.');
+            }
+        });
+    }
 });
 
