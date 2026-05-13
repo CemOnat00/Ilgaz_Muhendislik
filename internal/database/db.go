@@ -61,7 +61,7 @@ func SeedAdmin() {
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(defaultPass), bcrypt.DefaultCost)
 
 	// Update or Create admin
-	opts := options.Update().SetUpsert(true)
+	opts := options.UpdateOne().SetUpsert(true)
 	filter := bson.M{"username": defaultUser}
 	update := bson.M{
 		"$set": bson.M{
