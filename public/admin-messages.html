@@ -265,10 +265,11 @@
         });
 
         messageList.innerHTML = filtered.map(m => {
+            const mId = m.id || m._id;
             const initials = (m.ad_soyad || 'Anonymous').split(' ').filter(n => n).map(n => n[0]).join('').substring(0, 2).toUpperCase();
             const date = new Date(m.created_at || m.tarih).toLocaleString('tr-TR', { month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' });
             return `
-            <div class="flex items-start gap-4 px-6 py-5 border-l-4 ${m.okundu_mu ? 'border-transparent' : 'border-primary'} hover:bg-gray-50 cursor-pointer border-b border-gray-50 transition-colors" onclick="showDetail('${m.id}')">
+            <div class="flex items-start gap-4 px-6 py-5 border-l-4 ${m.okundu_mu ? 'border-transparent' : 'border-primary'} hover:bg-gray-50 cursor-pointer border-b border-gray-50 transition-colors" onclick="showDetail('${mId}')">
                 <div class="w-10 h-10 rounded-full bg-red-50 text-primary flex items-center justify-center font-bold text-sm flex-shrink-0 mt-0.5">
                     ${initials}
                 </div>
@@ -291,13 +292,14 @@
     }
 
     async function showDetail(id) {
-        const m = allMessages.find(msg => msg.id === id);
+        const m = allMessages.find(msg => (msg.id || msg._id) === id);
         if (!m) return;
+        const msgId = m.id || m._id;
 
         if (!m.okundu_mu) {
             const token = localStorage.getItem('adminToken');
             try {
-                await fetch(`/api/admin/mesajlar/${id}/read`, {
+                await fetch(`/api/admin/mesajlar/${msgId}/read`, {
                     method: 'PUT',
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
@@ -325,7 +327,7 @@
                 <div class="px-8 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/30">
                     <div class="flex items-center gap-4 text-gray-400 text-lg">
                         <button onclick="hideDetail()" class="hover:text-gray-700" title="Back"><i class="fa-solid fa-arrow-left"></i></button>
-                        <button onclick="confirmDelete('${m.id}')" class="hover:text-primary transition-colors" title="Delete"><i class="fa-solid fa-trash-can"></i></button>
+                        <button onclick="confirmDelete('${msgId}')" class="hover:text-primary transition-colors" title="Delete"><i class="fa-solid fa-trash-can"></i></button>
                     </div>
                     <span class="text-xs font-bold text-gray-400 uppercase tracking-widest"><i class="fa-regular fa-clock mr-1"></i> Received ${displayDate}</span>
                 </div>
@@ -415,7 +417,7 @@
             });
             if (res.ok) {
                 closeDeleteModal();
-                allMessages = allMessages.filter(msg => msg.id !== deleteTargetId);
+                allMessages = allMessages.filter(msg => (msg.id || msg._id) !== deleteTargetId);
                 renderMessages();
                 hideDetail();
             }
