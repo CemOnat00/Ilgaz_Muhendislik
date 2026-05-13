@@ -20,10 +20,26 @@ func getAuthToken(t *testing.T) string {
 	body, _ := json.Marshal(loginData)
 	req, _ := http.NewRequest("POST", "/api/admin/login", bytes.NewBuffer(body))
 	w := httptest.NewRecorder()
+	
+	if router == nil {
+		t.Fatal("Router is not initialized. Check TestMain in auth_test.go")
+	}
+	
 	router.ServeHTTP(w, req)
 
+	if w.Code != http.StatusOK {
+		t.Fatalf("Login failed with status %d: %s", w.Code, w.Body.String())
+	}
+
 	var resp models.LoginResponse
-	json.Unmarshal(w.Body.Bytes(), &resp)
+	if err := json.Unmarshal(w.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("Failed to unmarshal login response: %v", err)
+	}
+	
+	if resp.Token == "" {
+		t.Fatal("Login succeeded but returned an empty token")
+	}
+	
 	return resp.Token
 }
 
