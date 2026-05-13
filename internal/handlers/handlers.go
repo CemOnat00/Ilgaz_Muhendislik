@@ -16,6 +16,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // --- UPLOAD HANDLER ---
@@ -85,14 +86,18 @@ func GetProducts(c *gin.Context) {
 
 func GetProductByID(c *gin.Context) {
 	id := c.Param("id")
-	objID, _ := bson.ObjectIDFromHex(id)
+	objID, err := bson.ObjectIDFromHex(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Geçersiz ürün ID formatı"})
+		return
+	}
 
 	collection := database.GetCollection("products")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	var product models.Product
-	err := collection.FindOne(ctx, bson.M{"_id": objID}).Decode(&product)
+	err = collection.FindOne(ctx, bson.M{"_id": objID}).Decode(&product)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Ürün bulunamadı"})
 		return
@@ -111,6 +116,14 @@ func AddProduct(c *gin.Context) {
 	product.ID = bson.NewObjectID()
 	product.CreatedAt = time.Now()
 
+	// Ensure Name and Category are synced for consistency
+	if product.Name == "" && product.Isim != "" {
+		product.Name = product.Isim
+	}
+	if product.Category == "" && product.Kategori != "" {
+		product.Category = product.Kategori
+	}
+
 	collection := database.GetCollection("products")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -126,7 +139,11 @@ func AddProduct(c *gin.Context) {
 
 func UpdateProduct(c *gin.Context) {
 	id := c.Param("id")
-	objID, _ := bson.ObjectIDFromHex(id)
+	objID, err := bson.ObjectIDFromHex(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Geçersiz ürün ID formatı"})
+		return
+	}
 
 	var product models.Product
 	if err := c.ShouldBindJSON(&product); err != nil {
@@ -140,43 +157,62 @@ func UpdateProduct(c *gin.Context) {
 
 	update := bson.M{
 		"$set": bson.M{
-			"name":         product.Isim,
-			"baslik":       product.Baslik,
-			"isim":         product.Isim,
-			"category":     product.Kategori,
-			"kategori":     product.Kategori,
-			"price":        product.Price,
-			"stock_status": product.StockStatus,
-			"image_url":    product.ImageURL,
-			"description":  product.Description,
-			"status":       product.Status,
+			"name":              product.Isim,
+			"baslik":            product.Baslik,
+			"isim":              product.Isim,
+			"category":          product.Kategori,
+			"kategori":          product.Kategori,
+			"price":             product.Price,
+			"stock_status":      product.StockStatus,
+			"image_url":         product.ImageURL,
+			"description":       product.Description,
+			"status":            product.Status,
+			"images":            product.Images,
+			"videos":            product.Videos,
+			"technical_specs":   product.TechnicalSpecs,
+			"feature_boxes":     product.FeatureBoxes,
+			"application_areas": product.ApplicationAreas,
 		},
 	}
 
-	_, err := collection.UpdateOne(ctx, bson.M{"_id": objID}, update)
+	result, err := collection.UpdateOne(ctx, bson.M{"_id": objID}, update)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Güncelleme başarısız"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Güncelleme başarısız: " + err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Ürün güncellendi"})
+	if result.MatchedCount == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Güncellenecek ürün bulunamadı"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Ürün başarıyla güncellendi"})
 }
 
 func DeleteProduct(c *gin.Context) {
 	id := c.Param("id")
-	objID, _ := bson.ObjectIDFromHex(id)
+	objID, err := bson.ObjectIDFromHex(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Geçersiz ürün ID formatı"})
+		return
+	}
 
 	collection := database.GetCollection("products")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	_, err := collection.DeleteOne(ctx, bson.M{"_id": objID})
+	result, err := collection.DeleteOne(ctx, bson.M{"_id": objID})
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Silme işlemi başarısız"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Silme işlemi başarısız: " + err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Ürün silindi"})
+	if result.DeletedCount == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Silinecek ürün bulunamadı"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Ürün başarıyla silindi"})
 }
 
 func ReorderProducts(c *gin.Context) {
@@ -251,15 +287,24 @@ func GetMessages(c *gin.Context) {
 
 func MarkMessageRead(c *gin.Context) {
 	id := c.Param("id")
-	objID, _ := bson.ObjectIDFromHex(id)
+	objID, err := bson.ObjectIDFromHex(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Geçersiz mesaj ID formatı"})
+		return
+	}
 
 	collection := database.GetCollection("messages")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	_, err := collection.UpdateOne(ctx, bson.M{"_id": objID}, bson.M{"$set": bson.M{"is_read": true, "status": "Read"}})
+	result, err := collection.UpdateOne(ctx, bson.M{"_id": objID}, bson.M{"$set": bson.M{"is_read": true, "status": "Read"}})
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Güncellenemedi"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Güncellenemedi: " + err.Error()})
+		return
+	}
+
+	if result.MatchedCount == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Mesaj bulunamadı"})
 		return
 	}
 
@@ -268,15 +313,24 @@ func MarkMessageRead(c *gin.Context) {
 
 func DeleteMessage(c *gin.Context) {
 	id := c.Param("id")
-	objID, _ := bson.ObjectIDFromHex(id)
+	objID, err := bson.ObjectIDFromHex(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Geçersiz mesaj ID formatı"})
+		return
+	}
 
 	collection := database.GetCollection("messages")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	_, err := collection.DeleteOne(ctx, bson.M{"_id": objID})
+	result, err := collection.DeleteOne(ctx, bson.M{"_id": objID})
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Silinemedi"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Silinemedi: " + err.Error()})
+		return
+	}
+
+	if result.DeletedCount == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Silinecek mesaj bulunamadı"})
 		return
 	}
 
@@ -396,7 +450,11 @@ func AddProject(c *gin.Context) {
 
 func UpdateProject(c *gin.Context) {
 	id := c.Param("id")
-	objID, _ := bson.ObjectIDFromHex(id)
+	objID, err := bson.ObjectIDFromHex(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Geçersiz proje ID formatı"})
+		return
+	}
 
 	var project models.Project
 	if err := c.ShouldBindJSON(&project); err != nil {
@@ -421,30 +479,44 @@ func UpdateProject(c *gin.Context) {
 		},
 	}
 
-	_, err := collection.UpdateOne(ctx, bson.M{"_id": objID}, update)
+	result, err := collection.UpdateOne(ctx, bson.M{"_id": objID}, update)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Güncelleme başarısız"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Güncelleme başarısız: " + err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Proje güncellendi"})
+	if result.MatchedCount == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Güncellenecek proje bulunamadı"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Proje başarıyla güncellendi"})
 }
 
 func DeleteProject(c *gin.Context) {
 	id := c.Param("id")
-	objID, _ := bson.ObjectIDFromHex(id)
+	objID, err := bson.ObjectIDFromHex(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Geçersiz proje ID formatı"})
+		return
+	}
 
 	collection := database.GetCollection("projects")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	_, err := collection.DeleteOne(ctx, bson.M{"_id": objID})
+	result, err := collection.DeleteOne(ctx, bson.M{"_id": objID})
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Silme işlemi başarısız"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Silme işlemi başarısız: " + err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Proje silindi"})
+	if result.DeletedCount == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Silinecek proje bulunamadı"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Proje başarıyla silindi"})
 }
 
 func ReorderProjects(c *gin.Context) {
@@ -483,9 +555,14 @@ func AdminLogin(c *gin.Context) {
 
 	var admin models.Admin
 	err := collection.FindOne(ctx, bson.M{"username": loginReq.Username}).Decode(&admin)
-	
-	// Simple password check (In production, use bcrypt)
-	if err != nil || admin.Password != loginReq.Password {
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Geçersiz kullanıcı adı veya şifre"})
+		return
+	}
+
+	// Secure bcrypt password check
+	err = bcrypt.CompareHashAndPassword([]byte(admin.Password), []byte(loginReq.Password))
+	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Geçersiz kullanıcı adı veya şifre"})
 		return
 	}
@@ -564,8 +641,10 @@ func ResetPassword(c *gin.Context) {
 	}
 
 	// Update password and clear token
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
+
 	_, err = collection.UpdateOne(ctx, bson.M{"_id": admin.ID}, bson.M{
-		"$set":   bson.M{"password": req.NewPassword},
+		"$set":   bson.M{"password": string(hashedPassword)},
 		"$unset": bson.M{"reset_token": ""},
 	})
 

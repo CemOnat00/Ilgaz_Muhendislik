@@ -9,6 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var MongoClient *mongo.Client
@@ -53,20 +54,27 @@ func SeedAdmin() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	// Check if admin exists
-	var admin map[string]interface{}
-	err := collection.FindOne(ctx, bson.M{"username": "admin"}).Decode(&admin)
-	if err != nil {
-		// Not found, create it
-		_, err = collection.InsertOne(ctx, bson.M{
-			"username": "admin",
-			"password": "ilgaz2026",
+	// Default credentials (In production, move to .env)
+	defaultUser := "admin"
+	defaultPass := "ilgaz2026"
+
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(defaultPass), bcrypt.DefaultCost)
+
+	// Update or Create admin
+	opts := options.Update().SetUpsert(true)
+	filter := bson.M{"username": defaultUser}
+	update := bson.M{
+		"$set": bson.M{
+			"username": defaultUser,
+			"password": string(hashedPassword),
 			"email":    "admin@ilgazmuhendislik.com",
-		})
-		if err != nil {
-			log.Println("Admin seed hatası:", err)
-		} else {
-			log.Println("Varsayılan admin hesabı oluşturuldu (admin / ilgaz2026)")
-		}
+		},
+	}
+
+	_, err := collection.UpdateOne(ctx, filter, update, opts)
+	if err != nil {
+		log.Println("Admin seed hatası:", err)
+	} else {
+		log.Println("Admin hesabı güncellendi/oluşturuldu (Güvenli Hashlendi)")
 	}
 }

@@ -6,22 +6,39 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
+// TechnicalSpec (Teknik Özellik)
+type TechnicalSpec struct {
+	Key   string `json:"key" bson:"key"`
+	Value string `json:"value" bson:"value"`
+}
+
+// FeatureBox (Ürün Özellik Kutusu)
+type FeatureBox struct {
+	Title       string `json:"title" bson:"title"`
+	Description string `json:"description" bson:"description"`
+}
+
 // Product (Ürün) Model
 type Product struct {
-	ID          bson.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
-	Name        string             `json:"name" bson:"name"`
-	Baslik      string             `json:"baslik" bson:"baslik"`             // Admin/Legacy title
-	Isim        string             `json:"isim" bson:"isim"`                 // Catalog display name
-	Category    string             `json:"category" bson:"category"`         // Internal/Admin
-	Kategori    string             `json:"kategori" bson:"kategori"`         // Catalog display
-	Price       float64            `json:"fiyat" bson:"price"`
-	StockStatus bool               `json:"stokta_var_mi" bson:"stock_status"` // true: Stokta, false: Yok
-	ImageURL    string             `json:"resim" bson:"image_url"`
-	Description string             `json:"aciklama" bson:"description"`
-	Features    []string           `json:"ozellikler" bson:"features"`
-	Status      string             `json:"durum" bson:"status"` // Aktif/Pasif (durum for frontend)
-	Order       int                `json:"order" bson:"order"`
-	CreatedAt   time.Time          `json:"created_at" bson:"created_at"`
+	ID               bson.ObjectID   `json:"id,omitempty" bson:"_id,omitempty"`
+	Name             string          `json:"name" bson:"name"`
+	Baslik           string          `json:"baslik" bson:"baslik"`             // Admin/Legacy title
+	Isim             string          `json:"isim" bson:"isim"`                 // Catalog display name
+	Category         string          `json:"category" bson:"category"`         // Internal/Admin
+	Kategori         string          `json:"kategori" bson:"kategori"`         // Catalog display
+	Price            float64         `json:"fiyat" bson:"price"`
+	StockStatus      bool            `json:"stokta_var_mi" bson:"stock_status"` // true: Stokta, false: Yok
+	ImageURL         string          `json:"resim" bson:"image_url"`
+	Description      string          `json:"aciklama" bson:"description"`
+	Features         []string        `json:"ozellikler" bson:"features"`
+	Status           string          `json:"durum" bson:"status"` // Aktif/Pasif (durum for frontend)
+	Order            int             `json:"order" bson:"order"`
+	CreatedAt        time.Time       `json:"created_at" bson:"created_at"`
+	Images           []string        `json:"images" bson:"images"`
+	Videos           []string        `json:"videos" bson:"videos"`
+	TechnicalSpecs   []TechnicalSpec `json:"technical_specs" bson:"technical_specs"`
+	FeatureBoxes     []FeatureBox    `json:"feature_boxes" bson:"feature_boxes"`
+	ApplicationAreas string          `json:"application_areas" bson:"application_areas"`
 }
 
 // Message (İletişim Mesajı) Model

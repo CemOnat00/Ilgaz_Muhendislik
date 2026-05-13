@@ -111,25 +111,8 @@
                 </div>
                 
                 <!-- Thumbnails (4-col grid) -->
-                <div class="grid grid-cols-4 gap-4">
-                    <button class="aspect-square bg-gray-50 rounded-xl border-2 border-[#1E90FF] flex items-center justify-center p-2 overflow-hidden shadow-sm">
-                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0i-1_9XkxAjSdRMyj7bPE9eN-aQDzgUxLDHaLVdCmykKDxmM14nbYGdRz4g8me_GseLWHgfIk3WLAUYtk8AM1RidTlsLO4nx6U7DNS6sR8_i215aMbZFce8QpsVNxb0w5VuO2wBlqCxv1hctRjntYW3RR1IoGzdCq6TTl8T5dTCVqtQpcamrbDeJSgVzdrZDHWAroladexbSHqHd78lTy8rLI83FjKb6nFKDxQAUhycmrRsz3d3kynLYRNSD8kzg1fgxnQf-_QHwP" alt="Thumb 1" class="w-full h-full object-contain"/>
-                    </button>
-                    <!-- other random thumbs fitting style -->
-                    <button class="aspect-square bg-gray-800 rounded-xl border border-gray-200 flex items-center justify-center overflow-hidden hover:border-gray-400 transition relative">
-                        <!-- Simulated grey image with gauge -->
-                        <div class="w-full h-full bg-[#5d564f] flex flex-col items-center justify-center p-2">
-                             <div class="w-10 h-10 bg-white rounded-full border border-gray-300"></div>
-                             <div class="w-6 h-8 bg-gray-200 mt-1"></div>
-                        </div>
-                    </button>
-                    <button class="aspect-square bg-gray-100 rounded-xl border border-gray-200 flex items-center justify-center overflow-hidden hover:border-gray-400 transition p-2">
-                         <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwRCEVTciqeNkBFI6JSprTC7LOlqY7tA0dsV3X4S9_M4cvLPe8B193LyrQnSPyRzbBxMrUMcGDljZHdDovFuSGNaJctBcDMQ-WxIu_jo0melh_KgdJK-sVW2lgIRb2CE8mE_MyaqoAVPmCWyTSdouBfp8SYHY65VRNWQZVm-bmdAaxVXueJFdUjIavsyw-OmmgsVG98pm4Z3q72IlromjzUGVAMYnPewlHD2WmfWPDxBzI2_P3HQKQVYOf31NZHlEcZceDaKV-0l0u" alt="Thumb 3" class="w-full h-full object-contain opacity-70 grayscale"/>
-                    </button>
-                    <button class="aspect-square bg-gray-50 rounded-xl border border-gray-200 flex items-center justify-center hover:bg-gray-100 transition relative group cursor-pointer">
-                        <div class="w-full h-full absolute inset-0 bg-white"></div>
-                        <i class="fa-solid fa-play text-gray-300 text-3xl z-10 group-hover:text-primary transition"></i>
-                    </button>
+                <div id="thumbnails" class="grid grid-cols-4 gap-4">
+                    <!-- Dinamik olarak doldurulacak -->
                 </div>
             </div>
 
@@ -152,37 +135,14 @@
                 </p>
                 
                 <!-- Teknik Özellikler Tablosu -->
-                <div class="bg-gray-50/50 rounded-2xl border border-gray-100 overflow-hidden mb-8">
+                <div id="specsSection" class="bg-gray-50/50 rounded-2xl border border-gray-100 overflow-hidden mb-8 hidden">
                     <div class="px-6 py-4 flex items-center gap-2 border-b border-gray-100 bg-white">
                         <div class="w-3 h-3 bg-primary rounded-sm transform rotate-45"></div>
                         <h3 class="font-bold text-xs uppercase tracking-widest text-gray-800">Teknik Özellikler</h3>
                     </div>
                     
-                    <div class="flex flex-col text-sm text-gray-600">
-                        <div class="flex items-center justify-between px-6 py-3.5 border-b border-gray-100 hover:bg-white transition-colors">
-                            <span>Çalışma Basıncı (PN)</span>
-                            <span class="font-bold text-gray-900">PN 40 / PN 63</span>
-                        </div>
-                        <div class="flex items-center justify-between px-6 py-3.5 border-b border-gray-100 hover:bg-white transition-colors">
-                            <span>Gövde Malzemesi</span>
-                            <span class="font-bold text-gray-900">Dökme Çelik GS-C25</span>
-                        </div>
-                        <div class="flex items-center justify-between px-6 py-3.5 border-b border-gray-100 hover:bg-white transition-colors">
-                            <span>Max. Çalışma Sıcaklığı</span>
-                            <span class="font-bold text-gray-900">450°C</span>
-                        </div>
-                        <div class="flex items-center justify-between px-6 py-3.5 border-b border-gray-100 hover:bg-white transition-colors">
-                            <span>Bağlantı Şekli</span>
-                            <span class="font-bold text-gray-900">Flanşlı (DIN EN 1092-1)</span>
-                        </div>
-                        <div class="flex items-center justify-between px-6 py-3.5 border-b border-gray-100 hover:bg-white transition-colors">
-                            <span>Sızdırmazlık Sınıfı</span>
-                            <span class="font-bold text-gray-900">Class VI (Bubbles Tight)</span>
-                        </div>
-                        <div class="flex items-center justify-between px-6 py-3.5 hover:bg-white transition-colors">
-                            <span>Nominal Çap (DN)</span>
-                            <span class="font-bold text-gray-900">DN 15 - DN 300</span>
-                        </div>
+                    <div id="technicalSpecs" class="flex flex-col text-sm text-gray-600">
+                        <!-- Dinamik Satırlar -->
                     </div>
                 </div>
                 
@@ -208,24 +168,17 @@
                 <h2 class="text-2xl font-extrabold uppercase tracking-tight">Ürün Detayı ve Uygulama Alanları</h2>
             </div>
             
-            <p class="text-gray-600 leading-relaxed mb-8 text-[15px]">
-                Ilgaz Mühendislik ILG-V2400-S serisi flanşlı buhar vanaları, en zorlu endüstriyel koşullarda bile maksimum güvenilirlik sağlamak üzere tasarlanmıştır. Yüksek sıcaklık ve basınç altında çalışan kızgın buhar hatları için optimize edilmiş olan bu vanalar, özel alaşımlı dökme çelik gövdesi sayesinde korozyona ve ısıl genleşmelere karşı üstün direnç gösterir.
+            <p id="productDescDetail" class="text-gray-600 leading-relaxed mb-8 text-[15px]">
+                <!-- Ana açıklama buraya da gelecek -->
             </p>
             
             <!-- Bilgi Kutuları -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <div class="bg-red-50/60 p-6 rounded-xl border border-red-100/50">
-                    <h4 class="font-bold text-gray-900 mb-3 text-[15px]">Üstün Sızdırmazlık</h4>
-                    <p class="text-gray-600 text-sm leading-relaxed">Stellite kaplı valf oturma yüzeyleri sayesinde binlerce açma-kapama döngüsünden sonra dahi mükemmel sızdırmazlık performansı korunur.</p>
-                </div>
-                <div class="bg-red-50/60 p-6 rounded-xl border border-red-100/50">
-                    <h4 class="font-bold text-gray-900 mb-3 text-[15px]">Kolay Bakım</h4>
-                    <p class="text-gray-600 text-sm leading-relaxed">Hattan sökülmeden salmastra değişimi yapılabilen özel "back-seat" tasarımı ile işletme duruş sürelerini minimize eder.</p>
-                </div>
+            <div id="featureBoxes" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <!-- Dinamik Kutular -->
             </div>
             
-            <p class="text-gray-600 leading-relaxed text-[15px]">
-                <strong class="font-semibold text-gray-800">Uygulama Alanları:</strong> Enerji santralleri, tekstil fabrikaları kurutma hatları, kimya endüstrisi reaktör besleme hatları ve merkezi ısıtma sistemleri. Tüm ürünlerimiz EN 10204 3.1 sertifikasyonuna uygun olarak test edilmekte ve raporlanmaktadır.
+            <p id="applicationAreas" class="text-gray-600 leading-relaxed text-[15px]">
+                <!-- Uygulama alanları buraya gelecek -->
             </p>
             
         </div>
@@ -347,7 +300,7 @@
             }
             
             try {
-                const response = await fetch(`/api/urunler/\${productId}`);
+                const response = await fetch(`/api/urunler/${productId}`);
                 if (!response.ok) throw new Error('Ürün bulunamadı');
                 
                 const p = await response.json();
@@ -355,14 +308,111 @@
                 document.getElementById('breadcrumbTitle').innerText = p.isim;
                 document.getElementById('productTitle').innerText = p.isim;
                 document.getElementById('productDesc').innerText = p.aciklama;
+                document.getElementById('productDescDetail').innerText = p.aciklama;
                 document.getElementById('productCatBadge').innerText = p.kategori;
                 document.getElementById('mainImage').src = p.resim;
                 
+                // Technical Specs
+                if (p.technical_specs && p.technical_specs.length > 0) {
+                    document.getElementById('specsSection').classList.remove('hidden');
+                    const specsCont = document.getElementById('technicalSpecs');
+                    specsCont.innerHTML = p.technical_specs.map((s, i) => `
+                        <div class="flex items-center justify-between px-6 py-3.5 ${i < p.technical_specs.length - 1 ? 'border-b border-gray-100' : ''} hover:bg-white transition-colors">
+                            <span>${s.key}</span>
+                            <span class="font-bold text-gray-900">${s.value}</span>
+                        </div>
+                    `).join('');
+                }
+
+                // Feature Boxes
+                if (p.feature_boxes && p.feature_boxes.length > 0) {
+                    const featCont = document.getElementById('featureBoxes');
+                    featCont.innerHTML = p.feature_boxes.map(f => `
+                        <div class="bg-red-50/60 p-6 rounded-xl border border-red-100/50">
+                            <h4 class="font-bold text-gray-900 mb-3 text-[15px]">${f.title}</h4>
+                            <p class="text-gray-600 text-sm leading-relaxed">${f.description}</p>
+                        </div>
+                    `).join('');
+                }
+
+                // Application Areas
+                if (p.application_areas) {
+                    document.getElementById('applicationAreas').innerHTML = `
+                        <strong class="font-semibold text-gray-800">Uygulama Alanları:</strong> ${p.application_areas}
+                    `;
+                }
+
+                // Media (Images & Videos)
+                const mediaItems = [];
+                if (p.images) p.images.forEach(img => mediaItems.push({ type: 'image', url: img }));
+                if (p.videos) p.videos.forEach(vid => mediaItems.push({ type: 'video', url: vid }));
+
+                if (mediaItems.length > 0) {
+                    const thumbCont = document.getElementById('thumbnails');
+                    thumbCont.innerHTML = mediaItems.map((m, i) => `
+                        <button class="aspect-square bg-gray-50 rounded-xl border ${i === 0 ? 'border-[#1E90FF] border-2' : 'border-gray-200'} flex items-center justify-center p-2 overflow-hidden shadow-sm transition-all group" 
+                                data-type="${m.type}" data-url="${m.url}">
+                            ${m.type === 'image' 
+                                ? `<img src="${m.url}" class="w-full h-full object-contain"/>` 
+                                : `<i class="fa-solid fa-play text-gray-300 text-2xl group-hover:text-primary transition"></i>`}
+                        </button>
+                    `).join('');
+
+                    // Initialize first item
+                    if (mediaItems[0].type === 'image') {
+                        document.getElementById('mainImage').src = mediaItems[0].url;
+                    }
+
+                    // Attach Click Events
+                    thumbCont.querySelectorAll('button').forEach(btn => {
+                        btn.onclick = () => {
+                            const type = btn.dataset.type;
+                            const url = btn.dataset.url;
+                            const mainContainer = document.getElementById('mainImage').parentElement;
+                            
+                            // Reset borders
+                            thumbCont.querySelectorAll('button').forEach(b => {
+                                b.classList.remove('border-[#1E90FF]', 'border-2');
+                                b.classList.add('border-gray-200');
+                            });
+                            btn.classList.remove('border-gray-200');
+                            btn.classList.add('border-[#1E90FF]', 'border-2');
+
+                            mainContainer.style.opacity = '0.5';
+                            setTimeout(() => {
+                                if (type === 'image') {
+                                    mainContainer.innerHTML = `<img id="mainImage" src="${url}" alt="Ürün Görseli" class="w-full h-full object-contain filter drop-shadow-xl hover:scale-105 transition-transform duration-500"/>`;
+                                } else {
+                                    // Handle Video (Extract YouTube ID if possible)
+                                    let videoEmbed = url;
+                                    if (url.includes('youtube.com/watch?v=')) {
+                                        const id = url.split('v=')[1].split('&')[0];
+                                        videoEmbed = `https://www.youtube.com/embed/${id}?autoplay=1`;
+                                    } else if (url.includes('youtu.be/')) {
+                                        const id = url.split('youtu.be/')[1];
+                                        videoEmbed = `https://www.youtube.com/embed/${id}?autoplay=1`;
+                                    }
+                                    
+                                    if (videoEmbed.includes('youtube.com/embed/')) {
+                                        mainContainer.innerHTML = `<iframe class="w-full h-full rounded-xl" src="${videoEmbed}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+                                    } else {
+                                        mainContainer.innerHTML = `<div class="w-full h-full flex flex-col items-center justify-center gap-4 text-gray-400 bg-gray-100 rounded-xl">
+                                            <i class="fa-solid fa-link text-4xl"></i>
+                                            <a href="${url}" target="_blank" class="text-primary font-bold hover:underline">Videoyu Yeni Sekmede Aç</a>
+                                        </div>`;
+                                    }
+                                }
+                                mainContainer.style.opacity = '1';
+                            }, 150);
+                        };
+                    });
+                }
+                
                 // Teklif İste logic
                 document.getElementById('teklifBtn').onclick = () => {
-                    const subject = encodeURIComponent(`Teklif İsteği: \${p.isim}`);
-                    const message = encodeURIComponent(`Merhaba, \${p.isim} ürünü için fiyat teklifi almak istiyorum. ID: \${p.id}`);
-                    window.location.href = `iletisim.html?subject=\${subject}&message=\${message}`;
+                    const subject = encodeURIComponent(`Teklif İsteği: ${p.isim}`);
+                    const message = encodeURIComponent(`Merhaba, ${p.isim} ürünü için fiyat teklifi almak istiyorum. ID: ${p.id}`);
+                    window.location.href = `iletisim.html?subject=${subject}&message=${message}`;
                 };
                 
             } catch (error) {
@@ -370,39 +420,6 @@
                 document.getElementById('productTitle').innerText = 'Ürün Bulunamadı';
                 document.getElementById('productDesc').innerText = 'Aradığınız ürün sistemde mevcut değil.';
             }
-
-            // Thumbnail Logic
-            const thumbnailsContainer = document.querySelector('.grid.grid-cols-4.gap-4');
-            if (!thumbnailsContainer) return;
-            
-            const thumbnails = thumbnailsContainer.querySelectorAll('button');
-            const mainContainer = thumbnailsContainer.previousElementSibling;
-            
-            thumbnails.forEach(thumb => {
-                thumb.addEventListener('click', () => {
-                    mainContainer.style.opacity = '0.5';
-                    
-                    setTimeout(() => {
-                        thumbnails.forEach(t => {
-                            t.classList.remove('border-[#1E90FF]', 'border-2');
-                            t.classList.add('border-gray-200', 'border');
-                        });
-                        thumb.classList.remove('border-gray-200', 'border');
-                        thumb.classList.add('border-[#1E90FF]', 'border-2');
-                        
-                        const img = thumb.querySelector('img');
-                        if (img) {
-                            mainContainer.innerHTML = `<img id="mainImage" src="\${img.src}" alt="Ürün Görseli" class="w-full h-full object-contain filter drop-shadow-xl hover:scale-105 transition-transform duration-500"/>`;
-                        } else {
-                            mainContainer.innerHTML = `<div class="w-full h-full flex items-center justify-center scale-150">\${thumb.innerHTML}</div>`;
-                        }
-                        
-                        mainContainer.style.opacity = '1';
-                    }, 150);
-                    
-                    mainContainer.style.transition = 'opacity 0.15s ease-in-out';
-                });
-            });
         });
     </script>
 </body>

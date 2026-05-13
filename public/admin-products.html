@@ -112,28 +112,7 @@
                 <input type="text" class="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full pl-10 p-2.5 outline-none transition-colors" placeholder="Search products...">
             </div>
             
-            <div class="flex items-center gap-6">
-                <!-- Notifications -->
-                <button class="relative w-10 h-10 rounded-full bg-red-50 text-primary hover:bg-red-100 transition-colors flex items-center justify-center">
-                    <i class="fa-solid fa-bell"></i>
-                    <span class="absolute top-0 right-0 w-2.5 h-2.5 bg-primary border-2 border-white rounded-full"></span>
-                </button>
-                
-                <button class="w-10 h-10 rounded-full bg-red-50 text-primary hover:bg-red-100 transition-colors flex items-center justify-center">
-                    <i class="fa-solid fa-gear"></i>
-                </button>
-                
-                <!-- Avatar -->
-                <div class="flex items-center gap-3 pl-4 border-l border-gray-200">
-                    <div class="flex flex-col items-end">
-                        <span class="text-sm font-bold text-gray-900">Admin User</span>
-                        <span class="text-[10px] font-semibold text-gray-500 tracking-wide uppercase">Super Admin</span>
-                    </div>
-                    <div class="w-9 h-9 rounded-full bg-primary-light overflow-hidden shadow-sm">
-                        <img src="https://ui-avatars.com/api/?name=Admin+User&background=fee2e2&color=d63031" alt="Admin" class="w-full h-full object-cover">
-                    </div>
-                </div>
-            </div>
+
         </header>
 
         <!-- Scrollable Content -->
@@ -192,7 +171,8 @@
             
             <form id="productForm" class="p-8">
                 <input type="hidden" id="productId">
-                <div class="grid grid-cols-2 gap-6 mb-6">
+                
+                <div class="grid grid-cols-2 gap-6 mb-6 h-[60vh] overflow-y-auto pr-2">
                     <div class="col-span-2 sm:col-span-1">
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Internal Title (Baslik)</label>
                         <input type="text" id="pTitle" required class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-3 outline-none">
@@ -225,35 +205,59 @@
                         <input type="checkbox" id="pInStock" class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
                         <label for="pInStock" class="text-sm font-bold text-gray-700">In Stock</label>
                     </div>
-                    <div class="col-span-2">
-                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Product Image</label>
-                        <div class="flex gap-4">
-                            <div class="flex-grow">
-                                <label for="pImageFile" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-200 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
-                                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                        <i class="fa-solid fa-cloud-arrow-up text-gray-400 text-2xl mb-2"></i>
-                                        <p class="mb-1 text-sm text-gray-500 font-bold">Click to upload</p>
-                                        <p class="text-xs text-gray-400">PNG, JPG or WEBP (MAX. 2MB)</p>
-                                    </div>
-                                    <input type="file" id="pImageFile" class="hidden" accept="image/*" />
-                                </label>
-                                <input type="hidden" id="pImage">
-                            </div>
-                            <div class="w-32 h-32 rounded-lg border border-gray-200 bg-gray-50 overflow-hidden flex-shrink-0 relative group">
-                                <img id="pPreview" src="" alt="Preview" class="w-full h-full object-cover hidden">
-                                <div id="pNoPreview" class="w-full h-full flex items-center justify-center text-gray-300 text-xs text-center p-4">No Image Selected</div>
-                                <div id="uploadLoader" class="absolute inset-0 bg-white/80 hidden items-center justify-center">
-                                    <i class="fa-solid fa-circle-notch fa-spin text-primary text-xl"></i>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="col-span-2 border-t border-gray-100 pt-4">
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Main Description</label>
+                        <textarea id="pDescription" rows="2" class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-3 outline-none"></textarea>
                     </div>
-                    <div class="col-span-2">
-                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Description</label>
-                        <textarea id="pDescription" rows="3" class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-3 outline-none"></textarea>
+
+                    <!-- Images -->
+                    <div class="col-span-2 border-t border-gray-100 pt-4">
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Product Images</label>
+                        <div class="flex gap-4 mb-2">
+                            <input type="file" id="pImageFile" accept="image/*" class="w-full bg-gray-50 border border-gray-200 text-sm rounded-lg p-2" />
+                            <button type="button" onclick="uploadImage()" class="px-4 py-2 bg-gray-800 text-white font-bold rounded-lg whitespace-nowrap text-xs">Yükle</button>
+                        </div>
+                        <div id="imagesContainer" class="flex flex-wrap gap-2"></div>
+                    </div>
+
+                    <!-- Videos -->
+                    <div class="col-span-2 border-t border-gray-100 pt-4">
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Product Video URLs (YouTube/Vimeo)</label>
+                        <div class="flex gap-4 mb-2">
+                            <input type="text" id="newVideoUrl" placeholder="https://youtube.com/..." class="w-full bg-gray-50 border border-gray-200 text-sm rounded-lg p-3">
+                            <button type="button" onclick="addVideo()" class="px-4 py-2 bg-gray-800 text-white font-bold rounded-lg text-xs">Ekle</button>
+                        </div>
+                        <div id="videosContainer" class="flex flex-col gap-2"></div>
+                    </div>
+
+                    <!-- Technical Specs -->
+                    <div class="col-span-2 border-t border-gray-100 pt-4">
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Technical Specs (Key - Value)</label>
+                        <div class="flex gap-4 mb-2">
+                            <input type="text" id="newSpecKey" placeholder="Örn: Çalışma Basıncı" class="w-1/2 bg-gray-50 border border-gray-200 text-sm rounded-lg p-3">
+                            <input type="text" id="newSpecValue" placeholder="Örn: PN 40" class="w-1/2 bg-gray-50 border border-gray-200 text-sm rounded-lg p-3">
+                            <button type="button" onclick="addSpec()" class="px-4 py-2 bg-gray-800 text-white font-bold rounded-lg text-xs">Ekle</button>
+                        </div>
+                        <div id="specsContainer" class="flex flex-col gap-2"></div>
+                    </div>
+
+                    <!-- Feature Boxes -->
+                    <div class="col-span-2 border-t border-gray-100 pt-4">
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Feature Boxes</label>
+                        <div class="flex gap-4 mb-2">
+                            <input type="text" id="newFeatureTitle" placeholder="Kutu Başlığı" class="w-1/3 bg-gray-50 border border-gray-200 text-sm rounded-lg p-3">
+                            <input type="text" id="newFeatureDesc" placeholder="Kutu Açıklaması" class="w-2/3 bg-gray-50 border border-gray-200 text-sm rounded-lg p-3">
+                            <button type="button" onclick="addFeatureBox()" class="px-4 py-2 bg-gray-800 text-white font-bold rounded-lg text-xs">Ekle</button>
+                        </div>
+                        <div id="featuresContainer" class="flex flex-col gap-2"></div>
+                    </div>
+
+                    <!-- Application Areas -->
+                    <div class="col-span-2 border-t border-gray-100 pt-4">
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Application Areas (Uygulama Alanları)</label>
+                        <textarea id="pApplicationAreas" rows="2" placeholder="Enerji santralleri, tekstil fabrikaları..." class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-3 outline-none"></textarea>
                     </div>
                 </div>
-                
                 <div class="flex justify-end gap-4 mt-8">
                     <button type="button" onclick="closeModal()" class="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold rounded-lg transition-colors">Cancel</button>
                     <button type="submit" class="px-8 py-2.5 bg-primary hover:bg-primary-hover text-white font-bold rounded-lg shadow-md shadow-red-500/20 transition-all">Save Product</button>
@@ -334,18 +338,98 @@
             }
         });
 
-        function updatePreview(url) {
-            if (url && url.trim() !== '') {
-                pPreview.src = url;
-                pPreview.classList.remove('hidden');
-                pNoPreview.classList.add('hidden');
-                pImageHidden.value = url;
-            } else {
-                pPreview.src = '';
-                pPreview.classList.add('hidden');
-                pNoPreview.classList.remove('hidden');
-                pImageHidden.value = '';
+
+        let productImages = [];
+        let productVideos = [];
+        let productSpecs = [];
+        let productFeatures = [];
+
+        async function uploadImage() {
+            const fileInput = document.getElementById('pImageFile');
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('image', file);
+            const token = localStorage.getItem('adminToken');
+            
+            try {
+                const response = await fetch('/api/admin/upload', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    productImages.push(result.url);
+                    renderImages();
+                    fileInput.value = '';
+                } else {
+                    alert('Upload failed: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error uploading:', error);
             }
+        }
+
+        function removeImage(index) { productImages.splice(index, 1); renderImages(); }
+        function renderImages() {
+            document.getElementById('imagesContainer').innerHTML = productImages.map((img, i) => `
+                <div class="relative w-20 h-20 rounded border border-gray-200 overflow-hidden group">
+                    <img src="${img}" class="w-full h-full object-cover">
+                    <button type="button" onclick="removeImage(${i})" class="absolute inset-0 bg-red-500/80 text-white items-center justify-center hidden group-hover:flex"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            `).join('');
+        }
+
+        function addVideo() {
+            const el = document.getElementById('newVideoUrl');
+            if (el.value.trim()) { productVideos.push(el.value.trim()); el.value = ''; renderVideos(); }
+        }
+        function removeVideo(index) { productVideos.splice(index, 1); renderVideos(); }
+        function renderVideos() {
+            document.getElementById('videosContainer').innerHTML = productVideos.map((vid, i) => `
+                <div class="flex justify-between items-center p-2 bg-gray-50 border border-gray-100 rounded text-sm text-gray-600">
+                    <span class="truncate pr-4">${vid}</span>
+                    <button type="button" onclick="removeVideo(${i})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            `).join('');
+        }
+
+        function addSpec() {
+            const key = document.getElementById('newSpecKey');
+            const val = document.getElementById('newSpecValue');
+            if (key.value.trim() && val.value.trim()) {
+                productSpecs.push({ key: key.value.trim(), value: val.value.trim() });
+                key.value = ''; val.value = ''; renderSpecs();
+            }
+        }
+        function removeSpec(index) { productSpecs.splice(index, 1); renderSpecs(); }
+        function renderSpecs() {
+            document.getElementById('specsContainer').innerHTML = productSpecs.map((s, i) => `
+                <div class="flex justify-between items-center p-2 bg-gray-50 border border-gray-100 rounded text-sm text-gray-600">
+                    <span><strong>${s.key}:</strong> ${s.value}</span>
+                    <button type="button" onclick="removeSpec(${i})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            `).join('');
+        }
+
+        function addFeatureBox() {
+            const title = document.getElementById('newFeatureTitle');
+            const desc = document.getElementById('newFeatureDesc');
+            if (title.value.trim() && desc.value.trim()) {
+                productFeatures.push({ title: title.value.trim(), description: desc.value.trim() });
+                title.value = ''; desc.value = ''; renderFeatures();
+            }
+        }
+        function removeFeature(index) { productFeatures.splice(index, 1); renderFeatures(); }
+        function renderFeatures() {
+            document.getElementById('featuresContainer').innerHTML = productFeatures.map((f, i) => `
+                <div class="flex justify-between items-center p-2 bg-gray-50 border border-gray-100 rounded text-sm text-gray-600">
+                    <span><strong>${f.title}:</strong> ${f.description}</span>
+                    <button type="button" onclick="removeFeature(${i})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            `).join('');
         }
 
         // Drag & Drop Sorting
@@ -373,13 +457,15 @@
                 const products = await response.json();
                 document.getElementById('total-count').innerText = products.length;
                 
-                tableBody.innerHTML = products.map(p => `
+                tableBody.innerHTML = products.map(p => {
+                    const firstImage = p.images && p.images.length > 0 ? p.images[0] : p.resim;
+                    return `
                     <tr class="hover:bg-gray-50 transition-colors cursor-move" data-id="${p.id}">
                         <td class="px-6 py-4 whitespace-nowrap text-gray-400 font-mono text-xs">#${p.id.substring(0,8)}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center gap-4">
                                 <div class="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden">
-                                    <img src="${p.resim}" alt="" class="w-full h-full object-cover">
+                                    <img src="${firstImage}" alt="" class="w-full h-full object-cover">
                                 </div>
                                 <div>
                                     <p class="text-gray-900 font-bold">${p.baslik}</p>
@@ -402,7 +488,7 @@
                             </div>
                         </td>
                     </tr>
-                `).join('');
+                `}).join('');
             } catch (error) {
                 console.error('Error loading products:', error);
             }
@@ -411,7 +497,11 @@
         // Modal Controls
         function openModal() {
             productForm.reset();
-            updatePreview('');
+            productImages = [];
+            productVideos = [];
+            productSpecs = [];
+            productFeatures = [];
+            renderImages(); renderVideos(); renderSpecs(); renderFeatures();
             document.getElementById('productId').value = '';
             document.getElementById('modalTitle').innerText = 'Add New Product';
             productModal.classList.remove('hidden');
@@ -441,10 +531,19 @@
                 document.getElementById('pPrice').value = p.fiyat;
                 document.getElementById('pStatus').value = p.durum;
                 document.getElementById('pInStock').checked = p.stokta_var_mi;
-                document.getElementById('pImage').value = p.resim;
                 document.getElementById('pDescription').value = p.aciklama;
-                
-                updatePreview(p.resim);
+                document.getElementById('pApplicationAreas').value = p.application_areas || '';
+
+                // Load arrays
+                productImages = p.images || [];
+                // Fallback to p.resim if empty
+                if (productImages.length === 0 && p.resim) { productImages.push(p.resim); }
+
+                productVideos = p.videos || [];
+                productSpecs = p.technical_specs || [];
+                productFeatures = p.feature_boxes || [];
+
+                renderImages(); renderVideos(); renderSpecs(); renderFeatures();
                 
                 document.getElementById('modalTitle').innerText = 'Edit Product';
                 productModal.classList.remove('hidden');
@@ -484,6 +583,10 @@
             e.preventDefault();
             const id = document.getElementById('productId').value;
             const token = localStorage.getItem('adminToken');
+            
+            // Generate primary image URL from array, fallback empty
+            const primaryImage = productImages.length > 0 ? productImages[0] : '';
+
             const data = {
                 baslik: document.getElementById('pTitle').value,
                 isim: document.getElementById('pIsim').value,
@@ -491,9 +594,13 @@
                 fiyat: parseFloat(document.getElementById('pPrice').value),
                 durum: document.getElementById('pStatus').value,
                 stokta_var_mi: document.getElementById('pInStock').checked,
-                resim: pImageHidden.value,
+                resim: primaryImage,
                 aciklama: document.getElementById('pDescription').value,
-                ozellikler: []
+                images: productImages,
+                videos: productVideos,
+                technical_specs: productSpecs,
+                feature_boxes: productFeatures,
+                application_areas: document.getElementById('pApplicationAreas').value
             };
 
             const url = id ? `/api/admin/urunler/${id}` : '/api/admin/urunler';
