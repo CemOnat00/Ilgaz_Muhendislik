@@ -290,55 +290,8 @@
         const productForm = document.getElementById('productForm');
         const deleteModal = document.getElementById('deleteModal');
         const pImageFile = document.getElementById('pImageFile');
-        const pImageHidden = document.getElementById('pImage');
-        const pPreview = document.getElementById('pPreview');
-        const pNoPreview = document.getElementById('pNoPreview');
-        const uploadLoader = document.getElementById('uploadLoader');
         let deleteTargetId = null;
         
-        // Image Upload Logic
-        pImageFile.addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            // Show preview locally immediately
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                pPreview.src = event.target.result;
-                pPreview.classList.remove('hidden');
-                pNoPreview.classList.add('hidden');
-            };
-            reader.readAsDataURL(file);
-
-            // Upload to server
-            uploadLoader.classList.remove('hidden');
-            uploadLoader.classList.add('flex');
-
-            const formData = new FormData();
-            formData.append('image', file);
-
-            const token = localStorage.getItem('adminToken');
-            try {
-                const response = await fetch('/api/admin/upload', {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` },
-                    body: formData
-                });
-                const result = await response.json();
-                if (response.ok) {
-                    pImageHidden.value = result.url;
-                } else {
-                    alert('Upload failed: ' + result.error);
-                }
-            } catch (error) {
-                console.error('Error uploading:', error);
-            } finally {
-                uploadLoader.classList.add('hidden');
-                uploadLoader.classList.remove('flex');
-            }
-        });
-
-
         let productImages = [];
         let productVideos = [];
         let productSpecs = [];
@@ -347,7 +300,12 @@
         async function uploadImage() {
             const fileInput = document.getElementById('pImageFile');
             const file = fileInput.files[0];
-            if (!file) return;
+            if (!file) return alert('Lütfen önce bir resim seçin');
+
+            const uploadBtn = event.currentTarget;
+            const originalText = uploadBtn.innerText;
+            uploadBtn.disabled = true;
+            uploadBtn.innerText = 'Yükleniyor...';
 
             const formData = new FormData();
             formData.append('image', file);
@@ -365,10 +323,14 @@
                     renderImages();
                     fileInput.value = '';
                 } else {
-                    alert('Upload failed: ' + result.error);
+                    alert('Upload failed: ' + (result.error || 'Bilinmeyen hata'));
                 }
             } catch (error) {
                 console.error('Error uploading:', error);
+                alert('Yükleme sırasında teknik bir hata oluştu');
+            } finally {
+                uploadBtn.disabled = false;
+                uploadBtn.innerText = originalText;
             }
         }
 

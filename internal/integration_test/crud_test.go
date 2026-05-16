@@ -20,11 +20,11 @@ func getAuthToken(t *testing.T) string {
 	body, _ := json.Marshal(loginData)
 	req, _ := http.NewRequest("POST", "/api/admin/login", bytes.NewBuffer(body))
 	w := httptest.NewRecorder()
-	
+
 	if router == nil {
 		t.Fatal("Router is not initialized. Check TestMain in auth_test.go")
 	}
-	
+
 	router.ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
@@ -35,11 +35,11 @@ func getAuthToken(t *testing.T) string {
 	if err := json.Unmarshal(w.Body.Bytes(), &resp); err != nil {
 		t.Fatalf("Failed to unmarshal login response: %v", err)
 	}
-	
+
 	if resp.Token == "" {
 		t.Fatal("Login succeeded but returned an empty token")
 	}
-	
+
 	return resp.Token
 }
 
@@ -118,11 +118,11 @@ func TestMessageCRUD(t *testing.T) {
 	w = httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusOK, w.Code)
-	
+
 	var messages []models.Message
 	json.Unmarshal(w.Body.Bytes(), &messages)
 	assert.GreaterOrEqual(t, len(messages), 1)
-	
+
 	msgID := messages[0].ID.Hex()
 
 	// 3. Mark Read

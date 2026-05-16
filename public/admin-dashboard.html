@@ -162,8 +162,8 @@
                 <!-- Charts Area -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                     <!-- Chart 1: Product Inventory Trends -->
-                    <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm relative overflow-hidden h-[300px] flex flex-col justify-between">
-                        <div class="flex justify-between items-start z-10">
+                    <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm min-h-[350px] flex flex-col">
+                        <div class="flex justify-between items-start mb-6">
                             <div>
                                 <h3 class="text-gray-900 font-bold mb-1">Product Inventory Trends</h3>
                                 <p class="text-4xl font-black text-gray-900 flex items-baseline gap-2">
@@ -176,15 +176,15 @@
                                 <p class="text-xs text-gray-400 font-medium">Last 30 days</p>
                             </div>
                         </div>
-                        <!-- Chart canvas -->
-                        <div class="absolute bottom-2 left-0 w-full h-36 px-2">
+                        <!-- Chart canvas container -->
+                        <div class="flex-grow w-full relative">
                             <canvas id="productChart"></canvas>
                         </div>
                     </div>
 
                     <!-- Chart 2: Monthly Inquiries -->
-                    <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm relative overflow-hidden h-[300px] flex flex-col justify-between">
-                        <div class="flex justify-between items-start z-10">
+                    <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm min-h-[350px] flex flex-col">
+                        <div class="flex justify-between items-start mb-6">
                             <div>
                                 <h3 class="text-gray-900 font-bold mb-1">Monthly Inquiries</h3>
                                 <p class="text-4xl font-black text-gray-900 flex items-baseline gap-2">
@@ -197,8 +197,8 @@
                                 <p class="text-xs text-gray-400 font-medium">Last 30 days</p>
                             </div>
                         </div>
-                        <!-- Chart canvas -->
-                        <div class="absolute bottom-2 left-0 w-full h-40 px-2">
+                        <!-- Chart canvas container -->
+                        <div class="flex-grow w-full relative">
                             <canvas id="messageChart"></canvas>
                         </div>
                     </div>
