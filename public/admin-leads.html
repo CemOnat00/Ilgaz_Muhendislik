@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Potential Customers - Ilgaz Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            corePlugins: { preflight: false },
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#d63031',
+                        'primary-hover': '#b02626',
+                        'primary-light': '#fee2e2',
+                        'dark-navy': '#151b2b',
+                        'text-dark': '#1f2937'
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        *, ::before, ::after { box-sizing: border-box; border-width: 0; border-style: solid; border-color: #e5e7eb; }
+        body { margin: 0; font-family: 'Inter', sans-serif; background-color: #f8f9fa; color: #1f2937; }
+        .border { border-width: 1px; }
+        .border-b { border-bottom-width: 1px; }
+        .border-t { border-top-width: 1px; }
+        .border-r { border-right-width: 1px; }
+    </style>
+</head>
+
+<body class="flex h-screen overflow-hidden selection:bg-primary selection:text-white">
+
+    <!-- Sidebar -->
+    <aside class="w-[260px] bg-white border-r border-gray-200 flex flex-col justify-between flex-shrink-0 relative z-20">
+        <div>
+            <div class="h-20 px-6 flex items-center border-b border-gray-100">
+                <a href="admin-dashboard.html" class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white shadow-sm">
+                        <i class="fa-solid fa-industry text-sm"></i>
+                    </div>
+                    <div class="flex flex-col leading-none justify-center">
+                        <span class="font-bold text-[15px] text-gray-900">Ilgaz Mühendislik</span>
+                        <span class="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mt-0.5">Admin Panel</span>
+                    </div>
+                </a>
+            </div>
+
+            <nav class="p-4 flex flex-col gap-1.5 mt-2">
+                <a href="admin-dashboard.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors">
+                    <i class="fa-solid fa-border-all w-5 text-center text-lg"></i>
+                    <span class="text-sm">Dashboard</span>
+                </a>
+
+                <a href="admin-products.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors">
+                    <i class="fa-solid fa-box w-5 text-center text-lg"></i>
+                    <span class="text-sm">Products & Services</span>
+                </a>
+
+                <a href="admin-messages.html" class="flex items-center justify-between px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors group">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-envelope w-5 text-center text-lg"></i>
+                        <span class="text-sm">Messages</span>
+                    </div>
+                    <span id="sidebar-msg-count" class="bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-full group-hover:scale-110 transition-transform">0</span>
+                </a>
+
+                <a href="admin-projects.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors">
+                    <i class="fa-solid fa-compass-drafting w-5 text-center text-lg"></i>
+                    <span class="text-sm">Engineering Projects</span>
+                </a>
+
+                <!-- Active Item -->
+                <a href="admin-leads.html" class="flex items-center gap-3 px-4 py-3 bg-primary text-white font-semibold rounded-lg shadow-md shadow-red-500/20 transition-colors">
+                    <i class="fa-solid fa-user-tie w-5 text-center text-lg"></i>
+                    <span class="text-sm">Potential Customers</span>
+                </a>
+            </nav>
+        </div>
+
+        <div class="p-4 border-t border-gray-100 flex flex-col gap-2">
+            <a href="admin-settings.html" class="flex items-center gap-3 px-4 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors">
+                <i class="fa-solid fa-gear w-5 text-center"></i>
+                <span class="text-sm">Settings</span>
+            </a>
+            <a href="admin-login.html" class="flex items-center gap-3 px-4 py-2.5 text-gray-500 hover:bg-red-50 hover:text-primary font-medium rounded-lg transition-colors mt-2">
+                <i class="fa-solid fa-arrow-right-from-bracket w-5 text-center"></i>
+                <span class="text-sm">Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Wrapper -->
+    <div class="flex-grow flex flex-col overflow-hidden relative">
+
+        <header class="h-20 bg-white border-b border-gray-200 px-8 flex items-center justify-between flex-shrink-0">
+            <h1 class="text-lg font-bold text-gray-900">Potential Customers</h1>
+        </header>
+
+        <main class="flex-grow overflow-y-auto p-8">
+            <div class="max-w-[1200px] mx-auto">
+
+                <div class="mb-8">
+                    <h2 class="text-3xl font-black text-gray-900 tracking-tight mb-2">Potansiyel Müşteriler</h2>
+                    <p class="text-gray-500 text-lg">Katalog indiren ziyaretçiler — kim, neyi, ne zaman indirdi.</p>
+                </div>
+
+                <!-- Stat Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-12 h-12 bg-red-50 text-primary rounded-lg flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-file-arrow-down"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-gray-500 text-sm font-medium mb-1">Toplam İndirme</h3>
+                        <p id="stat-total" class="text-3xl font-black text-gray-900">0</p>
+                    </div>
+                    <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-12 h-12 bg-blue-50 text-blue-500 rounded-lg flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-calendar-week"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-gray-500 text-sm font-medium mb-1">Bu Hafta</h3>
+                        <p id="stat-week" class="text-3xl font-black text-gray-900">0</p>
+                    </div>
+                    <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-12 h-12 bg-orange-50 text-orange-500 rounded-lg flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-clock"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-gray-500 text-sm font-medium mb-1">Bugün</h3>
+                        <p id="stat-today" class="text-3xl font-black text-gray-900">0</p>
+                    </div>
+                </div>
+
+                <!-- Chart -->
+                <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm mb-8 min-h-[280px] flex flex-col">
+                    <h3 class="text-gray-900 font-bold mb-6">Son 7 Gün — Katalog İndirmeleri</h3>
+                    <div class="flex-grow w-full relative" style="min-height:200px">
+                        <canvas id="downloadsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Leads Table -->
+                <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden mb-6">
+                    <div class="px-6 py-5 border-b border-gray-100 flex justify-between items-center">
+                        <h3 class="text-lg font-bold text-gray-900">İndirme Kayıtları</h3>
+                        <span class="text-gray-400 text-xs font-medium"><span id="row-count" class="font-bold text-gray-700">0</span> kayıt</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left text-gray-600">
+                            <thead class="text-xs text-gray-900 uppercase font-black tracking-widest bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-4">Müşteri</th>
+                                    <th scope="col" class="px-6 py-4">Telefon</th>
+                                    <th scope="col" class="px-6 py-4">E-posta</th>
+                                    <th scope="col" class="px-6 py-4">İndirilen Katalog</th>
+                                    <th scope="col" class="px-6 py-4">Tarih</th>
+                                    <th scope="col" class="px-6 py-4 text-right">İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leads-table-body" class="bg-white divide-y divide-gray-100">
+                                <!-- JS Populated -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('adminToken');
+        if (!token) {
+            window.location.href = 'admin-login.html';
+        }
+
+        let downloadsChart = null;
+
+        function escapeHtml(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        async function updateSidebarCount() {
+            try {
+                const response = await fetch('/api/admin/mesajlar', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const messages = await response.json();
+                    const unread = (messages || []).filter(m => !m.okundu_mu).length;
+                    const badge = document.getElementById('sidebar-msg-count');
+                    if (badge) badge.innerText = unread;
+                }
+            } catch (e) {}
+        }
+
+        function renderStats(leads) {
+            const now = new Date();
+            const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+            document.getElementById('stat-total').innerText = leads.length;
+            document.getElementById('stat-week').innerText =
+                leads.filter(l => new Date(l.created_at) > weekAgo).length;
+            document.getElementById('stat-today').innerText =
+                leads.filter(l => new Date(l.created_at) >= startOfToday).length;
+            document.getElementById('row-count').innerText = leads.length;
+        }
+
+        function renderChart(leads) {
+            const days = Array.from({ length: 7 }, (_, i) => {
+                const d = new Date();
+                d.setDate(d.getDate() - (6 - i));
+                return d;
+            });
+            const counts = days.map(day => leads.filter(l => {
+                const d = new Date(l.created_at);
+                return d.getDate() === day.getDate() && d.getMonth() === day.getMonth() && d.getFullYear() === day.getFullYear();
+            }).length);
+
+            if (downloadsChart) downloadsChart.destroy();
+            downloadsChart = new Chart(document.getElementById('downloadsChart'), {
+                type: 'bar',
+                data: {
+                    labels: days.map(d => d.toLocaleDateString('tr-TR', { weekday: 'short', day: 'numeric' })),
+                    datasets: [{
+                        data: counts,
+                        backgroundColor: '#fca5a5',
+                        hoverBackgroundColor: '#d63031',
+                        borderRadius: 4,
+                        barPercentage: 0.6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false }, border: { display: false }, ticks: { color: '#9ca3af', font: { size: 10, weight: 'bold' } } },
+                        y: { beginAtZero: true, ticks: { precision: 0, color: '#9ca3af' }, grid: { color: '#f3f4f6' }, border: { display: false } }
+                    }
+                }
+            });
+        }
+
+        function renderTable(leads) {
+            const body = document.getElementById('leads-table-body');
+            if (!leads.length) {
+                body.innerHTML = `<tr><td colspan="6" class="px-6 py-16 text-center text-gray-400 font-medium">Henüz katalog indirme kaydı yok.</td></tr>`;
+                return;
+            }
+            body.innerHTML = leads.map(l => {
+                const name = escapeHtml(l.ad_soyad || 'İsimsiz');
+                const initial = (l.ad_soyad || '?').trim().charAt(0).toUpperCase();
+                const date = new Date(l.created_at);
+                const dateStr = date.toLocaleDateString('tr-TR') + ' ' + date.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+                return `
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-full bg-red-50 text-primary flex items-center justify-center text-xs font-bold">${escapeHtml(initial)}</div>
+                            <span class="text-gray-900 font-bold">${name}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-gray-600">${escapeHtml(l.telefon)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-gray-600">${escapeHtml(l.email)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="bg-gray-100 text-gray-700 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">${escapeHtml(l.kategori || 'Genel')}</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-gray-400 text-xs font-medium">${escapeHtml(dateStr)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right">
+                        <button onclick="deleteLead('${l.id}')" class="text-gray-400 hover:text-primary transition-colors text-lg"><i class="fa-solid fa-trash-can"></i></button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        async function loadLeads() {
+            try {
+                const response = await fetch('/api/admin/leads', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.status === 401) {
+                    localStorage.removeItem('adminToken');
+                    window.location.href = 'admin-login.html';
+                    return;
+                }
+                const leads = (await response.json()) || [];
+                renderStats(leads);
+                renderChart(leads);
+                renderTable(leads);
+            } catch (error) {
+                console.error('Kayıtlar yüklenemedi:', error);
+            }
+        }
+
+        async function deleteLead(id) {
+            if (!confirm('Bu kaydı silmek istediğinize emin misiniz?')) return;
+            try {
+                const response = await fetch(`/api/admin/leads/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.status === 401) {
+                    localStorage.removeItem('adminToken');
+                    window.location.href = 'admin-login.html';
+                    return;
+                }
+                if (response.ok) {
+                    loadLeads();
+                } else {
+                    const err = await response.json().catch(() => ({}));
+                    alert('Silinemedi: ' + (err.error || 'Bilinmeyen hata'));
+                }
+            } catch (e) {
+                alert('Silme sırasında teknik bir hata oluştu');
+            }
+        }
+
+        updateSidebarCount();
+        loadLeads();
+    </script>
+</body>
+
+</html>

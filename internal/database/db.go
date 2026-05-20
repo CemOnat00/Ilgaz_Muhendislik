@@ -326,3 +326,28 @@ func SeedProducts() {
 		log.Println("Toplam", len(seedProducts), "ornek urun basariyla veritabanina yuklendi.")
 	}
 }
+
+func SeedSettings() {
+	collection := GetCollection("settings")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	count, err := collection.CountDocuments(ctx, bson.M{})
+	if err != nil {
+		log.Println("Ayar sayisi kontrol edilemedi:", err)
+		return
+	}
+	if count > 0 {
+		log.Println("Site ayarlari zaten mevcut. Seed islemi atlandi.")
+		return
+	}
+
+	def := models.DefaultSettings()
+	def.ID = bson.NewObjectID()
+	_, err = collection.InsertOne(ctx, def)
+	if err != nil {
+		log.Println("Ayar seed hatası:", err)
+	} else {
+		log.Println("Varsayilan site ayarlari olusturuldu.")
+	}
+}

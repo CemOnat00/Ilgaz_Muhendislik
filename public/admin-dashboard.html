@@ -84,6 +84,11 @@
                     <i class="fa-solid fa-compass-drafting w-5 text-center text-lg"></i>
                     <span class="text-sm">Engineering Projects</span>
                 </a>
+
+                <a href="admin-leads.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors">
+                    <i class="fa-solid fa-user-tie w-5 text-center text-lg"></i>
+                    <span class="text-sm">Potential Customers</span>
+                </a>
             </nav>
         </div>
 
@@ -121,7 +126,7 @@
                 </div>
 
                 <!-- Stats Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                     <!-- Stat 1 -->
                     <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
                         <div class="flex justify-between items-start mb-4">
@@ -156,6 +161,18 @@
                         </div>
                         <h3 class="text-gray-500 text-sm font-medium mb-1">Active Projects</h3>
                         <p id="stat-projects" class="text-3xl font-black text-gray-900">0</p>
+                    </div>
+
+                    <!-- Stat 4 -->
+                    <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-12 h-12 bg-purple-50 text-purple-500 rounded-lg flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-file-arrow-down"></i>
+                            </div>
+                            <span class="text-gray-500 text-sm font-bold bg-gray-100 px-2 py-1 rounded-md">PDF</span>
+                        </div>
+                        <h3 class="text-gray-500 text-sm font-medium mb-1">Catalog Downloads</h3>
+                        <p id="stat-downloads" class="text-3xl font-black text-gray-900">0</p>
                     </div>
                 </div>
 
@@ -201,6 +218,23 @@
                         <div class="flex-grow w-full relative">
                             <canvas id="messageChart"></canvas>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Catalog Downloads Chart -->
+                <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm mb-8 min-h-[320px] flex flex-col">
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <h3 class="text-gray-900 font-bold mb-1">Catalog Download Activity</h3>
+                            <p class="text-4xl font-black text-gray-900 flex items-baseline gap-2">
+                                <span id="trend-downloads-count">0</span>
+                                <span class="text-sm font-medium text-gray-500">downloads · last 7 days</span>
+                            </p>
+                        </div>
+                        <a href="admin-leads.html" class="text-primary text-sm font-bold hover:text-primary-hover transition-colors">View Leads</a>
+                    </div>
+                    <div class="flex-grow w-full relative" style="min-height:200px">
+                        <canvas id="downloadsChart"></canvas>
                     </div>
                 </div>
 
@@ -391,5 +425,61 @@
             console.error('Stats loading failed:', error);
         }
     });
+</script>
+<script>
+    // Catalog download stats — bağımsız çalışır
+    (async () => {
+        const token = localStorage.getItem('adminToken');
+        if (!token) return;
+        try {
+            const res = await fetch('/api/admin/leads', { headers: { 'Authorization': `Bearer ${token}` } });
+            if (!res.ok) return;
+            const leads = (await res.json()) || [];
+
+            const totalEl = document.getElementById('stat-downloads');
+            if (totalEl) totalEl.innerText = leads.length;
+
+            const days = Array.from({ length: 7 }, (_, i) => {
+                const d = new Date();
+                d.setDate(d.getDate() - (6 - i));
+                return d;
+            });
+            const counts = days.map(day => leads.filter(l => {
+                const d = new Date(l.created_at);
+                return d.getDate() === day.getDate() && d.getMonth() === day.getMonth() && d.getFullYear() === day.getFullYear();
+            }).length);
+
+            const trendEl = document.getElementById('trend-downloads-count');
+            if (trendEl) trendEl.innerText = counts.reduce((a, b) => a + b, 0);
+
+            const canvas = document.getElementById('downloadsChart');
+            if (canvas) {
+                new Chart(canvas, {
+                    type: 'bar',
+                    data: {
+                        labels: days.map(d => d.toLocaleDateString('tr-TR', { weekday: 'short', day: 'numeric' })),
+                        datasets: [{
+                            data: counts,
+                            backgroundColor: '#ddd6fe',
+                            hoverBackgroundColor: '#8b5cf6',
+                            borderRadius: 4,
+                            barPercentage: 0.6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { grid: { display: false }, border: { display: false }, ticks: { color: '#9ca3af', font: { size: 10, weight: 'bold' } } },
+                            y: { beginAtZero: true, ticks: { precision: 0, color: '#9ca3af' }, grid: { color: '#f3f4f6' }, border: { display: false } }
+                        }
+                    }
+                });
+            }
+        } catch (e) {
+            console.error('Catalog download stats failed:', e);
+        }
+    })();
 </script>
 </html>

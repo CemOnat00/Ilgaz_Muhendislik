@@ -83,6 +83,11 @@
                     <i class="fa-solid fa-compass-drafting w-5 text-center text-lg"></i>
                     <span class="text-sm">Engineering Projects</span>
                 </a>
+
+                <a href="admin-leads.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors">
+                    <i class="fa-solid fa-user-tie w-5 text-center text-lg"></i>
+                    <span class="text-sm">Potential Customers</span>
+                </a>
             </nav>
         </div>
 
@@ -109,7 +114,7 @@
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <i class="fa-solid fa-magnifying-glass text-gray-400 text-sm"></i>
                 </div>
-                <input type="text" class="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full pl-10 p-2.5 outline-none transition-colors" placeholder="Search products...">
+                <input type="text" id="productSearch" class="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full pl-10 p-2.5 outline-none transition-colors" placeholder="Search products...">
             </div>
             
 
@@ -469,6 +474,7 @@
         let allAdminProducts = [];
         let filterStatus = 'all';
         let filterStock  = 'all';
+        let searchQuery  = '';
 
         function setStatusFilter(val) {
             filterStatus = val;
@@ -500,7 +506,9 @@
                 const matchStock  = filterStock === 'all' ||
                     (filterStock === 'instock'    &&  p.stokta_var_mi) ||
                     (filterStock === 'outofstock' && !p.stokta_var_mi);
-                return matchStatus && matchStock;
+                const matchSearch = !searchQuery ||
+                    [p.baslik, p.isim, p.kategori].some(f => (f || '').toLowerCase().includes(searchQuery));
+                return matchStatus && matchStock && matchSearch;
             });
 
             document.getElementById('total-count').innerText = products.length;
@@ -746,6 +754,11 @@
                 }
             } catch (e) {}
         }
+
+        document.getElementById('productSearch').addEventListener('input', (e) => {
+            searchQuery = e.target.value.trim().toLowerCase();
+            renderAdminTable();
+        });
 
         // Initial Load
         loadProducts();

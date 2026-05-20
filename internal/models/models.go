@@ -99,3 +99,40 @@ type ResetPasswordRequest struct {
 	Token       string `json:"token"`
 	NewPassword string `json:"new_password"`
 }
+
+// SiteSettings (Site / İletişim Ayarları) — tek dokümanlı koleksiyon
+type SiteSettings struct {
+	ID           bson.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
+	CompanyName  string        `json:"sirket_adi" bson:"company_name"`
+	Email        string        `json:"email" bson:"email"`
+	Phone        string        `json:"telefon" bson:"phone"`
+	SupportEmail string        `json:"destek_email" bson:"support_email"`
+	Address      string        `json:"adres" bson:"address"`
+	MapLocation  string        `json:"harita_konum" bson:"map_location"` // Harita için adres ya da "enlem,boylam"
+	MapZoom      int           `json:"harita_zoom" bson:"map_zoom"`
+}
+
+// Lead (Potansiyel Müşteri) — katalog indirme formundan toplanan iletişim bilgisi.
+// Her kayıt aynı zamanda bir indirme olayını temsil eder.
+type Lead struct {
+	ID        bson.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
+	Name      string        `json:"ad_soyad" bson:"name"`
+	Phone     string        `json:"telefon" bson:"phone"`
+	Email     string        `json:"email" bson:"email"`
+	Category  string        `json:"kategori" bson:"category"` // İndirilen katalog ("Genel" = tüm ürünler)
+	IPAddress string        `json:"ip_adresi" bson:"ip_address"`
+	CreatedAt time.Time     `json:"created_at" bson:"created_at"`
+}
+
+// DefaultSettings — veritabanında ayar dokümanı yoksa kullanılan varsayılanlar
+func DefaultSettings() SiteSettings {
+	return SiteSettings{
+		CompanyName:  "Ilgaz Mühendislik A.Ş.",
+		Email:        "info@ilgazmuhendislik.com",
+		Phone:        "+90 212 123 45 67",
+		SupportEmail: "support@ilgazmuhendislik.com",
+		Address:      "Mimarsinan, İsmet İnönü Blv. no:140 D:A, 55200 Atakum/Samsun",
+		MapLocation:  "41.33043975392915,36.27995416441768",
+		MapZoom:      17,
+	}
+}

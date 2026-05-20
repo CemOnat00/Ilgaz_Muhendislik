@@ -15,6 +15,8 @@ func SetupRoutes(r *gin.Engine) {
 		api.GET("/urunler/:id", handlers.GetProductByID)
 		api.POST("/mesajlar", handlers.CreateMessage)
 		api.GET("/projeler", handlers.GetProjects)
+		api.GET("/ayarlar", handlers.GetSettings)
+		api.POST("/katalog/indir", handlers.DownloadCatalog)
 
 		// Admin Auth
 		api.POST("/admin/login", handlers.AdminLogin)
@@ -39,6 +41,9 @@ func SetupRoutes(r *gin.Engine) {
 			admin.PUT("/projeler/reorder", handlers.ReorderProjects)
 			admin.PUT("/projeler/:id", handlers.UpdateProject)
 			admin.DELETE("/projeler/:id", handlers.DeleteProject)
+			admin.PUT("/ayarlar", handlers.UpdateSettings)
+			admin.GET("/leads", handlers.GetLeads)
+			admin.DELETE("/leads/:id", handlers.DeleteLead)
 		}
 	}
 }

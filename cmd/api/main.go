@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/cemonat00/ilgaz-backend/internal/database"
 	"github.com/cemonat00/ilgaz-backend/internal/routes"
@@ -21,9 +22,19 @@ func main() {
 	database.ConnectDB()
 	database.SeedAdmin()
 	database.SeedProducts()
+	database.SeedSettings()
 
 	// 2. Setup Gin Router
 	r := gin.Default()
+
+	// HTML sayfaları için tarayıcı önbelleğini kapat — her zaman güncel sürüm sunulur
+	r.Use(func(c *gin.Context) {
+		p := c.Request.URL.Path
+		if p == "/" || p == "/admin" || strings.HasSuffix(p, ".html") {
+			c.Header("Cache-Control", "no-cache, must-revalidate")
+		}
+		c.Next()
+	})
 
 	// 3. Static Files (Frontend)
 	r.Static("/css", "./public/css")
@@ -46,6 +57,8 @@ func main() {
 	r.StaticFile("/admin-products.html", "./public/admin-products.html")
 	r.StaticFile("/admin-messages.html", "./public/admin-messages.html")
 	r.StaticFile("/admin-projects.html", "./public/admin-projects.html")
+	r.StaticFile("/admin-settings.html", "./public/admin-settings.html")
+	r.StaticFile("/admin-leads.html", "./public/admin-leads.html")
 
 	// 4. Setup API Routes
 	routes.SetupRoutes(r)

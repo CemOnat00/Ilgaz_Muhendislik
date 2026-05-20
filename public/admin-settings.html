@@ -80,6 +80,11 @@
                     <i class="fa-solid fa-compass-drafting w-5 text-center text-lg"></i>
                     <span class="text-sm">Engineering Projects</span>
                 </a>
+
+                <a href="admin-leads.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors">
+                    <i class="fa-solid fa-user-tie w-5 text-center text-lg"></i>
+                    <span class="text-sm">Potential Customers</span>
+                </a>
             </nav>
         </div>
 
@@ -156,7 +161,27 @@
                         
                         <div class="mb-8">
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Office Address</label>
-                            <textarea id="cAddress" class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-3 outline-none" rows="3">Merkez Mah. Mühendis Sk. No: 24, Şişli / İstanbul</textarea>
+                            <textarea id="cAddress" class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-3 outline-none" rows="3">Mimarsinan, İsmet İnönü Blv. no:140 D:A, 55200 Atakum/Samsun</textarea>
+                        </div>
+
+                        <div class="border-t border-gray-100 pt-6 mb-8">
+                            <h4 class="text-sm font-bold text-gray-900 mb-1">Harita Konumu</h4>
+                            <p class="text-xs text-gray-500 mb-4">İletişim sayfasındaki Google Haritalar bu alandan yönetilir.</p>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Map Location</label>
+                                    <input type="text" id="cMapLocation" class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-3 outline-none" placeholder="Adres veya enlem,boylam">
+                                    <p class="text-[11px] text-gray-400 mt-1.5">Tam adres yazabilir, ya da kesin konum için <code>41.3601,36.1862</code> biçiminde enlem,boylam girebilirsiniz.</p>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Zoom (1-21)</label>
+                                    <input type="number" id="cMapZoom" min="1" max="21" class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-3 outline-none">
+                                </div>
+                            </div>
+                            <div class="rounded-lg overflow-hidden border border-gray-200 h-[260px] bg-gray-50">
+                                <iframe id="mapPreview" title="Harita Önizleme" class="w-full h-full" style="border:0" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                            </div>
+                            <p class="text-[11px] text-gray-400 mt-2">Canlı önizleme — konum veya zoom değiştikçe güncellenir.</p>
                         </div>
 
                         <div class="flex justify-end">
@@ -188,24 +213,90 @@
             } catch (e) {}
         }
 
+        function buildMapEmbed(query, zoom) {
+            const q = encodeURIComponent((query || '').trim());
+            let z = parseInt(zoom, 10);
+            if (isNaN(z) || z < 1 || z > 21) z = 16;
+            return `https://maps.google.com/maps?q=${q}&z=${z}&hl=tr&output=embed`;
+        }
+
+        function updateMapPreview() {
+            const loc = document.getElementById('cMapLocation').value || document.getElementById('cAddress').value;
+            const zoom = document.getElementById('cMapZoom').value;
+            if (!loc.trim()) return;
+            document.getElementById('mapPreview').src = buildMapEmbed(loc, zoom);
+        }
+
+        async function loadSettings() {
+            try {
+                const response = await fetch('/api/ayarlar');
+                if (!response.ok) return;
+                const s = await response.json();
+                document.getElementById('cName').value = s.sirket_adi || '';
+                document.getElementById('cEmail').value = s.email || '';
+                document.getElementById('cPhone').value = s.telefon || '';
+                document.getElementById('cSupport').value = s.destek_email || '';
+                document.getElementById('cAddress').value = s.adres || '';
+                document.getElementById('cMapLocation').value = s.harita_konum || '';
+                document.getElementById('cMapZoom').value = s.harita_zoom || 16;
+            } catch (e) {
+                console.error('Ayarlar yüklenemedi:', e);
+            }
+            updateMapPreview();
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             const token = localStorage.getItem('adminToken');
             if (!token) { window.location.href = 'admin-login.html'; return; }
             updateSidebarCount();
+            loadSettings();
+            document.getElementById('cMapLocation').addEventListener('input', updateMapPreview);
+            document.getElementById('cMapZoom').addEventListener('input', updateMapPreview);
         });
 
-        document.getElementById('settingsForm').addEventListener('submit', function(e) {
-
+        document.getElementById('settingsForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const btn = e.target.querySelector('button');
+            const btn = e.target.querySelector('button[type="submit"]');
+            const token = localStorage.getItem('adminToken');
             btn.disabled = true;
             btn.innerText = 'Saving...';
-            
-            setTimeout(() => {
-                alert('Ayarlar başarıyla kaydedildi!');
+
+            const data = {
+                sirket_adi: document.getElementById('cName').value,
+                email: document.getElementById('cEmail').value,
+                telefon: document.getElementById('cPhone').value,
+                destek_email: document.getElementById('cSupport').value,
+                adres: document.getElementById('cAddress').value,
+                harita_konum: document.getElementById('cMapLocation').value,
+                harita_zoom: parseInt(document.getElementById('cMapZoom').value, 10) || 16
+            };
+
+            try {
+                const response = await fetch('/api/admin/ayarlar', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(data)
+                });
+                if (response.status === 401) {
+                    localStorage.removeItem('adminToken');
+                    window.location.href = 'admin-login.html';
+                    return;
+                }
+                const result = await response.json();
+                if (response.ok) {
+                    alert(result.message || 'Ayarlar başarıyla kaydedildi!');
+                } else {
+                    alert('Kaydetme başarısız: ' + (result.error || 'Bilinmeyen hata'));
+                }
+            } catch (err) {
+                alert('Kaydetme sırasında teknik bir hata oluştu');
+            } finally {
                 btn.disabled = false;
                 btn.innerText = 'Save Changes';
-            }, 800);
+            }
         });
     </script>
 

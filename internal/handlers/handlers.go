@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/cemonat00/ilgaz-backend/internal/catalog"
 	"github.com/cemonat00/ilgaz-backend/internal/database"
 	"github.com/cemonat00/ilgaz-backend/internal/models"
 	"github.com/gin-gonic/gin"
@@ -681,4 +682,224 @@ func ResetPassword(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Şifre başarıyla güncellendi"})
+}
+
+// --- SETTINGS HANDLERS ---
+
+// GetSettings — Site ayarlarını döndürür (Public). Ayar dokümanı yoksa varsayılanları verir.
+func GetSettings(c *gin.Context) {
+	collection := database.GetCollection("settings")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	var settings models.SiteSettings
+	err := collection.FindOne(ctx, bson.M{}).Decode(&settings)
+	if err != nil {
+		c.JSON(http.StatusOK, models.DefaultSettings())
+		return
+	}
+
+	c.JSON(http.StatusOK, settings)
+}
+
+// UpdateSettings — Site ayarlarını günceller (Admin). Tek ayar dokümanını upsert eder.
+func UpdateSettings(c *gin.Context) {
+	var settings models.SiteSettings
+	if err := c.ShouldBindJSON(&settings); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Geçersiz ayar verisi"})
+		return
+	}
+
+	if settings.MapZoom < 1 || settings.MapZoom > 21 {
+		settings.MapZoom = 16
+	}
+
+	collection := database.GetCollection("settings")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	update := bson.M{
+		"$set": bson.M{
+			"company_name":  settings.CompanyName,
+			"email":         settings.Email,
+			"phone":         settings.Phone,
+			"support_email": settings.SupportEmail,
+			"address":       settings.Address,
+			"map_location":  settings.MapLocation,
+			"map_zoom":      settings.MapZoom,
+		},
+	}
+
+	opts := options.UpdateOne().SetUpsert(true)
+	_, err := collection.UpdateOne(ctx, bson.M{}, update, opts)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Ayarlar kaydedilemedi: " + err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Ayarlar başarıyla kaydedildi"})
+}
+
+// --- CATALOG & LEAD HANDLERS ---
+
+// slugify Türkçe metni dosya adı için ascii slug'a çevirir.
+func slugify(s string) string {
+	repl := strings.NewReplacer(
+		"ç", "c", "Ç", "c", "ğ", "g", "Ğ", "g", "ı", "i", "İ", "i",
+		"ö", "o", "Ö", "o", "ş", "s", "Ş", "s", "ü", "u", "Ü", "u", " ", "-",
+	)
+	s = strings.ToLower(repl.Replace(s))
+	var b strings.Builder
+	for _, r := range s {
+		if (r >= 'a' && r <= 'z') || (r >= '0' && r <= '9') || r == '-' {
+			b.WriteRune(r)
+		}
+	}
+	return b.String()
+}
+
+// DownloadCatalog — Lead bilgisini kaydeder, IP rate-limit uygular ve PDF kataloğu döndürür.
+func DownloadCatalog(c *gin.Context) {
+	var req struct {
+		Name     string `json:"ad_soyad"`
+		Phone    string `json:"telefon"`
+		Email    string `json:"email"`
+		Category string `json:"kategori"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Geçersiz form verisi"})
+		return
+	}
+
+	req.Name = strings.TrimSpace(req.Name)
+	req.Phone = strings.TrimSpace(req.Phone)
+	req.Email = strings.TrimSpace(req.Email)
+	req.Category = strings.TrimSpace(req.Category)
+
+	if req.Name == "" || req.Phone == "" || req.Email == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Ad-soyad, telefon ve e-posta zorunludur"})
+		return
+	}
+	if !strings.Contains(req.Email, "@") {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Geçerli bir e-posta adresi giriniz"})
+		return
+	}
+
+	ip := c.ClientIP()
+	leadsCol := database.GetCollection("leads")
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	// IP rate-limit: aynı IP'den son 20 saniyede kayıt → engelle (bot / hızlı tıklama)
+	if recent, _ := leadsCol.CountDocuments(ctx, bson.M{
+		"ip_address": ip,
+		"created_at": bson.M{"$gt": time.Now().Add(-20 * time.Second)},
+	}); recent > 0 {
+		c.JSON(http.StatusTooManyRequests, gin.H{"error": "Çok sık deneme yaptınız, lütfen birkaç saniye bekleyin."})
+		return
+	}
+	// Saatlik üst sınır: aynı IP'den son 1 saatte 20+ indirme → engelle
+	if hourly, _ := leadsCol.CountDocuments(ctx, bson.M{
+		"ip_address": ip,
+		"created_at": bson.M{"$gt": time.Now().Add(-1 * time.Hour)},
+	}); hourly >= 20 {
+		c.JSON(http.StatusTooManyRequests, gin.H{"error": "İndirme limitine ulaşıldı, lütfen daha sonra tekrar deneyin."})
+		return
+	}
+
+	category := req.Category
+	if category == "" {
+		category = "Genel"
+	}
+
+	// Aktif ürünleri çek ve gerekiyorsa kategoriye göre filtrele
+	prodCol := database.GetCollection("products")
+	cursor, err := prodCol.Find(ctx, bson.M{"status": "Aktif"}, options.Find().SetSort(bson.M{"order": 1}))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Ürünler okunamadı"})
+		return
+	}
+	defer cursor.Close(ctx)
+
+	var products []models.Product
+	for cursor.Next(ctx) {
+		var p models.Product
+		if cursor.Decode(&p) == nil {
+			if category == "Genel" || p.Kategori == category {
+				products = append(products, p)
+			}
+		}
+	}
+
+	pdfBytes, err := catalog.Generate(products, category)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Katalog oluşturulamadı"})
+		return
+	}
+
+	// Lead kaydı — her başarılı indirme bir potansiyel müşteri / indirme olayıdır
+	lead := models.Lead{
+		ID:        bson.NewObjectID(),
+		Name:      req.Name,
+		Phone:     req.Phone,
+		Email:     req.Email,
+		Category:  category,
+		IPAddress: ip,
+		CreatedAt: time.Now(),
+	}
+	_, _ = leadsCol.InsertOne(ctx, lead)
+
+	filename := "ilgaz-katalog.pdf"
+	if category != "Genel" {
+		filename = "ilgaz-katalog-" + slugify(category) + ".pdf"
+	}
+	c.Header("Content-Disposition", "attachment; filename=\""+filename+"\"")
+	c.Data(http.StatusOK, "application/pdf", pdfBytes)
+}
+
+// GetLeads — Tüm potansiyel müşteri/indirme kayıtlarını döndürür (Admin).
+func GetLeads(c *gin.Context) {
+	collection := database.GetCollection("leads")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	cursor, err := collection.Find(ctx, bson.M{}, options.Find().SetSort(bson.M{"created_at": -1}))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Kayıtlar çekilemedi"})
+		return
+	}
+	defer cursor.Close(ctx)
+
+	leads := []models.Lead{}
+	for cursor.Next(ctx) {
+		var l models.Lead
+		if cursor.Decode(&l) == nil {
+			leads = append(leads, l)
+		}
+	}
+	c.JSON(http.StatusOK, leads)
+}
+
+// DeleteLead — Bir potansiyel müşteri kaydını siler (Admin).
+func DeleteLead(c *gin.Context) {
+	objID, err := bson.ObjectIDFromHex(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Geçersiz ID formatı"})
+		return
+	}
+
+	collection := database.GetCollection("leads")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	result, err := collection.DeleteOne(ctx, bson.M{"_id": objID})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Silinemedi: " + err.Error()})
+		return
+	}
+	if result.DeletedCount == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Kayıt bulunamadı"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Kayıt silindi"})
 }

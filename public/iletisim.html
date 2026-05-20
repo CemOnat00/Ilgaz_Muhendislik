@@ -77,9 +77,6 @@
             
             <!-- Actions -->
             <div class="flex items-center gap-5">
-                <button class="text-gray-600 hover:text-primary transition text-lg hidden sm:block">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                </button>
                 <a href="iletisim.html" class="hidden sm:inline-flex bg-primary hover:bg-primary-hover text-white text-xs font-bold px-6 py-2.5 rounded-md transition-colors uppercase tracking-wide shadow-md shadow-red-500/20">
                     Teklif Al
                 </a>
@@ -199,7 +196,7 @@
                             <i class="fa-solid fa-phone"></i>
                         </div>
                         <h3 class="text-lg font-bold mb-2">Telefon</h3>
-                        <p class="text-text-muted">+90 (212) 555 00 00</p>
+                        <p class="text-text-muted" id="officePhone">+90 (212) 555 00 00</p>
                     </div>
                     <!-- E-posta -->
                     <div class="bg-red-50/70 p-8 rounded-2xl border border-red-100/50">
@@ -207,7 +204,7 @@
                             <i class="fa-solid fa-envelope"></i>
                         </div>
                         <h3 class="text-lg font-bold mb-2">E-posta</h3>
-                        <p class="text-text-muted">info@ilgazmuhendislik.com</p>
+                        <p class="text-text-muted" id="officeEmail">info@ilgazmuhendislik.com</p>
                     </div>
                 </div>
 
@@ -217,32 +214,33 @@
                         <i class="fa-solid fa-location-dot"></i>
                     </div>
                     <h3 class="text-lg font-bold mb-2">Adres</h3>
-                    <p class="text-text-muted">Atatürk Bulvarı, No: 123, Kat: 5, Ofis: 42, Çankaya, Ankara</p>
+                    <p class="text-text-muted" id="officeAddress">Mimarsinan, İsmet İnönü Blv. no:140 D:A, 55200 Atakum/Samsun</p>
                 </div>
 
-                <!-- Google Maps Mockup -->
-                <div class="relative w-full h-[280px] bg-gray-200 rounded-2xl overflow-hidden shadow-inner group">
-                    <!-- Abstract Map Background Graphic -->
-                    <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(#64748b 1px, transparent 1px); background-size: 20px 20px;"></div>
-                    <!-- Diagonal Map Paths -->
-                    <svg class="absolute inset-0 w-full h-full text-gray-300 opacity-60" viewBox="0 0 100 100" preserveAspectRatio="none">
-                        <path d="M0,30 L40,40 L100,20 M20,100 L40,40 L60,100 M0,80 L100,60" fill="none" stroke="currentColor" stroke-width="2"></path>
-                    </svg>
-                    
-                    <!-- Center Pin -->
-                    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center drop-shadow-md">
-                        <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-lg mb-2 relative z-10">
-                            <i class="fa-solid fa-location-dot text-3xl text-primary"></i>
+                <!-- Google Maps -->
+                <div class="relative w-full h-[300px] rounded-2xl overflow-hidden shadow-inner bg-gray-100 group">
+                    <!-- Loading placeholder -->
+                    <div id="mapLoader" class="absolute inset-0 flex items-center justify-center bg-gray-100 z-10">
+                        <i class="fa-solid fa-location-dot text-primary text-3xl animate-bounce"></i>
+                    </div>
+                    <!-- Interactive Google Map (anahtar gerektirmeyen embed) -->
+                    <iframe id="officeMap" title="Ofis Konumu" class="w-full h-full" style="border:0"
+                        loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen
+                        onload="document.getElementById('mapLoader').style.display='none'"></iframe>
+
+                    <!-- Branded office label -->
+                    <div class="absolute top-4 left-4 bg-white/95 backdrop-blur px-4 py-2.5 rounded-xl shadow-lg flex items-center gap-3 z-20 pointer-events-none">
+                        <div class="w-9 h-9 bg-primary text-white rounded-lg flex items-center justify-center shadow-sm">
+                            <i class="fa-solid fa-location-dot"></i>
                         </div>
-                        <div class="bg-white px-4 py-1.5 rounded-full shadow-md text-xs font-bold tracking-wide uppercase">
-                            Ofis Konumumuz
+                        <div class="leading-tight">
+                            <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Ofis Konumumuz</p>
+                            <p id="mapOfficeName" class="text-sm font-bold text-gray-900">Ilgaz Mühendislik</p>
                         </div>
-                        <!-- Pin shadow -->
-                        <div class="w-4 h-1 bg-black/20 rounded-[50%] blur-sm mt-3"></div>
                     </div>
 
-                    <!-- Open in maps button -->
-                    <a href="https://linkedin.com/company/ilgaz-muhendislik" class="absolute bottom-4 right-4 bg-[#d63031] hover:bg-[#b02626] text-white text-xs font-bold px-4 py-2.5 rounded-lg flex items-center gap-2 shadow-lg transition-colors z-20">
+                    <!-- Open in Google Maps -->
+                    <a id="mapsLink" href="#" target="_blank" rel="noopener" class="absolute bottom-4 right-4 bg-[#d63031] hover:bg-[#b02626] text-white text-xs font-bold px-4 py-2.5 rounded-lg flex items-center gap-2 shadow-lg transition-colors z-20">
                         Google Haritalarda Aç <i class="fa-solid fa-arrow-up-right-from-square"></i>
                     </a>
                 </div>
@@ -330,6 +328,51 @@
             
         </div>
     </footer>
+
+    <!-- Dinamik İletişim Bilgileri & Google Maps -->
+    <script>
+        (function () {
+            function buildMapEmbed(query, zoom) {
+                const q = encodeURIComponent((query || '').trim());
+                let z = parseInt(zoom, 10);
+                if (isNaN(z) || z < 1 || z > 21) z = 16;
+                return `https://maps.google.com/maps?q=${q}&z=${z}&hl=tr&output=embed`;
+            }
+            function mapsSearchUrl(query) {
+                return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((query || '').trim())}`;
+            }
+
+            function applySettings(s) {
+                const address = s.adres || '';
+                const mapLoc = (s.harita_konum && s.harita_konum.trim()) ? s.harita_konum : address;
+
+                if (address) document.getElementById('officeAddress').textContent = address;
+                if (s.telefon) document.getElementById('officePhone').textContent = s.telefon;
+                if (s.email) document.getElementById('officeEmail').textContent = s.email;
+                if (s.sirket_adi) document.getElementById('mapOfficeName').textContent = s.sirket_adi;
+
+                if (mapLoc) {
+                    document.getElementById('officeMap').src = buildMapEmbed(mapLoc, s.harita_zoom);
+                    document.getElementById('mapsLink').href = mapsSearchUrl(mapLoc);
+                }
+            }
+
+            const FALLBACK = {
+                adres: 'Mimarsinan, İsmet İnönü Blv. no:140 D:A, 55200 Atakum/Samsun',
+                harita_konum: '41.33043975392915,36.27995416441768',
+                harita_zoom: 17
+            };
+
+            document.addEventListener('DOMContentLoaded', async () => {
+                try {
+                    const res = await fetch('/api/ayarlar');
+                    applySettings(res.ok ? await res.json() : FALLBACK);
+                } catch (e) {
+                    applySettings(FALLBACK);
+                }
+            });
+        })();
+    </script>
 
 </body>
 </html>
