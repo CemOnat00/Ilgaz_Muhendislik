@@ -20,6 +20,7 @@ func main() {
 	// 1. Initialize Database
 	database.ConnectDB()
 	database.SeedAdmin()
+	database.SeedProducts()
 
 	// 2. Setup Gin Router
 	r := gin.Default()

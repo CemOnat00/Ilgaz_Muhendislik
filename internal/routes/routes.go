@@ -30,6 +30,7 @@ func SetupRoutes(r *gin.Engine) {
 			admin.PUT("/mesajlar/:id/read", handlers.MarkMessageRead)
 			admin.DELETE("/mesajlar/:id", handlers.DeleteMessage)
 			admin.POST("/mesajlar/:id/reply", handlers.ReplyMessage)
+			admin.GET("/urunler", handlers.GetAllProducts)
 			admin.POST("/urunler", handlers.AddProduct)
 			admin.PUT("/urunler/reorder", handlers.ReorderProducts)
 			admin.PUT("/urunler/:id", handlers.UpdateProduct)

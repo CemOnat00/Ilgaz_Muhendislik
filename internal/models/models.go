@@ -39,6 +39,8 @@ type Product struct {
 	TechnicalSpecs   []TechnicalSpec `json:"technical_specs" bson:"technical_specs"`
 	FeatureBoxes     []FeatureBox    `json:"feature_boxes" bson:"feature_boxes"`
 	ApplicationAreas string          `json:"application_areas" bson:"application_areas"`
+	IsIndustrial     bool            `json:"is_industrial" bson:"is_industrial"`
+	IsHomeAppliance  bool            `json:"is_home_appliance" bson:"is_home_appliance"`
 }
 
 // Message (İletişim Mesajı) Model

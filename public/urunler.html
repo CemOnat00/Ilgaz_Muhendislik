@@ -143,6 +143,10 @@
                                 <input type="checkbox" id="filter-industrial">
                                 <span>Endüstriyel Tip</span>
                             </label>
+                            <label class="filter-label">
+                                <input type="checkbox" id="filter-home">
+                                <span>Ev Tipi</span>
+                            </label>
                         </div>
                     </div>
 
@@ -304,6 +308,7 @@
             stockOnly: false,
             newOnly: false,
             industrialOnly: false,
+            homeApplianceOnly: false,
             search: new URLSearchParams(window.location.search).get('search') || ''
         };
         let currentPage = 1;
@@ -318,6 +323,8 @@
             try {
                 const response = await fetch('/api/urunler');
                 allProducts = await response.json();
+                // Stoğu bitenleri en alta taşı
+                allProducts.sort((a, b) => (b.stokta_var_mi ? 1 : 0) - (a.stokta_var_mi ? 1 : 0));
                 updateCategoryCounts();
                 applyFilters();
             } catch (error) {
@@ -369,6 +376,11 @@
                 currentPage = 1;
                 applyFilters();
             });
+            document.getElementById('filter-home').addEventListener('change', (e) => {
+                currentFilters.homeApplianceOnly = e.target.checked;
+                currentPage = 1;
+                applyFilters();
+            });
 
             // Sorting
             document.querySelector('.sort-select').addEventListener('change', (e) => {
@@ -388,10 +400,26 @@
             filteredProducts = allProducts.filter(p => {
                 const matchCat = currentFilters.category === 'all' || p.kategori === currentFilters.category;
                 const matchStock = !currentFilters.stockOnly || p.stokta_var_mi;
+                
+                // New Products filter (created within the last 14 days)
+                let matchNew = true;
+                if (currentFilters.newOnly) {
+                    const createdDate = p.created_at ? new Date(p.created_at) : null;
+                    const fourteenDaysAgo = new Date();
+                    fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+                    matchNew = createdDate && createdDate >= fourteenDaysAgo;
+                }
+
+                // Industrial Type filter (using db attribute)
+                const matchIndustrial = !currentFilters.industrialOnly || p.is_industrial;
+
+                // Home Appliance filter (using db attribute)
+                const matchHome = !currentFilters.homeApplianceOnly || p.is_home_appliance;
+
                 const matchSearch = !currentFilters.search || 
                                    p.isim.toLowerCase().includes(currentFilters.search.toLowerCase()) || 
                                    p.aciklama.toLowerCase().includes(currentFilters.search.toLowerCase());
-                return matchCat && matchStock && matchSearch;
+                return matchCat && matchStock && matchNew && matchIndustrial && matchHome && matchSearch;
             });
 
             renderProducts();
@@ -413,11 +441,23 @@
 
             productGrid.innerHTML = pageItems.map(p => {
                 const priceFormatted = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'EUR' }).format(p.fiyat);
+                
+                // Check if product is new (<= 14 days)
+                let isNew = false;
+                if (p.created_at) {
+                    const createdDate = new Date(p.created_at);
+                    const fourteenDaysAgo = new Date();
+                    fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+                    isNew = createdDate >= fourteenDaysAgo;
+                }
+                const newBadgeHTML = isNew ? `<span class="absolute top-3 left-3 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg z-10 animate-pulse">YENİ</span>` : '';
+
                 return `
-                    <div class="product-card group">
+                    <div class="product-card group relative">
                         <div class="product-img-wrapper overflow-hidden relative">
-                            ${p.stokta_var_mi ? '<span class="product-badge stock">Stokta</span>' : '<span class="product-badge bg-gray-500 text-white">Tükendi</span>'}
-                            <img src="${p.resim}" alt="${p.isim}" class="group-hover:scale-110 transition-transform duration-500" onerror="this.src='https://via.placeholder.com/300x200?text=Ilgaz+Ürün'">
+                            ${newBadgeHTML}
+                            ${p.stokta_var_mi ? '<span class="product-badge stock z-10 mt-10">Stokta</span>' : '<span class="product-badge bg-gray-500 text-white z-10 mt-10">Tükendi</span>'}
+                            <img src="${p.resim}" alt="${p.isim}" class="group-hover:scale-110 transition-transform duration-500 relative z-0" onerror="this.src='https://via.placeholder.com/300x200?text=Ilgaz+Ürün'">
                         </div>
                         <div class="product-info">
                             <span class="product-cat">${p.kategori}</span>

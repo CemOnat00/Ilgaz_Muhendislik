@@ -113,6 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
             header?.classList.add('h-20');
             header?.classList.remove('h-16');
         }
+    });
     // --- CONTACT FORM LOGIC ---
     const contactForm = document.getElementById('contactForm') || document.querySelector('form[action="#"]');
     if (contactForm) {
@@ -180,5 +181,26 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // --- SMOOTH SCROLL FOR ANCHOR LINKS ---
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+            if (href.startsWith('#') && href.length > 1) {
+                const target = document.querySelector(href);
+                if (target) {
+                    e.preventDefault();
+                    const header = document.querySelector('header');
+                    // Offset exactly equal to the sticky header height (80px)
+                    const headerHeight = header ? 80 : 0;
+                    const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - headerHeight;
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+        });
+    });
 });
 

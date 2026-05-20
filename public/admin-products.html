@@ -130,11 +130,40 @@
                     </button>
                 </div>
 
-                <!-- Tabs -->
-                <div class="flex gap-8 border-b border-gray-200 mb-6 px-2">
-                    <button class="pb-4 font-bold text-primary border-b-2 border-primary">
-                        All Items (<span id="total-count">0</span>)
-                    </button>
+                <!-- Filter Bar: two independent toggle groups -->
+                <div class="flex flex-wrap items-center gap-3 mb-6">
+                    <!-- Status Group -->
+                    <div class="flex items-center bg-gray-100 rounded-lg p-1 gap-1">
+                        <button onclick="setStatusFilter('all')" id="sf-all" class="status-filter-btn px-3 py-1.5 rounded-md text-xs font-bold transition-all bg-white text-gray-900 shadow-sm">
+                            Tümü
+                        </button>
+                        <button onclick="setStatusFilter('active')" id="sf-active" class="status-filter-btn px-3 py-1.5 rounded-md text-xs font-bold transition-all text-gray-500 hover:text-gray-700">
+                            ✔ Aktif <span id="count-active" class="opacity-60">0</span>
+                        </button>
+                        <button onclick="setStatusFilter('passive')" id="sf-passive" class="status-filter-btn px-3 py-1.5 rounded-md text-xs font-bold transition-all text-gray-500 hover:text-gray-700">
+                            ○ Pasif <span id="count-passive" class="opacity-60">0</span>
+                        </button>
+                    </div>
+
+                    <span class="text-gray-300 font-light text-lg select-none">+</span>
+
+                    <!-- Stock Group -->
+                    <div class="flex items-center bg-gray-100 rounded-lg p-1 gap-1">
+                        <button onclick="setStockFilter('all')" id="stf-all" class="stock-filter-btn px-3 py-1.5 rounded-md text-xs font-bold transition-all bg-white text-gray-900 shadow-sm">
+                            Tümü
+                        </button>
+                        <button onclick="setStockFilter('instock')" id="stf-instock" class="stock-filter-btn px-3 py-1.5 rounded-md text-xs font-bold transition-all text-gray-500 hover:text-gray-700">
+                            🟢 Stokta <span id="count-instock" class="opacity-60">0</span>
+                        </button>
+                        <button onclick="setStockFilter('outofstock')" id="stf-outofstock" class="stock-filter-btn px-3 py-1.5 rounded-md text-xs font-bold transition-all text-gray-500 hover:text-gray-700">
+                            🔴 Tükendi <span id="count-outofstock" class="opacity-60">0</span>
+                        </button>
+                    </div>
+
+                    <!-- Result count -->
+                    <span class="text-gray-400 text-xs font-medium ml-2">
+                        <span id="total-count" class="font-bold text-gray-700">0</span> sonuç
+                    </span>
                 </div>
 
                 <!-- Table Container -->
@@ -204,6 +233,16 @@
                     <div class="flex items-center gap-2 pt-6">
                         <input type="checkbox" id="pInStock" class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
                         <label for="pInStock" class="text-sm font-bold text-gray-700">In Stock</label>
+                    </div>
+                    <div class="flex items-center gap-4 pt-6">
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" id="pIndustrial" class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
+                            <label for="pIndustrial" class="text-sm font-bold text-gray-700">Endüstriyel</label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" id="pHomeAppliance" class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
+                            <label for="pHomeAppliance" class="text-sm font-bold text-gray-700">Ev Tipi</label>
+                        </div>
                     </div>
                     <div class="col-span-2 border-t border-gray-100 pt-4">
                         <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Main Description</label>
@@ -285,6 +324,11 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script>
+        const token = localStorage.getItem('adminToken');
+        if (!token) {
+            window.location.href = 'admin-login.html';
+        }
+
         const tableBody = document.getElementById('products-table-body');
         const productModal = document.getElementById('productModal');
         const productForm = document.getElementById('productForm');
@@ -317,6 +361,11 @@
                     headers: { 'Authorization': `Bearer ${token}` },
                     body: formData
                 });
+                if (response.status === 401) {
+                    localStorage.removeItem('adminToken');
+                    window.location.href = 'admin-login.html';
+                    return;
+                }
                 const result = await response.json();
                 if (response.ok) {
                     productImages.push(result.url);
@@ -403,58 +452,130 @@
                 const newOrder = rows.map(row => row.dataset.id);
                 const token = localStorage.getItem('adminToken');
                 try {
-                    await fetch('/api/admin/urunler/reorder', {
+                    const response = await fetch('/api/admin/urunler/reorder', {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                         body: JSON.stringify({ order: newOrder })
                     });
+                    if (response.status === 401) {
+                        localStorage.removeItem('adminToken');
+                        window.location.href = 'admin-login.html';
+                        return;
+                    }
                 } catch (e) {}
             }
         });
 
-        // Fetch all products
+        let allAdminProducts = [];
+        let filterStatus = 'all';
+        let filterStock  = 'all';
+
+        function setStatusFilter(val) {
+            filterStatus = val;
+            document.querySelectorAll('.status-filter-btn').forEach(btn => {
+                btn.classList.remove('bg-white', 'text-gray-900', 'shadow-sm');
+                btn.classList.add('text-gray-500');
+            });
+            const b = document.getElementById('sf-' + val);
+            if (b) { b.classList.add('bg-white', 'text-gray-900', 'shadow-sm'); b.classList.remove('text-gray-500'); }
+            renderAdminTable();
+        }
+
+        function setStockFilter(val) {
+            filterStock = val;
+            document.querySelectorAll('.stock-filter-btn').forEach(btn => {
+                btn.classList.remove('bg-white', 'text-gray-900', 'shadow-sm');
+                btn.classList.add('text-gray-500');
+            });
+            const b = document.getElementById('stf-' + val);
+            if (b) { b.classList.add('bg-white', 'text-gray-900', 'shadow-sm'); b.classList.remove('text-gray-500'); }
+            renderAdminTable();
+        }
+
+        function renderAdminTable() {
+            let products = allAdminProducts.filter(p => {
+                const matchStatus = filterStatus === 'all' ||
+                    (filterStatus === 'active'  && p.durum === 'Aktif') ||
+                    (filterStatus === 'passive' && p.durum !== 'Aktif');
+                const matchStock  = filterStock === 'all' ||
+                    (filterStock === 'instock'    &&  p.stokta_var_mi) ||
+                    (filterStock === 'outofstock' && !p.stokta_var_mi);
+                return matchStatus && matchStock;
+            });
+
+            document.getElementById('total-count').innerText = products.length;
+
+            if (products.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-16 text-center text-gray-400 font-medium">Bu kriterlere uygun ürün bulunamadı.</td></tr>`;
+                return;
+            }
+
+            tableBody.innerHTML = products.map(p => {
+                const firstImage = p.images && p.images.length > 0 ? p.images[0] : p.resim;
+                const statusColor = p.durum === 'Aktif' ? 'green' : 'red';
+                const isPassive = p.durum !== 'Aktif';
+                return `
+                <tr class="hover:bg-gray-50 transition-colors cursor-move ${isPassive ? 'opacity-50' : ''}" data-id="${p.id}">
+                    <td class="px-6 py-4 whitespace-nowrap text-gray-400 font-mono text-xs">#${p.id.substring(0,8)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden">
+                                <img src="${firstImage}" alt="" class="w-full h-full object-cover">
+                            </div>
+                            <div>
+                                <p class="text-gray-900 font-bold">${p.baslik}</p>
+                                <p class="text-[11px] text-gray-500 font-medium">${p.isim}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="bg-gray-100 text-gray-600 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">${p.kategori}</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex flex-col gap-1">
+                            <span class="inline-flex items-center gap-1.5 text-${statusColor}-600 font-semibold text-xs">
+                                <div class="w-2 h-2 rounded-full bg-${statusColor}-500"></div>
+                                ${p.durum}
+                            </span>
+                            <span class="inline-flex items-center gap-1.5 text-${p.stokta_var_mi ? 'blue' : 'gray'}-500 font-semibold text-xs">
+                                <div class="w-2 h-2 rounded-full bg-${p.stokta_var_mi ? 'blue' : 'gray'}-400"></div>
+                                ${p.stokta_var_mi ? 'Stokta' : 'Tükendi'}
+                            </span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right">
+                        <div class="flex items-center justify-end gap-3 text-gray-400 text-lg">
+                            <button onclick="editProduct('${p.id}')" class="hover:text-primary transition-colors"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="deleteProduct('${p.id}')" class="hover:text-gray-900 transition-colors"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+        }
+
         async function loadProducts() {
             try {
-                const response = await fetch('/api/urunler');
-                const products = await response.json();
-                document.getElementById('total-count').innerText = products.length;
-                
-                tableBody.innerHTML = products.map(p => {
-                    const firstImage = p.images && p.images.length > 0 ? p.images[0] : p.resim;
-                    return `
-                    <tr class="hover:bg-gray-50 transition-colors cursor-move" data-id="${p.id}">
-                        <td class="px-6 py-4 whitespace-nowrap text-gray-400 font-mono text-xs">#${p.id.substring(0,8)}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center gap-4">
-                                <div class="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden">
-                                    <img src="${firstImage}" alt="" class="w-full h-full object-cover">
-                                </div>
-                                <div>
-                                    <p class="text-gray-900 font-bold">${p.baslik}</p>
-                                    <p class="text-[11px] text-gray-500 font-medium">${p.isim}</p>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="bg-gray-100 text-gray-600 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">${p.kategori}</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center gap-1.5 text-${p.durum === 'Aktif' ? 'green' : 'red'}-600 font-semibold text-sm">
-                                <div class="w-2 h-2 rounded-full bg-${p.durum === 'Aktif' ? 'green' : 'red'}-500"></div> ${p.durum} ${p.stokta_var_mi ? '(Stokta)' : '(Yok)'}
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right">
-                            <div class="flex items-center justify-end gap-3 text-gray-400 text-lg">
-                                <button onclick="editProduct('${p.id}')" class="hover:text-primary transition-colors"><i class="fa-solid fa-pen"></i></button>
-                                <button onclick="deleteProduct('${p.id}')" class="hover:text-gray-900 transition-colors"><i class="fa-solid fa-trash-can"></i></button>
-                            </div>
-                        </td>
-                    </tr>
-                `}).join('');
+                const response = await fetch('/api/admin/urunler', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
+                });
+                allAdminProducts = await response.json();
+                // Stoğu bitenleri en alta taşı
+                allAdminProducts.sort((a, b) => (b.stokta_var_mi ? 1 : 0) - (a.stokta_var_mi ? 1 : 0));
+
+                // Update counts
+                document.getElementById('total-count').innerText = allAdminProducts.length;
+                document.getElementById('count-active').innerText = allAdminProducts.filter(p => p.durum === 'Aktif').length;
+                document.getElementById('count-passive').innerText = allAdminProducts.filter(p => p.durum !== 'Aktif').length;
+                document.getElementById('count-instock').innerText = allAdminProducts.filter(p => p.stokta_var_mi).length;
+                document.getElementById('count-outofstock').innerText = allAdminProducts.filter(p => !p.stokta_var_mi).length;
+
+                renderAdminTable();
             } catch (error) {
                 console.error('Error loading products:', error);
             }
         }
+
 
         // Modal Controls
         function openModal() {
@@ -493,6 +614,8 @@
                 document.getElementById('pPrice').value = p.fiyat;
                 document.getElementById('pStatus').value = p.durum;
                 document.getElementById('pInStock').checked = p.stokta_var_mi;
+                document.getElementById('pIndustrial').checked = p.is_industrial || false;
+                document.getElementById('pHomeAppliance').checked = p.is_home_appliance || false;
                 document.getElementById('pDescription').value = p.aciklama;
                 document.getElementById('pApplicationAreas').value = p.application_areas || '';
 
@@ -530,11 +653,17 @@
                     method: 'DELETE',
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
+                if (response.status === 401) {
+                    localStorage.removeItem('adminToken');
+                    window.location.href = 'admin-login.html';
+                    return;
+                }
                 if (response.ok) {
                     closeDeleteModal();
                     loadProducts();
                 } else {
-                    alert('Failed to delete product');
+                    const err = await response.json().catch(() => ({}));
+                    alert('Failed to delete product: ' + (err.error || 'Unknown error'));
                 }
             } catch (error) {
                 console.error('Error deleting product:', error);
@@ -556,6 +685,8 @@
                 fiyat: parseFloat(document.getElementById('pPrice').value),
                 durum: document.getElementById('pStatus').value,
                 stokta_var_mi: document.getElementById('pInStock').checked,
+                is_industrial: document.getElementById('pIndustrial').checked,
+                is_home_appliance: document.getElementById('pHomeAppliance').checked,
                 resim: primaryImage,
                 aciklama: document.getElementById('pDescription').value,
                 images: productImages,
@@ -578,11 +709,18 @@
                     body: JSON.stringify(data)
                 });
 
+                if (response.status === 401) {
+                    localStorage.removeItem('adminToken');
+                    window.location.href = 'admin-login.html';
+                    return;
+                }
+
                 if (response.ok) {
                     closeModal();
                     loadProducts();
                 } else {
-                    alert('Failed to save product');
+                    const err = await response.json().catch(() => ({}));
+                    alert('Failed to save product: ' + (err.error || 'Unknown error'));
                 }
             } catch (error) {
                 console.error('Error saving product:', error);
@@ -595,6 +733,11 @@
                 const response = await fetch('/api/admin/mesajlar', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
+                if (response.status === 401) {
+                    localStorage.removeItem('adminToken');
+                    window.location.href = 'admin-login.html';
+                    return;
+                }
                 if (response.ok) {
                     const messages = await response.json();
                     const unreadCount = messages.filter(m => !m.okundu_mu).length;

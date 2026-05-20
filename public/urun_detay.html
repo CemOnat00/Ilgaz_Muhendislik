@@ -146,12 +146,9 @@
                     </div>
                 </div>
                 
-                    <div class="flex flex-col sm:flex-row gap-4 mt-auto">
-                        <button id="teklifBtn" class="flex-1 bg-[#d63031] hover:bg-[#b02626] text-white font-bold py-4 rounded-lg flex items-center justify-center gap-2 transition-colors shadow-lg shadow-red-500/20 tracking-wide text-sm">
+                    <div class="mt-auto w-full">
+                        <button id="teklifBtn" class="w-full bg-[#d63031] hover:bg-[#b02626] text-white font-bold py-4 rounded-lg flex items-center justify-center gap-2 transition-colors shadow-lg shadow-red-500/20 tracking-wide text-sm">
                             <i class="fa-solid fa-file-invoice text-lg"></i> TEKLİF İSTE
-                        </button>
-                        <button onclick="window.print()" class="flex-1 bg-white hover:bg-gray-50 text-gray-800 border-2 border-gray-100 hover:border-gray-200 font-bold py-4 rounded-lg flex items-center justify-center gap-2 transition-all tracking-wide text-sm">
-                            <i class="fa-solid fa-download"></i> KATALOG / YAZDIR
                         </button>
                     </div>
                 
@@ -307,6 +304,16 @@
                 
                 document.getElementById('breadcrumbTitle').innerText = p.isim;
                 document.getElementById('productTitle').innerText = p.isim;
+                
+                // YENİ ÜRÜN Rozeti
+                if (p.created_at) {
+                    const createdDate = new Date(p.created_at);
+                    const fourteenDaysAgo = new Date();
+                    fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+                    if (createdDate >= fourteenDaysAgo) {
+                        document.getElementById('productTitle').innerHTML = p.isim + ` <span class="align-middle inline-block bg-blue-500 text-white text-[13px] font-bold px-3 py-1 rounded-full ml-3 mb-2 shadow-lg animate-pulse tracking-wide">YENİ ÜRÜN</span>`;
+                    }
+                }
                 document.getElementById('productDesc').innerText = p.aciklama;
                 document.getElementById('productDescDetail').innerText = p.aciklama;
                 document.getElementById('productCatBadge').innerText = p.kategori;

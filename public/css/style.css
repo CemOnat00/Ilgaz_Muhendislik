@@ -32,6 +32,10 @@
     --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 /* --- Reset & Global --- */
 * {
     margin: 0;
@@ -45,6 +49,10 @@ body {
     background-color: #FCFCFC;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+}
+
+#services {
+    scroll-margin-top: 80px;
 }
 
 a {

@@ -61,6 +61,30 @@ func UploadImage(c *gin.Context) {
 
 // --- PRODUCT HANDLERS ---
 
+// GetAllProducts — Admin için tüm ürünleri döndürür (Pasif dahil)
+func GetAllProducts(c *gin.Context) {
+	collection := database.GetCollection("products")
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	var products []models.Product
+	opts := options.Find().SetSort(bson.M{"order": 1})
+	cursor, err := collection.Find(ctx, bson.M{}, opts)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Ürünler çekilemedi"})
+		return
+	}
+	defer cursor.Close(ctx)
+
+	for cursor.Next(ctx) {
+		var product models.Product
+		cursor.Decode(&product)
+		products = append(products, product)
+	}
+
+	c.JSON(http.StatusOK, products)
+}
+
 func GetProducts(c *gin.Context) {
 	collection := database.GetCollection("products")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -68,7 +92,8 @@ func GetProducts(c *gin.Context) {
 
 	var products []models.Product
 	options := options.Find().SetSort(bson.M{"order": 1})
-	cursor, err := collection.Find(ctx, bson.M{}, options)
+	// Sadece "Aktif" ürünleri döndür — "Pasif" ürünler müşteri kataloğunda gizlenir
+	cursor, err := collection.Find(ctx, bson.M{"status": "Aktif"}, options)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Ürünler çekilemedi"})
 		return
@@ -172,6 +197,8 @@ func UpdateProduct(c *gin.Context) {
 			"technical_specs":   product.TechnicalSpecs,
 			"feature_boxes":     product.FeatureBoxes,
 			"application_areas": product.ApplicationAreas,
+			"is_industrial":     product.IsIndustrial,
+			"is_home_appliance": product.IsHomeAppliance,
 		},
 	}
 
