@@ -9,7 +9,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script>
         tailwind.config = {
@@ -166,22 +168,11 @@
 
                         <div class="border-t border-gray-100 pt-6 mb-8">
                             <h4 class="text-sm font-bold text-gray-900 mb-1">Harita Konumu</h4>
-                            <p class="text-xs text-gray-500 mb-4">İletişim sayfasındaki Google Haritalar bu alandan yönetilir.</p>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
-                                <div class="md:col-span-2">
-                                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Map Location</label>
-                                    <input type="text" id="cMapLocation" class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-3 outline-none" placeholder="Adres veya enlem,boylam">
-                                    <p class="text-[11px] text-gray-400 mt-1.5">Tam adres yazabilir, ya da kesin konum için <code>41.3601,36.1862</code> biçiminde enlem,boylam girebilirsiniz.</p>
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Zoom (1-21)</label>
-                                    <input type="number" id="cMapZoom" min="1" max="21" class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-3 outline-none">
-                                </div>
-                            </div>
-                            <div class="rounded-lg overflow-hidden border border-gray-200 h-[260px] bg-gray-50">
-                                <iframe id="mapPreview" title="Harita Önizleme" class="w-full h-full" style="border:0" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-                            </div>
-                            <p class="text-[11px] text-gray-400 mt-2">Canlı önizleme — konum veya zoom değiştikçe güncellenir.</p>
+                            <p class="text-xs text-gray-500 mb-4">Kırmızı pini sürükleyerek (veya haritaya tıklayarak) ofisin tam yerini işaretleyin. İletişim sayfasındaki harita bu noktayı gösterir.</p>
+                            <div id="settingsMap" class="rounded-lg overflow-hidden border border-gray-200 h-[340px] bg-gray-50"></div>
+                            <p id="mapCoordLabel" class="text-[11px] text-gray-400 mt-2">Seçili konum: —</p>
+                            <input type="hidden" id="cMapLocation">
+                            <input type="hidden" id="cMapZoom">
                         </div>
 
                         <div class="flex justify-end">
@@ -213,36 +204,70 @@
             } catch (e) {}
         }
 
-        function buildMapEmbed(query, zoom) {
-            const q = encodeURIComponent((query || '').trim());
-            let z = parseInt(zoom, 10);
-            if (isNaN(z) || z < 1 || z > 21) z = 16;
-            return `https://maps.google.com/maps?q=${q}&z=${z}&hl=tr&output=embed`;
+        let settingsMap = null, settingsMarker = null;
+
+        function setMapValue(lat, lng) {
+            const v = Number(lat).toFixed(8) + ',' + Number(lng).toFixed(8);
+            document.getElementById('cMapLocation').value = v;
+            document.getElementById('mapCoordLabel').textContent = 'Seçili konum: ' + v;
         }
 
-        function updateMapPreview() {
-            const loc = document.getElementById('cMapLocation').value || document.getElementById('cAddress').value;
-            const zoom = document.getElementById('cMapZoom').value;
-            if (!loc.trim()) return;
-            document.getElementById('mapPreview').src = buildMapEmbed(loc, zoom);
+        function initSettingsMap(coordStr, zoom) {
+            const parts = String(coordStr || '').split(',');
+            let lat = parseFloat(parts[0]);
+            let lng = parseFloat(parts[1]);
+            if (!(parts.length === 2 && isFinite(lat) && isFinite(lng))) {
+                lat = 41.33043975392915;
+                lng = 36.27995416441768;
+            }
+            let z = parseInt(zoom, 10);
+            if (isNaN(z) || z < 3 || z > 19) z = 16;
+
+            settingsMap = L.map('settingsMap').setView([lat, lng], z);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap'
+            }).addTo(settingsMap);
+
+            const pin = L.divIcon({
+                className: 'ilgaz-pin',
+                html: '<i class="fa-solid fa-location-dot" style="color:#d63031;font-size:36px;line-height:1;text-shadow:0 2px 5px rgba(0,0,0,.35)"></i>',
+                iconSize: [36, 36],
+                iconAnchor: [18, 34]
+            });
+
+            settingsMarker = L.marker([lat, lng], { icon: pin, draggable: true }).addTo(settingsMap);
+            settingsMarker.on('dragend', function () {
+                const p = settingsMarker.getLatLng();
+                setMapValue(p.lat, p.lng);
+            });
+            settingsMap.on('click', function (e) {
+                settingsMarker.setLatLng(e.latlng);
+                setMapValue(e.latlng.lat, e.latlng.lng);
+            });
+            settingsMap.on('zoomend', function () {
+                document.getElementById('cMapZoom').value = settingsMap.getZoom();
+            });
+
+            setMapValue(lat, lng);
+            document.getElementById('cMapZoom').value = z;
+            setTimeout(function () { settingsMap.invalidateSize(); }, 250);
         }
 
         async function loadSettings() {
+            let s = {};
             try {
                 const response = await fetch('/api/ayarlar');
-                if (!response.ok) return;
-                const s = await response.json();
-                document.getElementById('cName').value = s.sirket_adi || '';
-                document.getElementById('cEmail').value = s.email || '';
-                document.getElementById('cPhone').value = s.telefon || '';
-                document.getElementById('cSupport').value = s.destek_email || '';
-                document.getElementById('cAddress').value = s.adres || '';
-                document.getElementById('cMapLocation').value = s.harita_konum || '';
-                document.getElementById('cMapZoom').value = s.harita_zoom || 16;
+                if (response.ok) s = await response.json();
             } catch (e) {
                 console.error('Ayarlar yüklenemedi:', e);
             }
-            updateMapPreview();
+            document.getElementById('cName').value = s.sirket_adi || '';
+            document.getElementById('cEmail').value = s.email || '';
+            document.getElementById('cPhone').value = s.telefon || '';
+            document.getElementById('cSupport').value = s.destek_email || '';
+            document.getElementById('cAddress').value = s.adres || '';
+            initSettingsMap(s.harita_konum, s.harita_zoom);
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -250,8 +275,6 @@
             if (!token) { window.location.href = 'admin-login.html'; return; }
             updateSidebarCount();
             loadSettings();
-            document.getElementById('cMapLocation').addEventListener('input', updateMapPreview);
-            document.getElementById('cMapZoom').addEventListener('input', updateMapPreview);
         });
 
         document.getElementById('settingsForm').addEventListener('submit', async function(e) {
