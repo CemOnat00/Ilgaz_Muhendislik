@@ -101,7 +101,7 @@
             <!-- Sol: Ürün Görselleri -->
             <div class="flex flex-col gap-4 w-full">
                 <!-- Ana Görsel -->
-                <div class="w-full aspect-[4/3] bg-gray-50 rounded-2xl flex items-center justify-center p-8 border border-gray-100 overflow-hidden">
+                <div id="mainMediaWrapper" class="w-full aspect-[4/3] bg-gray-50 rounded-2xl flex items-center justify-center p-8 border border-gray-100 overflow-hidden">
                     <img id="mainImage" src="https://via.placeholder.com/600x400?text=Yükleniyor..." alt="Ürün Görseli" class="w-full h-full object-contain filter drop-shadow-xl hover:scale-105 transition-transform duration-500"/>
                 </div>
                 
@@ -551,7 +551,7 @@
                         btn.onclick = () => {
                             const type = btn.dataset.type;
                             const url = btn.dataset.url;
-                            const mainContainer = document.getElementById('mainImage').parentElement;
+                            const mainContainer = document.getElementById('mainMediaWrapper');
                             
                             // Reset borders
                             thumbCont.querySelectorAll('button').forEach(b => {

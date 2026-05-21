@@ -241,6 +241,14 @@
                     <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1.5">E-posta</label>
                     <input id="catEmail" type="email" required placeholder="ornek@mail.com" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
                 </div>
+                <!-- KVKK Checkbox -->
+                <div class="flex items-start gap-3 my-2">
+                    <input id="catKVKK" type="checkbox" required
+                        class="mt-0.5 w-4 h-4 text-primary bg-gray-50 border-gray-300 rounded focus:ring-primary shrink-0">
+                    <label for="catKVKK" class="text-sm text-gray-600 leading-relaxed">
+                        <a href="#" class="text-primary font-semibold hover:underline">KVKK Aydınlatma Metni</a>'ni okudum ve kişisel verilerimin işlenmesini onaylıyorum. <span class="text-primary">*</span>
+                    </label>
+                </div>
                 <div id="catAlert" class="hidden rounded-lg px-3 py-2 text-xs font-bold"></div>
                 <button type="submit" id="catSubmit" class="w-full bg-primary hover:bg-primary-hover text-white font-bold py-3 rounded-lg flex items-center justify-center gap-2 transition-colors">
                     <i class="fa-solid fa-download"></i> Kataloğu İndir
@@ -575,12 +583,18 @@
             document.getElementById('catAlert').classList.add('hidden');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
+            if (typeof window.updateBodyScroll === 'function') {
+                window.updateBodyScroll();
+            }
         }
 
         function closeCatalogModal() {
             const modal = document.getElementById('catalogModal');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
+            if (typeof window.updateBodyScroll === 'function') {
+                window.updateBodyScroll();
+            }
         }
 
         document.getElementById('catalogModal').addEventListener('click', (e) => {
@@ -597,7 +611,8 @@
                 ad_soyad: document.getElementById('catName').value.trim(),
                 telefon: document.getElementById('catPhone').value.trim(),
                 email: document.getElementById('catEmail').value.trim(),
-                kategori: document.getElementById('catCategory').value
+                kategori: document.getElementById('catCategory').value,
+                kvkk_onay: document.getElementById('catKVKK').checked
             };
 
             alertBox.classList.add('hidden');

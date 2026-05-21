@@ -207,11 +207,27 @@ func TestQAWebPortalRequirements(t *testing.T) {
 	// REQUIREMENT 4: Ürün Kataloğu Dinamik PDF İndirme Sistemi
 	// -------------------------------------------------------------
 	t.Run("Req4_DynamicPDFCatalogDownload", func(t *testing.T) {
-		catalogReq := map[string]string{
-			"ad_soyad": "Katalog Test",
-			"telefon":  "05559998877",
-			"email":    "katalog@test.com",
-			"kategori": "Vana Grubu",
+		// Case A: Missing KVKK Onay
+		catalogReqFail := map[string]interface{}{
+			"ad_soyad":  "Katalog Test Fail",
+			"telefon":   "05559998877",
+			"email":     "katalog_fail@test.com",
+			"kategori":  "Vana Grubu",
+			"kvkk_onay": false,
+		}
+		bodyFail, _ := json.Marshal(catalogReqFail)
+		reqFail, _ := http.NewRequest("POST", "/api/katalog/indir", bytes.NewBuffer(bodyFail))
+		wFail := httptest.NewRecorder()
+		router.ServeHTTP(wFail, reqFail)
+		assert.Equal(t, http.StatusBadRequest, wFail.Code)
+
+		// Case B: Valid KVKK Onay
+		catalogReq := map[string]interface{}{
+			"ad_soyad":  "Katalog Test",
+			"telefon":   "05559998877",
+			"email":     "katalog@test.com",
+			"kategori":  "Vana Grubu",
+			"kvkk_onay": true,
 		}
 		body, _ := json.Marshal(catalogReq)
 		req, _ := http.NewRequest("POST", "/api/katalog/indir", bytes.NewBuffer(body))
@@ -248,11 +264,12 @@ func TestQAWebPortalRequirements(t *testing.T) {
 
 		// Test email deduplication on Catalog Download
 		// Try to download again with same email
-		catalogReq2 := map[string]string{
-			"ad_soyad": "Katalog Test Mükerrer",
-			"telefon":  "05559998877",
-			"email":    "katalog@test.com",
-			"kategori": "Vana Grubu",
+		catalogReq2 := map[string]interface{}{
+			"ad_soyad":  "Katalog Test Mükerrer",
+			"telefon":   "05559998877",
+			"email":     "katalog@test.com",
+			"kategori":  "Vana Grubu",
+			"kvkk_onay": true,
 		}
 		body2, _ := json.Marshal(catalogReq2)
 		req2, _ := http.NewRequest("POST", "/api/katalog/indir", bytes.NewBuffer(body2))

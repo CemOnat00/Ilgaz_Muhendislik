@@ -61,18 +61,20 @@
 
             <!-- Menu -->
             <nav class="p-4 flex flex-col gap-1.5 mt-2">
-                <!-- Active Item -->
-                <a href="admin-dashboard.html" class="flex items-center gap-3 px-4 py-3 bg-primary-light text-primary font-semibold rounded-lg transition-colors">
+                <!-- Dashboard -->
+                <a href="admin-dashboard.html" id="menu-dashboard" class="flex items-center gap-3 px-4 py-3 bg-primary text-white font-semibold rounded-lg shadow-md shadow-red-500/20 transition-all duration-200">
                     <i class="fa-solid fa-border-all w-5 text-center text-lg"></i>
                     <span class="text-sm">Dashboard</span>
                 </a>
                 
-                <a href="admin-products.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors">
+                <!-- Ürünler -->
+                <a href="admin-products.html" id="menu-products" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors">
                     <i class="fa-solid fa-box w-5 text-center text-lg"></i>
-                    <span class="text-sm">Products</span>
+                    <span class="text-sm">Ürünler</span>
                 </a>
                 
-                <a href="admin-messages.html" class="flex items-center justify-between px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors group">
+                <!-- Mesajlar -->
+                <a href="admin-messages.html" id="menu-messages" class="flex items-center justify-between px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors group">
                     <div class="flex items-center gap-3">
                         <i class="fa-solid fa-envelope w-5 text-center text-lg"></i>
                         <span class="text-sm">Mesajlar</span>
@@ -80,12 +82,17 @@
                     <span id="sidebar-msg-count" class="bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-full group-hover:scale-110 transition-transform">0</span>
                 </a>
                 
-                <a href="admin-reviews.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors">
-                    <i class="fa-solid fa-star w-5 text-center text-lg"></i>
-                    <span class="text-sm">Yorumlar</span>
+                <!-- Yorumlar -->
+                <a href="admin-reviews.html" id="menu-reviews" class="flex items-center justify-between px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors group">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-star w-5 text-center text-lg"></i>
+                        <span class="text-sm">Yorumlar</span>
+                    </div>
+                    <span id="sidebar-pending-count" class="bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-full group-hover:scale-110 transition-transform">0</span>
                 </a>
 
-                <a href="admin-leads.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors">
+                <!-- Potansiyel Müşteriler -->
+                <a href="admin-leads.html" id="menu-leads" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors">
                     <i class="fa-solid fa-user-tie w-5 text-center text-lg"></i>
                     <span class="text-sm">Potansiyel Müşteriler</span>
                 </a>
@@ -94,13 +101,16 @@
 
         <!-- Bottom Actions -->
         <div class="p-4 border-t border-gray-100 flex flex-col gap-2">
-            <a href="admin-settings.html" class="flex items-center gap-3 px-4 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors">
+            <!-- Ayarlar -->
+            <a href="admin-settings.html" id="menu-settings" class="flex items-center gap-3 px-4 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors">
                 <i class="fa-solid fa-gear w-5 text-center"></i>
-                <span class="text-sm">Settings</span>
+                <span class="text-sm">Ayarlar</span>
             </a>
-            <a href="admin-login.html" class="flex items-center gap-3 px-4 py-2.5 text-gray-500 hover:bg-red-50 hover:text-primary font-medium rounded-lg transition-colors mt-2">
+            
+            <!-- Çıkış -->
+            <a href="admin-login.html" onclick="localStorage.removeItem('adminToken')" class="flex items-center gap-3 px-4 py-2.5 text-gray-500 hover:bg-red-50 hover:text-primary font-medium rounded-lg transition-colors mt-2">
                 <i class="fa-solid fa-arrow-right-from-bracket w-5 text-center"></i>
-                <span class="text-sm">Logout</span>
+                <span class="text-sm">Çıkış</span>
             </a>
         </div>
     </aside>
@@ -332,6 +342,8 @@
                 if (resReviews.ok) {
                     const pendingReviews = (await resReviews.json()) || [];
                     document.getElementById('stat-projects').innerText = pendingReviews.length;
+                    const badge = document.getElementById('sidebar-pending-count');
+                    if (badge) badge.innerText = pendingReviews.length;
                 }
             } catch(e) {}
 

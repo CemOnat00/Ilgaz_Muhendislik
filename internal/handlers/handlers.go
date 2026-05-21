@@ -625,6 +625,7 @@ func DownloadCatalog(c *gin.Context) {
 		Phone    string `json:"telefon"`
 		Email    string `json:"email"`
 		Category string `json:"kategori"`
+		KVKKOk   bool   `json:"kvkk_onay"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Geçersiz form verisi"})
@@ -638,6 +639,11 @@ func DownloadCatalog(c *gin.Context) {
 
 	if req.Name == "" || req.Phone == "" || req.Email == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Ad-soyad, telefon ve e-posta zorunludur"})
+		return
+	}
+
+	if !req.KVKKOk {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "KVKK Aydınlatma Metnini onaylamanız zorunludur"})
 		return
 	}
 	if !strings.Contains(req.Email, "@") {
