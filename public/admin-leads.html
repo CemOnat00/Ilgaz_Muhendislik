@@ -168,6 +168,7 @@
                                     <th scope="col" class="px-6 py-4">Telefon</th>
                                     <th scope="col" class="px-6 py-4">E-posta</th>
                                     <th scope="col" class="px-6 py-4">Kaynak / Detay</th>
+                                    <th scope="col" class="px-6 py-4">IP Adresi</th>
                                     <th scope="col" class="px-6 py-4">Tarih</th>
                                     <th scope="col" class="px-6 py-4 text-right">İşlem</th>
                                 </tr>
@@ -264,7 +265,7 @@
         function renderTable(leads) {
             const body = document.getElementById('leads-table-body');
             if (!leads.length) {
-                body.innerHTML = `<tr><td colspan="6" class="px-6 py-16 text-center text-gray-400 font-medium">Henüz katalog indirme kaydı yok.</td></tr>`;
+                body.innerHTML = `<tr><td colspan="7" class="px-6 py-16 text-center text-gray-400 font-medium">Henüz katalog indirme kaydı yok.</td></tr>`;
                 return;
             }
             body.innerHTML = leads.map(l => {
@@ -292,6 +293,7 @@
                     <td class="px-6 py-4 whitespace-nowrap">
                         ${sourceBadge}
                     </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-gray-600 font-mono text-xs">${escapeHtml(l.ip_adresi || 'Bilinmiyor')}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-gray-400 text-xs font-medium">${escapeHtml(dateStr)}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-right">
                         <button onclick="deleteLead('${l.id}')" class="text-gray-400 hover:text-primary transition-colors text-lg"><i class="fa-solid fa-trash-can"></i></button>

@@ -697,17 +697,35 @@ func DownloadCatalog(c *gin.Context) {
 		return
 	}
 
-	// Lead kaydı — her başarılı indirme bir potansiyel müşteri / indirme olayıdır
-	lead := models.Lead{
-		ID:        bson.NewObjectID(),
-		Name:      req.Name,
-		Phone:     req.Phone,
-		Email:     req.Email,
-		Category:  category,
-		IPAddress: ip,
-		CreatedAt: time.Now(),
+	// Lead kaydı — e-posta mükerrerlik kontrolü ile potansiyel müşteri kaydı
+	var existingLead models.Lead
+	err = leadsCol.FindOne(ctx, bson.M{"email": req.Email}).Decode(&existingLead)
+	if err == nil {
+		// Zaten kayıtlı olan e-postayı güncelle (mükerrerliği engelle)
+		_, _ = leadsCol.UpdateOne(ctx, bson.M{"_id": existingLead.ID}, bson.M{
+			"$set": bson.M{
+				"name":       req.Name,
+				"phone":      req.Phone,
+				"category":   category,
+				"source":     "catalog_download",
+				"ip_address": ip,
+				"created_at": time.Now(),
+			},
+		})
+	} else {
+		// Yeni potansiyel müşteri
+		lead := models.Lead{
+			ID:        bson.NewObjectID(),
+			Name:      req.Name,
+			Phone:     req.Phone,
+			Email:     req.Email,
+			Category:  category,
+			Source:    "catalog_download",
+			IPAddress: ip,
+			CreatedAt: time.Now(),
+		}
+		_, _ = leadsCol.InsertOne(ctx, lead)
 	}
-	_, _ = leadsCol.InsertOne(ctx, lead)
 
 	filename := "ilgaz-katalog.pdf"
 	if category != "Genel" {

@@ -175,7 +175,7 @@ func Generate(products []models.Product, categoryLabel string) ([]byte, error) {
 	return pdf.GetBytesPdf(), nil
 }
 
-// formatPrice fiyatı binlik ayraçlı euro biçimine çevirir (ör. 12.500 €).
+// formatPrice fiyatı binlik ayraçlı Türk Lirası biçimine çevirir (ör. 12.500 TL).
 func formatPrice(v float64) string {
 	n := int64(v + 0.5)
 	s := fmt.Sprintf("%d", n)
@@ -186,5 +186,5 @@ func formatPrice(v float64) string {
 		}
 		out = append(out, c)
 	}
-	return string(out) + " €"
+	return string(out) + " TL"
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 	"unicode/utf8"
 
@@ -12,6 +13,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
+)
+
+var (
+	voteMutex sync.Mutex
+	lastVotes = make(map[string]time.Time)
 )
 
 // maskName "Ahmet Yılmaz" → "A*** Y***" dönüşümü yapar.
@@ -289,24 +295,40 @@ func VoteHelpful(c *gin.Context) {
 	}
 
 	ip := c.ClientIP()
+
+	// IP rate-limit: 20 saniye içinde oy kullanma engeli.
+	// Çift tıklama (double-click) veya anlık ardışık isteklerde (200ms altı) rate-limit yerine
+	// doğrudan mükerrer oy kontrolüne (409 Conflict) izin vermek için kısa bir tolerans tanıyoruz.
+	voteMutex.Lock()
+	lastVoteTime, exists := lastVotes[ip]
+	if exists && time.Since(lastVoteTime) < 20*time.Second && time.Since(lastVoteTime) >= 200*time.Millisecond {
+		voteMutex.Unlock()
+		c.JSON(http.StatusTooManyRequests, gin.H{"error": "Çok sık oy kullanıyorsunuz, lütfen bekleyin."})
+		return
+	}
+	voteMutex.Unlock()
+
 	collection := database.GetCollection("reviews")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-
-	// IP daha önce oy verdi mi?
-	existing, err := collection.FindOne(ctx, bson.M{
-		"_id":      objID,
-		"voter_ips": ip,
-	}).Raw()
-	if err == nil && existing != nil {
-		c.JSON(http.StatusConflict, gin.H{"error": "Bu yoruma zaten oy verdiniz"})
-		return
-	}
 
 	// Sadece onaylı yorumlara oy verilebilir
 	var review models.Review
 	if err := collection.FindOne(ctx, bson.M{"_id": objID, "is_approved": true}).Decode(&review); err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Yorum bulunamadı"})
+		return
+	}
+
+	// IP daha önce oy verdi mi?
+	hasVoted := false
+	for _, voterIP := range review.VoterIPs {
+		if voterIP == ip {
+			hasVoted = true
+			break
+		}
+	}
+	if hasVoted {
+		c.JSON(http.StatusConflict, gin.H{"error": "Bu yoruma zaten oy verdiniz"})
 		return
 	}
 
@@ -327,6 +349,11 @@ func VoteHelpful(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Oy kaydedilemedi"})
 		return
 	}
+
+	// Başarılı oy sonrasında IP'nin son oy zamanını güncelle
+	voteMutex.Lock()
+	lastVotes[ip] = time.Now()
+	voteMutex.Unlock()
 
 	c.JSON(http.StatusOK, gin.H{"message": "Oyunuz kaydedildi"})
 }

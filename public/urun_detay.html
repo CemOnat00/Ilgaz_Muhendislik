@@ -124,6 +124,12 @@
                 <h1 id="productTitle" class="text-3xl md:text-5xl font-extrabold mb-6 leading-[1.1] tracking-tight text-gray-900">
                     Yükleniyor...
                 </h1>
+
+                <!-- Fiyat ve Stok Durumu -->
+                <div class="flex flex-wrap items-center gap-4 mb-6">
+                    <span id="productPrice" class="text-2xl font-extrabold text-primary"></span>
+                    <span id="productStockStatus" class="hidden text-xs font-bold px-3 py-1.5 rounded-full border"></span>
+                </div>
                 
                 <p id="productDesc" class="text-gray-500 text-[15px] leading-relaxed mb-8">
                     Lütfen bekleyiniz...
@@ -167,6 +173,14 @@
             <!-- Bilgi Kutuları -->
             <div id="featureBoxes" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 <!-- Dinamik Kutular -->
+            </div>
+
+            <!-- Ürün Özellikleri (Bulleted List) -->
+            <div id="featuresListSection" class="mb-8 hidden bg-gray-50/50 p-6 rounded-xl border border-gray-100">
+                <h4 class="font-bold text-gray-900 mb-4 text-[16px]">Öne Çıkan Özellikler</h4>
+                <ul id="featuresList" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-gray-600 text-[14px]">
+                    <!-- Dinamik Özellikler -->
+                </ul>
             </div>
             
             <p id="applicationAreas" class="text-gray-600 leading-relaxed text-[15px]">
@@ -409,6 +423,12 @@
 
     <script src="js/script.js"></script>
     <script>
+        function escapeHtml(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
             const productId = urlParams.get('id');
@@ -441,6 +461,28 @@
                 document.getElementById('productCatBadge').innerText = p.kategori;
                 document.getElementById('mainImage').src = p.resim;
                 
+                // Fiyat ve Stok Durumu
+                if (p.fiyat !== undefined && p.fiyat !== null) {
+                    const priceFormatted = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(p.fiyat);
+                    document.getElementById('productPrice').innerText = priceFormatted;
+                } else {
+                    document.getElementById('productPrice').innerText = '';
+                }
+
+                const stockBadge = document.getElementById('productStockStatus');
+                if (p.stokta_var_mi !== undefined && p.stokta_var_mi !== null) {
+                    stockBadge.classList.remove('hidden');
+                    if (p.stokta_var_mi) {
+                        stockBadge.innerText = 'Stokta Var';
+                        stockBadge.className = 'align-middle inline-block text-[12px] font-bold px-3 py-1.5 rounded-full shadow-sm bg-green-50 text-green-700 border border-green-200';
+                    } else {
+                        stockBadge.innerText = 'Tükendi';
+                        stockBadge.className = 'align-middle inline-block text-[12px] font-bold px-3 py-1.5 rounded-full shadow-sm bg-gray-50 text-gray-500 border border-gray-200';
+                    }
+                } else {
+                    stockBadge.classList.add('hidden');
+                }
+                
                 // Technical Specs
                 if (p.technical_specs && p.technical_specs.length > 0) {
                     document.getElementById('specsSection').classList.remove('hidden');
@@ -461,6 +503,18 @@
                             <h4 class="font-bold text-gray-900 mb-3 text-[15px]">${f.title}</h4>
                             <p class="text-gray-600 text-sm leading-relaxed">${f.description}</p>
                         </div>
+                    `).join('');
+                }
+
+                // Öne Çıkan Özellikler (Bulleted List)
+                if (p.ozellikler && p.ozellikler.length > 0) {
+                    document.getElementById('featuresListSection').classList.remove('hidden');
+                    const featuresCont = document.getElementById('featuresList');
+                    featuresCont.innerHTML = p.ozellikler.map(feat => `
+                        <li class="flex items-start gap-2.5">
+                            <i class="fa-solid fa-check text-primary mt-1 flex-shrink-0 text-sm"></i>
+                            <span>${escapeHtml(feat)}</span>
+                        </li>
                     `).join('');
                 }
 

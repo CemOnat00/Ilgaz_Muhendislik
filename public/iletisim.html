@@ -331,8 +331,8 @@
     <script>
         (function () {
             function gmapsUrl(lat, lng) {
-                // ?q=enlem,boylam — her zaman tek bir konum pini açar, yol tarifi açmaz
-                return 'https://www.google.com/maps?q=' + lat + ',' + lng;
+                // Direction format to Google Maps
+                return 'https://www.google.com/maps/dir/?api=1&destination=' + lat + ',' + lng;
             }
 
             function initMap(coordStr, address, zoom) {
