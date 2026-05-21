@@ -75,19 +75,19 @@
                 <a href="admin-messages.html" class="flex items-center justify-between px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors group">
                     <div class="flex items-center gap-3">
                         <i class="fa-solid fa-envelope w-5 text-center text-lg"></i>
-                        <span class="text-sm">Messages</span>
+                        <span class="text-sm">Mesajlar</span>
                     </div>
                     <span id="sidebar-msg-count" class="bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-full group-hover:scale-110 transition-transform">0</span>
                 </a>
                 
-                <a href="admin-projects.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors">
-                    <i class="fa-solid fa-compass-drafting w-5 text-center text-lg"></i>
-                    <span class="text-sm">Engineering Projects</span>
+                <a href="admin-reviews.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors">
+                    <i class="fa-solid fa-star w-5 text-center text-lg"></i>
+                    <span class="text-sm">Yorumlar</span>
                 </a>
 
                 <a href="admin-leads.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors">
                     <i class="fa-solid fa-user-tie w-5 text-center text-lg"></i>
-                    <span class="text-sm">Potential Customers</span>
+                    <span class="text-sm">Potansiyel Müşteriler</span>
                 </a>
             </nav>
         </div>
@@ -154,12 +154,12 @@
                     <!-- Stat 3 -->
                     <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
                         <div class="flex justify-between items-start mb-4">
-                            <div class="w-12 h-12 bg-orange-50 text-orange-500 rounded-lg flex items-center justify-center text-xl">
-                                <i class="fa-solid fa-users-gear"></i>
+                            <div class="w-12 h-12 bg-yellow-50 text-yellow-500 rounded-lg flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-star"></i>
                             </div>
-                            <span class="text-gray-500 text-sm font-bold bg-gray-100 px-2 py-1 rounded-md">Active</span>
+                            <span class="text-orange-500 text-sm font-bold bg-orange-50 px-2 py-1 rounded-md">Beklemede</span>
                         </div>
-                        <h3 class="text-gray-500 text-sm font-medium mb-1">Active Projects</h3>
+                        <h3 class="text-gray-500 text-sm font-medium mb-1">Bekleyen Yorumlar</h3>
                         <p id="stat-projects" class="text-3xl font-black text-gray-900">0</p>
                     </div>
 
@@ -324,10 +324,16 @@
                 }
             });
 
-            // Fetch Projects
-            const resProjeler = await fetch('/api/projeler');
-            const projects = (await resProjeler.json()) || [];
-            document.getElementById('stat-projects').innerText = projects.length;
+            // Bekleyen Yorumları Çek (Onay Bekleyen)
+            try {
+                const resReviews = await fetch('/api/admin/yorumlar?durum=beklemede', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (resReviews.ok) {
+                    const pendingReviews = (await resReviews.json()) || [];
+                    document.getElementById('stat-projects').innerText = pendingReviews.length;
+                }
+            } catch(e) {}
 
             // Fetch Messages (Protected)
             const resMessages = await fetch('/api/admin/mesajlar', {
@@ -434,7 +440,8 @@
         try {
             const res = await fetch('/api/admin/leads', { headers: { 'Authorization': `Bearer ${token}` } });
             if (!res.ok) return;
-            const leads = (await res.json()) || [];
+            const allLeads = (await res.json()) || [];
+            const leads = allLeads.filter(l => l.kaynak !== 'review_form');
 
             const totalEl = document.getElementById('stat-downloads');
             if (totalEl) totalEl.innerText = leads.length;

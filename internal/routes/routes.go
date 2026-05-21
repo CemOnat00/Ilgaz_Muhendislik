@@ -14,9 +14,13 @@ func SetupRoutes(r *gin.Engine) {
 		api.GET("/urunler", handlers.GetProducts)
 		api.GET("/urunler/:id", handlers.GetProductByID)
 		api.POST("/mesajlar", handlers.CreateMessage)
-		api.GET("/projeler", handlers.GetProjects)
 		api.GET("/ayarlar", handlers.GetSettings)
 		api.POST("/katalog/indir", handlers.DownloadCatalog)
+
+		// Yorum (Review) Public Endpoints
+		api.POST("/yorumlar", handlers.CreateReview)
+		api.GET("/yorumlar/:productId", handlers.GetProductReviews)
+		api.POST("/yorumlar/:id/oy", handlers.VoteHelpful)
 
 		// Admin Auth
 		api.POST("/admin/login", handlers.AdminLogin)
@@ -37,13 +41,16 @@ func SetupRoutes(r *gin.Engine) {
 			admin.PUT("/urunler/reorder", handlers.ReorderProducts)
 			admin.PUT("/urunler/:id", handlers.UpdateProduct)
 			admin.DELETE("/urunler/:id", handlers.DeleteProduct)
-			admin.POST("/projeler", handlers.AddProject)
-			admin.PUT("/projeler/reorder", handlers.ReorderProjects)
-			admin.PUT("/projeler/:id", handlers.UpdateProject)
-			admin.DELETE("/projeler/:id", handlers.DeleteProject)
 			admin.PUT("/ayarlar", handlers.UpdateSettings)
 			admin.GET("/leads", handlers.GetLeads)
 			admin.DELETE("/leads/:id", handlers.DeleteLead)
+
+			// Yorum (Review) Admin Endpoints
+			admin.GET("/yorumlar", handlers.GetAllReviews)
+			admin.PUT("/yorumlar/:id/onayla", handlers.ApproveReview)
+			admin.PUT("/yorumlar/:id/yanit", handlers.ReplyReview)
+			admin.DELETE("/yorumlar/:id", handlers.DeleteReview)
 		}
 	}
 }
+

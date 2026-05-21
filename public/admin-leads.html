@@ -70,20 +70,20 @@
                 <a href="admin-messages.html" class="flex items-center justify-between px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors group">
                     <div class="flex items-center gap-3">
                         <i class="fa-solid fa-envelope w-5 text-center text-lg"></i>
-                        <span class="text-sm">Messages</span>
+                        <span class="text-sm">Mesajlar</span>
                     </div>
                     <span id="sidebar-msg-count" class="bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-full group-hover:scale-110 transition-transform">0</span>
                 </a>
 
-                <a href="admin-projects.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors">
-                    <i class="fa-solid fa-compass-drafting w-5 text-center text-lg"></i>
-                    <span class="text-sm">Engineering Projects</span>
+                <a href="admin-reviews.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors">
+                    <i class="fa-solid fa-star w-5 text-center text-lg"></i>
+                    <span class="text-sm">Yorumlar</span>
                 </a>
 
                 <!-- Active Item -->
                 <a href="admin-leads.html" class="flex items-center gap-3 px-4 py-3 bg-primary text-white font-semibold rounded-lg shadow-md shadow-red-500/20 transition-colors">
                     <i class="fa-solid fa-user-tie w-5 text-center text-lg"></i>
-                    <span class="text-sm">Potential Customers</span>
+                    <span class="text-sm">Potansiyel Müşteriler</span>
                 </a>
             </nav>
         </div>
@@ -112,7 +112,7 @@
 
                 <div class="mb-8">
                     <h2 class="text-3xl font-black text-gray-900 tracking-tight mb-2">Potansiyel Müşteriler</h2>
-                    <p class="text-gray-500 text-lg">Katalog indiren ziyaretçiler — kim, neyi, ne zaman indirdi.</p>
+                    <p class="text-gray-500 text-lg">Katalog indiren veya yorum bırakan ziyaretçilerin iletişim bilgileri.</p>
                 </div>
 
                 <!-- Stat Cards -->
@@ -123,32 +123,32 @@
                                 <i class="fa-solid fa-file-arrow-down"></i>
                             </div>
                         </div>
-                        <h3 class="text-gray-500 text-sm font-medium mb-1">Toplam İndirme</h3>
-                        <p id="stat-total" class="text-3xl font-black text-gray-900">0</p>
+                        <h3 class="text-gray-500 text-sm font-medium mb-1">Toplam Katalog İndirme</h3>
+                        <p id="stat-downloads" class="text-3xl font-black text-gray-900">0</p>
+                    </div>
+                    <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-12 h-12 bg-yellow-50 text-yellow-500 rounded-lg flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-star"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-gray-500 text-sm font-medium mb-1">Toplam Yorum Bırakan</h3>
+                        <p id="stat-reviews" class="text-3xl font-black text-gray-900">0</p>
                     </div>
                     <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
                         <div class="flex justify-between items-start mb-4">
                             <div class="w-12 h-12 bg-blue-50 text-blue-500 rounded-lg flex items-center justify-center text-xl">
-                                <i class="fa-solid fa-calendar-week"></i>
+                                <i class="fa-solid fa-users"></i>
                             </div>
                         </div>
-                        <h3 class="text-gray-500 text-sm font-medium mb-1">Bu Hafta</h3>
-                        <p id="stat-week" class="text-3xl font-black text-gray-900">0</p>
-                    </div>
-                    <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="w-12 h-12 bg-orange-50 text-orange-500 rounded-lg flex items-center justify-center text-xl">
-                                <i class="fa-solid fa-clock"></i>
-                            </div>
-                        </div>
-                        <h3 class="text-gray-500 text-sm font-medium mb-1">Bugün</h3>
-                        <p id="stat-today" class="text-3xl font-black text-gray-900">0</p>
+                        <h3 class="text-gray-500 text-sm font-medium mb-1">Toplam Potansiyel Müşteri</h3>
+                        <p id="stat-total" class="text-3xl font-black text-gray-900">0</p>
                     </div>
                 </div>
 
                 <!-- Chart -->
                 <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm mb-8 min-h-[280px] flex flex-col">
-                    <h3 class="text-gray-900 font-bold mb-6">Son 7 Gün — Katalog İndirmeleri</h3>
+                    <h3 class="text-gray-900 font-bold mb-6">Son 7 Gün — Yeni Potansiyel Müşteriler</h3>
                     <div class="flex-grow w-full relative" style="min-height:200px">
                         <canvas id="downloadsChart"></canvas>
                     </div>
@@ -167,7 +167,7 @@
                                     <th scope="col" class="px-6 py-4">Müşteri</th>
                                     <th scope="col" class="px-6 py-4">Telefon</th>
                                     <th scope="col" class="px-6 py-4">E-posta</th>
-                                    <th scope="col" class="px-6 py-4">İndirilen Katalog</th>
+                                    <th scope="col" class="px-6 py-4">Kaynak / Detay</th>
                                     <th scope="col" class="px-6 py-4">Tarih</th>
                                     <th scope="col" class="px-6 py-4 text-right">İşlem</th>
                                 </tr>
@@ -216,11 +216,12 @@
             const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
             const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
+            const downloads = leads.filter(l => l.kaynak === 'catalog_download' || !l.kaynak);
+            const reviews = leads.filter(l => l.kaynak === 'review_form');
+
+            document.getElementById('stat-downloads').innerText = downloads.length;
+            document.getElementById('stat-reviews').innerText = reviews.length;
             document.getElementById('stat-total').innerText = leads.length;
-            document.getElementById('stat-week').innerText =
-                leads.filter(l => new Date(l.created_at) > weekAgo).length;
-            document.getElementById('stat-today').innerText =
-                leads.filter(l => new Date(l.created_at) >= startOfToday).length;
             document.getElementById('row-count').innerText = leads.length;
         }
 
@@ -271,6 +272,13 @@
                 const initial = (l.ad_soyad || '?').trim().charAt(0).toUpperCase();
                 const date = new Date(l.created_at);
                 const dateStr = date.toLocaleDateString('tr-TR') + ' ' + date.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+                let sourceBadge = '';
+                if (l.kaynak === 'review_form') {
+                     sourceBadge = `<span class="bg-yellow-50 text-yellow-600 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Yorum</span>`;
+                } else {
+                     sourceBadge = `<span class="bg-gray-100 text-gray-700 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Katalog: ${escapeHtml(l.kategori || 'Genel')}</span>`;
+                }
+
                 return `
                 <tr class="hover:bg-gray-50 transition-colors">
                     <td class="px-6 py-4 whitespace-nowrap">
@@ -282,7 +290,7 @@
                     <td class="px-6 py-4 whitespace-nowrap text-gray-600">${escapeHtml(l.telefon)}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-gray-600">${escapeHtml(l.email)}</td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="bg-gray-100 text-gray-700 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">${escapeHtml(l.kategori || 'Genel')}</span>
+                        ${sourceBadge}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-gray-400 text-xs font-medium">${escapeHtml(dateStr)}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-right">

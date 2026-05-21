@@ -56,19 +56,54 @@ type Message struct {
 	Tarih     time.Time          `json:"tarih" bson:"-"`             // JSON duplicate for frontend
 }
 
-// Project (Proje) Model
-type Project struct {
+// Review (Ürün Değerlendirmesi) Modeli
+type Review struct {
 	ID          bson.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
-	Title       string             `json:"title" bson:"title"`
-	Customer    string             `json:"customer" bson:"customer"`
-	Category    string             `json:"category" bson:"category"`
-	SubTitle    string             `json:"subtitle" bson:"subtitle"`
-	Progress    int                `json:"progress" bson:"progress"`
-	Status      string             `json:"status" bson:"status"` // In Progress, Completed
-	Description string             `json:"description" bson:"description"`
-	ImageURL    string             `json:"image_url" bson:"image_url"`
-	Order       int                `json:"order" bson:"order"`
-	Date        time.Time          `json:"date" bson:"date"`
+	ProductID   bson.ObjectID `json:"product_id" bson:"product_id"`       // hangi ürüne ait
+	ProductName string        `json:"product_name" bson:"product_name"`   // denormalized — admin listesi kolaylığı
+	Name        string        `json:"ad_soyad" bson:"name"`
+	Phone       string        `json:"-" bson:"phone"`                     // JSON'da gizli — sadece admin görür
+	Email       string        `json:"-" bson:"email"`                     // JSON'da gizli — sadece admin görür
+	Rating      int           `json:"rating" bson:"rating"`               // 1-5 arası
+	Content     string        `json:"content" bson:"content"`
+	IsApproved  bool          `json:"is_approved" bson:"is_approved"`     // false = beklemede
+	AdminReply  string        `json:"admin_reply" bson:"admin_reply"`     // boş = yanıt yok
+	HelpfulYes  int           `json:"helpful_yes" bson:"helpful_yes"`
+	HelpfulNo   int           `json:"helpful_no" bson:"helpful_no"`
+	VoterIPs    []string      `json:"-" bson:"voter_ips"`                 // IP tekrar oy koruması
+	IPAddress   string        `json:"-" bson:"ip_address"`               // gönderenin IP'si
+	CreatedAt   time.Time     `json:"created_at" bson:"created_at"`
+	UpdatedAt   time.Time     `json:"updated_at" bson:"updated_at"`
+}
+
+// PublicReview — Müşteri tarafına gönderilecek, hassas alanları maskeli response struct
+type PublicReview struct {
+	ID         string    `json:"id"`
+	MaskedName string    `json:"ad_soyad"`     // "A*** Y***" formatı
+	Rating     int       `json:"rating"`
+	Content    string    `json:"content"`
+	AdminReply string    `json:"admin_reply"`
+	HelpfulYes int       `json:"helpful_yes"`
+	HelpfulNo  int       `json:"helpful_no"`
+	CreatedAt  time.Time `json:"created_at"`
+	HasVoted   bool      `json:"has_voted"`    // bu IP oy verdi mi? (handler'da set edilir)
+}
+
+// AdminReview — Admin paneline gönderilecek, tüm alanları görünür response struct
+type AdminReview struct {
+	ID          string    `json:"id"`
+	ProductID   string    `json:"product_id"`
+	ProductName string    `json:"product_name"`
+	Name        string    `json:"ad_soyad"`
+	Phone       string    `json:"telefon"`
+	Email       string    `json:"email"`
+	Rating      int       `json:"rating"`
+	Content     string    `json:"content"`
+	IsApproved  bool      `json:"is_approved"`
+	AdminReply  string    `json:"admin_reply"`
+	HelpfulYes  int       `json:"helpful_yes"`
+	HelpfulNo   int       `json:"helpful_no"`
+	CreatedAt   time.Time `json:"created_at"`
 }
 
 // Admin Model
@@ -112,14 +147,14 @@ type SiteSettings struct {
 	MapZoom      int           `json:"harita_zoom" bson:"map_zoom"`
 }
 
-// Lead (Potansiyel Müşteri) — katalog indirme formundan toplanan iletişim bilgisi.
-// Her kayıt aynı zamanda bir indirme olayını temsil eder.
+// Lead (Potansiyel Müşteri) — katalog indirme ve yorum formundan toplanan iletişim bilgisi.
 type Lead struct {
 	ID        bson.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
 	Name      string        `json:"ad_soyad" bson:"name"`
 	Phone     string        `json:"telefon" bson:"phone"`
 	Email     string        `json:"email" bson:"email"`
-	Category  string        `json:"kategori" bson:"category"` // İndirilen katalog ("Genel" = tüm ürünler)
+	Category  string        `json:"kategori" bson:"category"`  // İndirilen katalog ("Genel" = tüm ürünler)
+	Source    string        `json:"kaynak" bson:"source"`      // "catalog_download" | "review_form"
 	IPAddress string        `json:"ip_adresi" bson:"ip_address"`
 	CreatedAt time.Time     `json:"created_at" bson:"created_at"`
 }

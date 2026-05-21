@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yorumlar - Ilgaz Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            corePlugins: { preflight: false },
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#d63031',
+                        'primary-hover': '#b02626',
+                        'primary-light': '#fee2e2',
+                        'dark-navy': '#151b2b',
+                        'text-dark': '#1f2937'
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        *, ::before, ::after { box-sizing: border-box; border-width: 0; border-style: solid; border-color: #e5e7eb; }
+        body { margin: 0; font-family: 'Inter', sans-serif; background-color: #f8f9fa; color: #1f2937; }
+        .border { border-width: 1px; }
+        .border-b { border-bottom-width: 1px; }
+        .border-t { border-top-width: 1px; }
+        .border-r { border-right-width: 1px; }
+    </style>
+</head>
+
+<body class="flex h-screen overflow-hidden selection:bg-primary selection:text-white">
+
+    <!-- Sidebar -->
+    <aside class="w-[260px] bg-white border-r border-gray-200 flex flex-col justify-between flex-shrink-0 relative z-20">
+        <div>
+            <!-- Logo -->
+            <div class="h-20 px-6 flex items-center border-b border-gray-100">
+                <a href="admin-dashboard.html" class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white shadow-sm">
+                        <i class="fa-solid fa-industry text-sm"></i>
+                    </div>
+                    <div class="flex flex-col leading-none justify-center">
+                        <span class="font-bold text-[15px] text-gray-900">Ilgaz Mühendislik</span>
+                        <span class="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mt-0.5">Admin Panel</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Menu -->
+            <nav class="p-4 flex flex-col gap-1.5 mt-2">
+                <a href="admin-dashboard.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors">
+                    <i class="fa-solid fa-border-all w-5 text-center text-lg"></i>
+                    <span class="text-sm">Dashboard</span>
+                </a>
+
+                <a href="admin-products.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors">
+                    <i class="fa-solid fa-box w-5 text-center text-lg"></i>
+                    <span class="text-sm">Ürünler</span>
+                </a>
+
+                <a href="admin-messages.html" class="flex items-center justify-between px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors group">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-envelope w-5 text-center text-lg"></i>
+                        <span class="text-sm">Mesajlar</span>
+                    </div>
+                    <span id="sidebar-msg-count" class="bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-full group-hover:scale-110 transition-transform">0</span>
+                </a>
+
+                <!-- Active Item -->
+                <a href="admin-reviews.html" class="flex items-center justify-between px-4 py-3 bg-primary text-white font-semibold rounded-lg shadow-md shadow-red-500/20 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-star w-5 text-center text-lg"></i>
+                        <span class="text-sm">Yorumlar</span>
+                    </div>
+                    <span id="sidebar-pending-count" class="bg-white text-primary text-[10px] font-bold px-2 py-0.5 rounded-full">0</span>
+                </a>
+
+                <a href="admin-leads.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors">
+                    <i class="fa-solid fa-user-tie w-5 text-center text-lg"></i>
+                    <span class="text-sm">Potansiyel Müşteriler</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Bottom Actions -->
+        <div class="p-4 border-t border-gray-100 flex flex-col gap-2">
+            <a href="admin-settings.html" class="flex items-center gap-3 px-4 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium rounded-lg transition-colors">
+                <i class="fa-solid fa-gear w-5 text-center"></i>
+                <span class="text-sm">Ayarlar</span>
+            </a>
+            <a href="admin-login.html" id="logoutBtn" class="flex items-center gap-3 px-4 py-2.5 text-gray-500 hover:bg-red-50 hover:text-primary font-medium rounded-lg transition-colors mt-2">
+                <i class="fa-solid fa-arrow-right-from-bracket w-5 text-center"></i>
+                <span class="text-sm">Çıkış</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Wrapper -->
+    <div class="flex-grow flex flex-col overflow-hidden relative">
+
+        <!-- Header -->
+        <header class="h-20 bg-white border-b border-gray-200 px-8 flex items-center justify-between flex-shrink-0">
+            <h1 class="text-lg font-bold text-gray-900">Yorum Yönetimi</h1>
+            <!-- Filtre Tabları -->
+            <div class="flex items-center gap-2">
+                <button data-filter="all" onclick="setFilter('all')" class="filter-tab px-4 py-2 text-sm font-bold rounded-lg transition-all bg-primary text-white shadow-sm">
+                    Tümü
+                </button>
+                <button data-filter="beklemede" onclick="setFilter('beklemede')" class="filter-tab px-4 py-2 text-sm font-bold rounded-lg transition-all text-gray-600 hover:bg-gray-100">
+                    Beklemede
+                </button>
+                <button data-filter="onaylanmis" onclick="setFilter('onaylanmis')" class="filter-tab px-4 py-2 text-sm font-bold rounded-lg transition-all text-gray-600 hover:bg-gray-100">
+                    Onaylı
+                </button>
+            </div>
+        </header>
+
+        <!-- Scrollable Content -->
+        <main class="flex-grow overflow-y-auto p-8">
+            <div class="max-w-[1100px] mx-auto">
+
+                <!-- Page Header -->
+                <div class="flex justify-between items-start mb-8">
+                    <div>
+                        <h2 class="text-3xl font-black text-gray-900 tracking-tight mb-2">Müşteri Yorumları</h2>
+                        <p class="text-gray-500">Bekleyen yorumları onaylayın, yanıtlayın veya silin.</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="bg-orange-50 border border-orange-100 rounded-xl px-4 py-2.5 text-center">
+                            <p class="text-2xl font-black text-orange-500" id="pendingCountBig">0</p>
+                            <p class="text-xs text-orange-400 font-semibold mt-0.5">Beklemede</p>
+                        </div>
+                        <div class="bg-green-50 border border-green-100 rounded-xl px-4 py-2.5 text-center">
+                            <p class="text-2xl font-black text-green-500" id="approvedCountBig">0</p>
+                            <p class="text-xs text-green-400 font-semibold mt-0.5">Onaylı</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Yükleniyor -->
+                <div id="loadingState" class="text-center py-20 text-gray-400">
+                    <i class="fa-solid fa-spinner fa-spin text-4xl mb-4 block"></i>
+                    <p class="font-semibold">Yorumlar yükleniyor...</p>
+                </div>
+
+                <!-- Boş Durum -->
+                <div id="emptyState" class="hidden text-center py-20 text-gray-400">
+                    <i class="fa-regular fa-star text-5xl mb-4 block"></i>
+                    <p class="font-semibold text-lg">Bu filtrede yorum bulunmuyor.</p>
+                </div>
+
+                <!-- Yorum Listesi -->
+                <div id="reviewsContainer" class="flex flex-col gap-5 hidden"></div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Yanıt Modal -->
+    <div id="replyModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
+            <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h3 class="text-xl font-black text-gray-900">Yoruma Yanıt Ver</h3>
+                <button onclick="closeReplyModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            <div class="p-8">
+                <p class="text-sm text-gray-500 mb-4">Yanıtınız, kullanıcı yorumunun altında <strong class="text-primary">"Ilgaz Mühendislik Yanıtı"</strong> olarak gösterilecektir.</p>
+                <input type="hidden" id="replyReviewId">
+                <textarea id="replyText" rows="5" placeholder="Yanıtınızı buraya yazın..."
+                    class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-3 outline-none resize-none mb-6"></textarea>
+                <div id="replyMsg" class="hidden text-sm font-medium mb-4 rounded-lg px-4 py-2"></div>
+                <div class="flex gap-3">
+                    <button onclick="closeReplyModal()" class="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold rounded-xl transition-all">İptal</button>
+                    <button onclick="submitReply()" class="flex-1 py-3 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl shadow-md shadow-red-500/20 transition-all">
+                        <i class="fa-solid fa-paper-plane mr-2"></i>Yanıtı Kaydet
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Silme Onay Modal -->
+    <div id="deleteModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[110] hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden">
+            <div class="p-8 text-center">
+                <div class="w-16 h-16 bg-red-50 text-primary rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
+                    <i class="fa-solid fa-trash-can"></i>
+                </div>
+                <h3 class="text-xl font-black text-gray-900 mb-2">Yorum Silinsin mi?</h3>
+                <p class="text-gray-500 text-sm mb-8">Bu yorum kalıcı olarak silinecek. Bu işlem geri alınamaz.</p>
+                <div class="flex flex-col gap-3">
+                    <button id="confirmDeleteBtn" class="w-full py-3 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl transition-all shadow-md shadow-red-500/20">Evet, Sil</button>
+                    <button onclick="closeDeleteModal()" class="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold rounded-xl transition-all">İptal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allReviews = [];
+        let currentFilter = 'all';
+        let deleteTargetId = null;
+        const token = localStorage.getItem('adminToken');
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!token) { window.location.href = 'admin-login.html'; return; }
+            loadReviews();
+            updateSidebarCounts();
+        });
+
+        document.getElementById('logoutBtn').onclick = (e) => {
+            e.preventDefault();
+            localStorage.removeItem('adminToken');
+            window.location.href = 'admin-login.html';
+        };
+
+        async function updateSidebarCounts() {
+            try {
+                const [msgsRes, reviewsRes] = await Promise.all([
+                    fetch('/api/admin/mesajlar', { headers: { 'Authorization': `Bearer ${token}` } }),
+                    fetch('/api/admin/yorumlar', { headers: { 'Authorization': `Bearer ${token}` } })
+                ]);
+                if (msgsRes.ok) {
+                    const msgs = await msgsRes.json();
+                    const unread = msgs.filter(m => !m.okundu_mu).length;
+                    document.getElementById('sidebar-msg-count').innerText = unread;
+                }
+                if (reviewsRes.ok) {
+                    const reviews = await reviewsRes.json();
+                    const pending = reviews.filter(r => !r.is_approved).length;
+                    document.getElementById('sidebar-pending-count').innerText = pending;
+                }
+            } catch {}
+        }
+
+        async function loadReviews() {
+            try {
+                document.getElementById('loadingState').classList.remove('hidden');
+                document.getElementById('reviewsContainer').classList.add('hidden');
+                document.getElementById('emptyState').classList.add('hidden');
+
+                const res = await fetch('/api/admin/yorumlar', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.status === 401) { window.location.href = 'admin-login.html'; return; }
+                if (!res.ok) throw new Error('Yorumlar alınamadı');
+
+                allReviews = await res.json() || [];
+
+                const pending = allReviews.filter(r => !r.is_approved).length;
+                const approved = allReviews.filter(r => r.is_approved).length;
+                document.getElementById('pendingCountBig').innerText = pending;
+                document.getElementById('approvedCountBig').innerText = approved;
+                document.getElementById('sidebar-pending-count').innerText = pending;
+
+                renderReviews();
+            } catch (e) {
+                console.error(e);
+            } finally {
+                document.getElementById('loadingState').classList.add('hidden');
+            }
+        }
+
+        function setFilter(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-tab').forEach(btn => {
+                const active = btn.dataset.filter === filter;
+                btn.className = `filter-tab px-4 py-2 text-sm font-bold rounded-lg transition-all ${active
+                    ? 'bg-primary text-white shadow-sm'
+                    : 'text-gray-600 hover:bg-gray-100'}`;
+            });
+            renderReviews();
+        }
+
+        function renderStars(rating) {
+            let html = '';
+            for (let i = 1; i <= 5; i++) {
+                html += `<span class="${i <= rating ? 'text-yellow-400' : 'text-gray-200'}">★</span>`;
+            }
+            return html;
+        }
+
+        function formatDate(dateStr) {
+            return new Date(dateStr).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        }
+
+        function renderReviews() {
+            const filtered = currentFilter === 'all' ? allReviews
+                : currentFilter === 'beklemede' ? allReviews.filter(r => !r.is_approved)
+                : allReviews.filter(r => r.is_approved);
+
+            const container = document.getElementById('reviewsContainer');
+            const emptyState = document.getElementById('emptyState');
+
+            if (filtered.length === 0) {
+                container.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            emptyState.classList.add('hidden');
+            container.classList.remove('hidden');
+
+            container.innerHTML = filtered.map(r => {
+                const statusBadge = r.is_approved
+                    ? `<span class="bg-green-50 text-green-600 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider border border-green-100">Onaylı</span>`
+                    : `<span class="bg-orange-50 text-orange-500 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider border border-orange-100">Beklemede</span>`;
+
+                const adminReplySection = r.admin_reply
+                    ? `<div class="mt-3 bg-red-50 border border-red-100 rounded-xl p-3">
+                            <p class="text-[10px] font-black text-primary uppercase tracking-widest mb-1">Mevcut Yanıt</p>
+                            <p class="text-sm text-gray-700">${r.admin_reply}</p>
+                       </div>`
+                    : '';
+
+                return `
+                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" id="review-card-${r.id}">
+                        <!-- Kart Başlık -->
+                        <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex flex-wrap items-center justify-between gap-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 bg-red-50 text-primary rounded-full flex items-center justify-center font-black text-sm shrink-0">
+                                    ${r.ad_soyad ? r.ad_soyad[0] : '?'}
+                                </div>
+                                <div>
+                                    <p class="font-bold text-gray-900 text-sm">${r.ad_soyad || 'Anonim'}</p>
+                                    <p class="text-xs text-gray-400">${r.email || ''} ${r.telefon ? '· ' + r.telefon : ''}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="text-base">${renderStars(r.rating)}</div>
+                                ${statusBadge}
+                                <span class="text-xs text-gray-400 font-medium">${formatDate(r.created_at)}</span>
+                            </div>
+                        </div>
+
+                        <!-- İçerik -->
+                        <div class="px-6 py-5">
+                            <p class="text-xs text-gray-400 font-semibold uppercase tracking-wide mb-1">${r.product_name || 'Ürün'}</p>
+                            <p class="text-gray-700 text-[15px] leading-relaxed mb-1">${r.content}</p>
+                            ${adminReplySection}
+
+                            <!-- Faydalı oy sayısı -->
+                            <div class="flex items-center gap-4 mt-3 text-xs text-gray-400 font-medium">
+                                <span><i class="fa-regular fa-thumbs-up mr-1 text-green-400"></i>${r.helpful_yes} faydalı</span>
+                                <span><i class="fa-regular fa-thumbs-down mr-1 text-red-400"></i>${r.helpful_no} faydasız</span>
+                            </div>
+                        </div>
+
+                        <!-- Aksiyonlar -->
+                        <div class="px-6 py-4 border-t border-gray-100 flex flex-wrap items-center gap-3">
+                            ${!r.is_approved ? `
+                            <button onclick="approveReview('${r.id}')"
+                                class="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-sm font-bold rounded-lg transition-all shadow-sm shadow-green-500/20">
+                                <i class="fa-solid fa-check"></i> Onayla & Yayınla
+                            </button>` : ''}
+                            <button onclick="openReplyModal('${r.id}')"
+                                class="flex items-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 text-sm font-bold rounded-lg transition-all border border-blue-100">
+                                <i class="fa-solid fa-reply"></i> ${r.admin_reply ? 'Yanıtı Güncelle' : 'Yanıtla'}
+                            </button>
+                            <button onclick="confirmDelete('${r.id}')"
+                                class="flex items-center gap-2 px-4 py-2 bg-red-50 hover:bg-primary hover:text-white text-primary text-sm font-bold rounded-lg transition-all border border-red-100">
+                                <i class="fa-solid fa-trash-can"></i> Sil
+                            </button>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        async function approveReview(id) {
+            try {
+                const res = await fetch(`/api/admin/yorumlar/${id}/onayla`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const r = allReviews.find(x => x.id === id);
+                    if (r) r.is_approved = true;
+                    const pending = allReviews.filter(x => !x.is_approved).length;
+                    const approved = allReviews.filter(x => x.is_approved).length;
+                    document.getElementById('pendingCountBig').innerText = pending;
+                    document.getElementById('approvedCountBig').innerText = approved;
+                    document.getElementById('sidebar-pending-count').innerText = pending;
+                    renderReviews();
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        function openReplyModal(id) {
+            const r = allReviews.find(x => x.id === id);
+            document.getElementById('replyReviewId').value = id;
+            document.getElementById('replyText').value = r?.admin_reply || '';
+            document.getElementById('replyMsg').classList.add('hidden');
+            document.getElementById('replyModal').classList.remove('hidden');
+            document.getElementById('replyModal').classList.add('flex');
+        }
+
+        function closeReplyModal() {
+            document.getElementById('replyModal').classList.add('hidden');
+            document.getElementById('replyModal').classList.remove('flex');
+        }
+
+        async function submitReply() {
+            const id = document.getElementById('replyReviewId').value;
+            const reply = document.getElementById('replyText').value.trim();
+            const msgEl = document.getElementById('replyMsg');
+
+            if (!reply) {
+                msgEl.className = 'text-sm font-medium mb-4 rounded-lg px-4 py-2 bg-red-50 text-primary border border-red-100';
+                msgEl.innerText = 'Yanıt metni boş bırakılamaz.';
+                msgEl.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/admin/yorumlar/${id}/yanit`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ yanit: reply })
+                });
+                if (res.ok) {
+                    const r = allReviews.find(x => x.id === id);
+                    if (r) r.admin_reply = reply;
+                    closeReplyModal();
+                    renderReviews();
+                } else {
+                    const data = await res.json();
+                    msgEl.className = 'text-sm font-medium mb-4 rounded-lg px-4 py-2 bg-red-50 text-primary border border-red-100';
+                    msgEl.innerText = data.error || 'Yanıt kaydedilemedi.';
+                    msgEl.classList.remove('hidden');
+                }
+            } catch { }
+        }
+
+        function confirmDelete(id) {
+            deleteTargetId = id;
+            document.getElementById('deleteModal').classList.remove('hidden');
+            document.getElementById('deleteModal').classList.add('flex');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.add('hidden');
+            document.getElementById('deleteModal').classList.remove('flex');
+            deleteTargetId = null;
+        }
+
+        document.getElementById('confirmDeleteBtn').onclick = async () => {
+            if (!deleteTargetId) return;
+            try {
+                const res = await fetch(`/api/admin/yorumlar/${deleteTargetId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    allReviews = allReviews.filter(r => r.id !== deleteTargetId);
+                    const pending = allReviews.filter(r => !r.is_approved).length;
+                    const approved = allReviews.filter(r => r.is_approved).length;
+                    document.getElementById('pendingCountBig').innerText = pending;
+                    document.getElementById('approvedCountBig').innerText = approved;
+                    document.getElementById('sidebar-pending-count').innerText = pending;
+                    closeDeleteModal();
+                    renderReviews();
+                }
+            } catch (e) { console.error(e); }
+        };
+    </script>
+</body>
+
+</html>

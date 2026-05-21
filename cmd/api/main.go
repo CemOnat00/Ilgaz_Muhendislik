@@ -56,7 +56,7 @@ func main() {
 	r.StaticFile("/admin-dashboard.html", "./public/admin-dashboard.html")
 	r.StaticFile("/admin-products.html", "./public/admin-products.html")
 	r.StaticFile("/admin-messages.html", "./public/admin-messages.html")
-	r.StaticFile("/admin-projects.html", "./public/admin-projects.html")
+	r.StaticFile("/admin-reviews.html", "./public/admin-reviews.html")
 	r.StaticFile("/admin-settings.html", "./public/admin-settings.html")
 	r.StaticFile("/admin-leads.html", "./public/admin-leads.html")
 
